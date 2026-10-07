@@ -310,7 +310,13 @@ a.btn.primary{color:var(--on-ink)}
 .prop-sum div{padding:12px 14px;border-radius:12px;background:var(--hair)}
 .prop-sum span{display:block;font-size:12px;color:var(--muted)}
 .prop-sum b{font-size:16px}
-.prop-txt{grid-column:1/-1;margin:0;padding:14px;border-radius:12px;background:var(--hair);font:inherit;font-size:14px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;max-height:55vh;overflow:auto}
+.prop-txt{grid-column:1/-1;margin:0;padding:14px 16px;border-radius:12px;background:var(--hair);font-size:14px;line-height:1.55;overflow-wrap:anywhere;max-height:55vh;overflow:auto}
+.prop-txt p,.prop-txt ul{margin:0 0 8px}
+.prop-txt ul{padding-left:20px}
+.prop-txt h4{margin:16px 0 8px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.prop-txt h4:first-child{margin-top:0}
+.prop-txt table{border-collapse:collapse;margin:0 0 10px;width:100%}
+.prop-txt td,.prop-txt th{border-bottom:1px solid var(--stroke);padding:6px 8px;text-align:left;vertical-align:top}
 .creds-box pre{margin:0 0 12px;padding:14px;border-radius:12px;background:var(--hair);font-family:var(--mono);font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere;user-select:all}
 @media (max-width:820px){.cred{grid-template-columns:1fr}}
 /* ---- acceso ---- */
@@ -1145,6 +1151,24 @@ function wireProp(c){
   });
 }
 function pintarProp(c){const box=document.getElementById('prop-box');if(box){box.outerHTML=propBox(c);wireProp(c)}}
+// Markdown sencillo de Claude (negritas, cursivas, listas, tablas, títulos) a HTML seguro.
+function mdBasico(t){
+  const inl=x=>esc(x).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(^|[^*])\*(?!\s)(.+?)\*/g,'$1<i>$2</i>');
+  const out=[];let lista=null,tabla=null;
+  const cerrar=()=>{if(lista){out.push('<ul>'+lista.join('')+'</ul>');lista=null}if(tabla){out.push('<table>'+tabla.join('')+'</table>');tabla=null}};
+  for(const l of String(t||'').split('\n')){
+    const s=l.trim();
+    if(/^\|.*\|$/.test(s)){if(/^\|[\s:|-]+\|$/.test(s))continue;if(lista){out.push('<ul>'+lista.join('')+'</ul>');lista=null}
+      const cel=s.slice(1,-1).split('|').map(x=>x.trim());tabla=tabla||[];const tag=tabla.length?'td':'th';
+      tabla.push('<tr>'+cel.map(x=>`<${tag}>${inl(x)}</${tag}>`).join('')+'</tr>');continue}
+    if(/^[-*•]\s+/.test(s)){if(tabla){out.push('<table>'+tabla.join('')+'</table>');tabla=null}(lista=lista||[]).push('<li>'+inl(s.replace(/^[-*•]\s+/,''))+'</li>');continue}
+    cerrar();
+    if(!s||/^[─—=_-]{3,}$/.test(s))continue;
+    const h=s.match(/^#{1,6}\s+(.*)$/)||s.match(/^(\d+\.\s+[A-ZÁÉÍÓÚÑ ]{4,})$/);
+    out.push(h?`<h4>${inl(h[1])}</h4>`:`<p>${inl(s)}</p>`);
+  }
+  cerrar();return out.join('');
+}
 function verPropuesta(c){
   const p=propDe(c.id),pr=(p.datos&&p.datos.pricing)||{};
   const caja=(l,v)=>v?`<div><span>${l}</span><b>${esc(v)}</b></div>`:'';
@@ -1152,7 +1176,7 @@ function verPropuesta(c){
     caja('Mantenimiento',pr.monthly_maintenance_mxn?money(pr.monthly_maintenance_mxn)+'/mes':'')+caja('Nivel',pr.project_level);
   modal(`Propuesta · ${c.empresa||''}`,`${sum?`<div class="prop-sum">${sum}</div>`:''}
     ${p.incompleta?'<p class="prop-err" style="grid-column:1/-1">La respuesta de Claude quedó cortada; conviene volver a generarla.</p>':''}
-    <pre class="prop-txt" id="prop-txt">${esc(p.texto)}</pre>
+    <div class="prop-txt" id="prop-txt">${mdBasico(p.texto)}</div>
     <div style="grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn btn-sm" id="prop-copy">Copiar texto</button>
     ${p.datos?`<a class="btn btn-sm" href="propuesta.html?id=${encodeURIComponent(c.id)}" target="_blank" rel="noopener">Abrir presentación</a>`:''}</div>`,
     {onSubmit:async()=>{},submitLabel:'Cerrar'});
