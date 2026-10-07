@@ -5,3 +5,5 @@ supabase/.temp/
 supabase/.branches/
 node_modules/
 .netlify/
+# ZIPs para subir a Netlify a mano (se generan desde web/ y encuesta/)
+para-netlify/
