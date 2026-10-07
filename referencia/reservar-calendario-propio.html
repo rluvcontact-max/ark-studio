@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agenda tu llamada · ARK</title>
+<meta name="color-scheme" content="light">
+<link rel="icon" type="image/png" href="/favicon-64.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+/* Reserva de llamada: se ve dentro del recuadro blanco de la encuesta (iframe) y también sola */
+:root{--bg:#ffffff;--ink:#0d1220;--ink-2:#4a5368;--ink-3:#8790a3;--line:rgba(13,18,32,.09);--soft:#f3f5fa;--accent:#2f6bff;--sel:rgba(47,107,255,.10);--ok:#22c55e;--err:#d6336c}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:"Inter",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;-webkit-font-smoothing:antialiased;letter-spacing:-.011em}
+.wrap{max-width:560px;margin:0 auto;padding:20px 16px 24px;display:flex;flex-direction:column;gap:18px}
+.host{display:flex;align-items:center;gap:14px}
+.av{width:52px;height:52px;border-radius:50%;flex:none;overflow:hidden;display:grid;place-items:center;font-weight:700;background:linear-gradient(135deg,#9db8ff,#ffc2dc)}
+.av img{width:100%;height:100%;object-fit:cover}
+.host h1{font-size:18px;font-weight:650;letter-spacing:-.02em;line-height:1.25}
+.host p{font-size:13.5px;color:var(--ink-2);margin-top:2px;line-height:1.4}
+.lbl{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3)}
+.days{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.day{flex:none;scroll-snap-align:start;width:64px;padding:10px 0;border-radius:16px;border:1px solid var(--line);background:var(--soft);cursor:pointer;font:inherit;color:var(--ink);display:flex;flex-direction:column;align-items:center;gap:2px;transition:background .15s,border-color .15s}
+.day small{font-size:11.5px;color:var(--ink-3);text-transform:capitalize}
+.day b{font-size:19px;font-weight:650;font-variant-numeric:tabular-nums}
+.day span{font-size:11px;color:var(--ink-3);text-transform:capitalize}
+.day[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.day[aria-pressed="true"] small,.day[aria-pressed="true"] span{color:rgba(255,255,255,.7)}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
+.slot{padding:12px 0;border-radius:12px;border:1px solid var(--line);background:#fff;font:inherit;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;cursor:pointer;color:var(--ink);transition:all .15s}
+.slot:hover{border-color:var(--accent)}
+.slot[aria-pressed="true"]{background:var(--sel);border-color:var(--accent);color:var(--accent)}
+.fields{display:grid;gap:10px}
+.fields label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:500;color:var(--ink-2)}
+.fields input{font:inherit;font-size:16px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--soft);color:var(--ink);outline:none}
+.fields input:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--sel)}
+.btn{width:100%;padding:15px 20px;border-radius:99px;border:0;background:var(--ink);color:#fff;font:inherit;font-size:15.5px;font-weight:600;cursor:pointer;transition:opacity .2s,transform .12s}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.note{font-size:12.5px;color:var(--ink-3);text-align:center;line-height:1.5}
+.err{color:var(--err);font-size:13.5px;text-align:center;min-height:1em}
+.empty{padding:22px 14px;border-radius:16px;background:var(--soft);color:var(--ink-2);font-size:14px;text-align:center;line-height:1.5}
+.done{text-align:center;padding:18px 4px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.badge{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#34d399,#22c55e);box-shadow:0 12px 30px -10px rgba(34,197,94,.6)}
+.badge svg{width:30px;height:30px}
+.done h2{font-size:21px;font-weight:700;letter-spacing:-.025em}
+.done p{font-size:15px;color:var(--ink-2);line-height:1.5;max-width:400px}
+.done .when{font-size:16px;color:var(--ink);font-weight:600;padding:12px 16px;border-radius:14px;background:var(--soft)}
+.skel{height:52px;border-radius:12px;background:linear-gradient(90deg,var(--soft),#e8ecf4,var(--soft));background-size:200% 100%;animation:sk 1.2s infinite}
+@keyframes sk{to{background-position:-200% 0}}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="host">
+    <div class="av" id="av">R</div>
+    <div><h1 id="titulo">Llamada de 10 minutos con Ricardo</h1>
+      <p>Por videollamada · te mandamos el enlace por WhatsApp. Horario del centro de México.</p></div>
+  </header>
+
+  <section id="pick">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <span class="lbl">Elige el día</span>
+      <div class="days" id="days"><div class="skel" style="width:100%"></div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
+      <span class="lbl" id="lbl-hora">Elige la hora</span>
+      <div class="slots" id="slots"></div>
+    </div>
+    <div class="fields" id="datos" hidden style="margin-top:16px">
+      <span class="lbl">Tus datos</span>
+      <label>Tu nombre<input id="d-nombre" autocomplete="name"></label>
+      <label>Nombre de tu negocio<input id="d-negocio" autocomplete="organization"></label>
+      <label>WhatsApp<input id="d-whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="33 1234 5678"></label>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:18px">
+      <p class="err" id="err"></p>
+      <button class="btn" id="go" disabled>Elige un horario</button>
+      <p class="note">Al confirmar, tu llamada queda apartada en la agenda de ARK.</p>
+    </div>
+  </section>
+
+  <section class="done" id="done" hidden>
+    <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <h2 id="ok-t">¡Listo!</h2>
+    <div class="when" id="ok-when"></div>
+    <p id="ok-p"></p>
+  </section>
+</main>
+<script>
+const SB=window.supabase.createClient('https://tuaxfleudqxmvoicssqw.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1YXhmbGV1ZHF4bXZvaWNzc3F3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyOTUxMjEsImV4cCI6MjEwNjg3MTEyMX0.GBXnLj1xiPn7GsaXdysfoODsbfGuL-q6FFG78BZLGPQ',{auth:{persistSession:false}});
+const P=new URLSearchParams(location.search);
+const asesor=P.get('a')||'';
+const datos={};['nombre','negocio','whatsapp','correo','giro','sistemas','usuarios','plataforma','tiempo','comentarios'].forEach(k=>{if(P.get(k))datos[k]=P.get(k)});
+const $=s=>document.querySelector(s);
+let host='Ricardo', porDia={}, dia=null, hora=null;
+const fecha=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const largo=s=>fecha(s).toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
+
+if(!datos.nombre||!datos.negocio||!datos.whatsapp){$('#datos').hidden=false;
+  if(datos.nombre)$('#d-nombre').value=datos.nombre;if(datos.negocio)$('#d-negocio').value=datos.negocio;if(datos.whatsapp)$('#d-whatsapp').value=datos.whatsapp;}
+
+async function cargar(){
+  if(asesor){
+    const {data:a}=await SB.rpc('reserva_anfitrion',{p_asesor:asesor});
+    if(a&&a.nombre){host=a.nombre.split(' ')[0];$('#titulo').textContent='Llamada de 10 minutos con '+a.nombre;
+      const av=$('#av');if(a.foto){av.innerHTML='';const im=new Image();im.src=a.foto;im.alt='';av.appendChild(im)}else av.textContent=a.nombre[0]}
+  }
+  const {data,error}=await SB.rpc('reserva_horarios',{p_asesor:asesor});
+  if(error){$('#days').innerHTML='<div class="empty" style="width:100%">No pudimos cargar los horarios. Recarga la página para intentar de nuevo.</div>';return}
+  porDia={};(data||[]).forEach(r=>{(porDia[r.fecha]=porDia[r.fecha]||[]).push(r.hora)});
+  const dias=Object.keys(porDia).sort();
+  if(!dias.length){$('#days').innerHTML='<div class="empty" style="width:100%">Por ahora no hay horarios libres. Escríbenos por WhatsApp y te buscamos un espacio.</div>';$('#lbl-hora').hidden=true;return}
+  if(!dia||!porDia[dia])dia=dias[0];
+  pintarDias(dias);pintarHoras();
+}
+function pintarDias(dias){
+  $('#days').innerHTML=dias.map(d=>{const f=fecha(d);return `<button class="day" data-d="${d}" aria-pressed="${d===dia}"><small>${f.toLocaleDateString('es-MX',{weekday:'short'}).replace('.','')}</small><b>${f.getDate()}</b><span>${f.toLocaleDateString('es-MX',{month:'short'}).replace('.','')}</span></button>`}).join('');
+}
+function pintarHoras(){
+  $('#lbl-hora').textContent='Horarios del '+largo(dia);
+  $('#slots').innerHTML=(porDia[dia]||[]).map(h=>`<button class="slot" data-h="${h}" aria-pressed="${h===hora}">${h}</button>`).join('');
+  boton();
+}
+function boton(){const b=$('#go');b.disabled=!hora;b.textContent=hora?`Confirmar ${largo(dia).split(',')[0]} a las ${hora}`:'Elige un horario'}
+$('#days').addEventListener('click',e=>{const b=e.target.closest('.day');if(!b)return;dia=b.dataset.d;hora=null;document.querySelectorAll('.day').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));pintarHoras()});
+$('#slots').addEventListener('click',e=>{const b=e.target.closest('.slot');if(!b)return;hora=b.dataset.h;document.querySelectorAll('.slot').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));boton()});
+$('#go').addEventListener('click',async()=>{
+  const err=$('#err');err.textContent='';
+  if(!$('#datos').hidden){datos.nombre=$('#d-nombre').value.trim();datos.negocio=$('#d-negocio').value.trim();datos.whatsapp=$('#d-whatsapp').value.trim()}
+  if(!datos.nombre||!datos.negocio||(datos.whatsapp||'').replace(/\D/g,'').length<10){err.textContent='Escribe tu nombre, tu negocio y un WhatsApp de 10 dígitos.';return}
+  const b=$('#go');b.disabled=true;b.textContent='Apartando…';
+  const {data,error}=await SB.rpc('reservar',{p_asesor:asesor,p_fecha:dia,p_hora:hora,p_datos:datos});
+  if(error){err.textContent=error.message&&!/fetch|network/i.test(error.message)?error.message:'No se pudo apartar. Revisa tu conexión e intenta de nuevo.';hora=null;await cargar();return}
+  $('#pick').hidden=true;$('#done').hidden=false;
+  $('#ok-t').textContent='¡Listo, '+datos.nombre.split(' ')[0]+'!';
+  const L=largo(dia);$('#ok-when').textContent=L[0].toUpperCase()+L.slice(1)+' · '+hora;
+  $('#ok-p').textContent=`Tu llamada de 10 minutos con ${data&&data.anfitrion?data.anfitrion.split(' ')[0]:host} quedó agendada. Antes de la llamada te mandaremos el enlace por WhatsApp.`;
+  try{parent.postMessage({type:'ark-reserva',fecha:dia,hora},'*')}catch(e){}
+});
+cargar();
+</script>
+</body>
+</html>

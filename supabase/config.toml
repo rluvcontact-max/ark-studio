@@ -1,0 +1,8 @@
+# Proyecto remoto: supabase link --project-ref tuaxfleudqxmvoicssqw
+project_id = "ark-studio"
+
+[functions.lead-encuesta]
+verify_jwt = false
+
+[functions.sync-google]
+verify_jwt = true

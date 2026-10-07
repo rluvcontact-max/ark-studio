@@ -1,0 +1,3 @@
+# Sitio de la encuesta (arkencuesta): publica esta misma carpeta.
+[build]
+  publish = "."
