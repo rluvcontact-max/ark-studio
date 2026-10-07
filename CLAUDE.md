@@ -34,7 +34,7 @@ Deploys: hoy se hacen arrastrando la carpeta a Netlify (Deploys → drag & drop)
 - **Cuentas**: Supabase Auth con email/contraseña. Los empleados entran con usuario corto; el front y `_email_de()` lo convierten a `<usuario>@arkstudio.app`. Ricardo entra con su correo. Crear/cambiar/quitar cuentas: RPC `admin_guardar_acceso(p_empleado, p_usuario, p_password)` y `admin_quitar_acceso(p_empleado)` (solo admin).
 - **Edge Functions** (`supabase/functions/`):
   - `sync-google` (verify_jwt): lee el iCal secreto de cada empleado y hace upsert de sus citas en `eventos` con id `gcal-…`, `origen: "google"`. La llama pg_cron cada 15 min (`sync-google-calendar`).
-  - `lead-encuesta` (sin JWT, CORS solo arkencuesta): registra un prospecto en `clientes` según `?v=`. **Pendiente:** la encuesta publicada todavía no la llama (solo envía a Netlify Forms).
+  - `lead-encuesta` (sin JWT, CORS solo arkencuesta): registra un prospecto en `clientes` según `?v=`. La encuesta la llama (función `enviarLead`) justo después de enviar a Netlify Forms; si falla, la encuesta sigue igual.
 - Después de cambios de esquema, revisar los avisos de seguridad (Supabase → Advisors).
 
 ## Empleados y claves

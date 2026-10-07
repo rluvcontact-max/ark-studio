@@ -8,4 +8,4 @@ Puntos clave del archivo:
 - `EQUIPO`: clave `?v=` → nombre, foto y página de reservas de Google Calendar de cada vendedor.
 - `GENERAL`: agenda que se usa cuando el link no trae `?v=`.
 - Envía las respuestas a Netlify Forms (`encuesta-app`), con el campo `vendedor`.
-- Pendiente: llamar también a la Edge Function `lead-encuesta` para que el prospecto aparezca solo en Clientes de ARK.
+- Después de Netlify Forms llama a la Edge Function `lead-encuesta` (función `enviarLead`), así el prospecto aparece solo en Clientes de ARK, asignado al vendedor del link.
