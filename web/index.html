@@ -1196,6 +1196,8 @@ function abrirPropuesta(c,paso){
   if(paso===0){
     const datosG=g.found?`<div class="negocio-g"><div class="prop-sum">${caja('Calificación',g.rating?'★ '+g.rating:'')+caja('Reseñas',g.reviews)+caja('Categoría en Google',g.category)}</div>
         ${g.address?`<p><b>Dirección:</b> ${esc(g.address)}</p>`:''}${g.website?`<p><b>Sitio:</b> ${esc(g.website)}</p>`:''}${g.summary?`<p>${esc(g.summary)}</p>`:''}</div>`
+      :(g.summary||g.website)?`<div class="negocio-g"><p class="prop-err">Claude no pudo leer la ficha de Google; esto lo encontró en otras fuentes públicas:</p>
+        ${g.website?`<p><b>Sitio:</b> ${esc(g.website)}</p>`:''}${g.summary?`<p>${esc(g.summary)}</p>`:''}</div>`
       :google?'<p class="prop-err" style="margin-top:12px">Claude no pudo consultar el perfil de Google; la propuesta se hizo solo con la encuesta.</p>':'';
     cuerpo=`<div class="negocio-card"><div class="negocio-emoji" aria-hidden="true">${GIRO_EMOJI[giro]||'✨'}</div>
       <div><h4>${esc(c.empresa||'Sin nombre')}</h4><p>${esc(giro||'Giro sin definir')}${c.contacto?' · '+esc(c.contacto):''}</p></div>
