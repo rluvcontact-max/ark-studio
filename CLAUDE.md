@@ -26,7 +26,7 @@ Deploys: hoy se hacen arrastrando la carpeta a Netlify (Deploys → drag & drop)
 - URL: `https://tuaxfleudqxmvoicssqw.supabase.co`
 - La llave **anon** (pública) está en `web/index.html`; es normal que esté en el cliente. **Nunca** poner la service role key en el front ni en el repo.
 - Patrón de tablas: casi todas tienen `id text`, `data jsonb` y `creado`. El front trabaja con objetos planos `{id, ...data}`. `clientes` y `eventos` tienen la columna generada `empleado_id = data->>'empleadoId'` para las reglas RLS.
-- Tablas: `perfiles` (user_id → rol `admin|empleado`, empleado_id, usuario), `empleados`, `clientes`, `eventos`, `finanzas`, `juntas`, `config` (`sync` de Grain, `reservas`), `calendarios_google` (iCal secreto por empleado, solo service role).
+- Tablas: `perfiles` (user_id → rol `admin|empleado`, empleado_id, usuario), `empleados`, `clientes`, `eventos`, `finanzas`, `juntas`, `config` (`sync` de Grain, `reservas`), `calendarios_google` (iCal secreto por empleado, solo service role), `propuestas` (id = cliente; propuesta de Claude, la lee el admin o el empleado del cliente, solo escribe el servidor).
 - **RLS** (ver `supabase/migrations/`):
   - admin (`es_admin()`) ve y escribe todo.
   - empleado: solo `clientes`/`eventos` con su `empleado_id` (`mi_empleado()`); lee `empleados`; nunca `finanzas`, `juntas`, `config`.
@@ -34,7 +34,8 @@ Deploys: hoy se hacen arrastrando la carpeta a Netlify (Deploys → drag & drop)
 - **Cuentas**: Supabase Auth con email/contraseña. Los empleados entran con usuario corto; el front y `_email_de()` lo convierten a `<usuario>@arkstudio.app`. Ricardo entra con su correo. Crear/cambiar/quitar cuentas: RPC `admin_guardar_acceso(p_empleado, p_usuario, p_password)` y `admin_quitar_acceso(p_empleado)` (solo admin).
 - **Edge Functions** (`supabase/functions/`):
   - `sync-google` (verify_jwt): lee el iCal secreto de cada empleado y hace upsert de sus citas en `eventos` con id `gcal-…`, `origen: "google"`. La llama pg_cron cada 15 min (`sync-google-calendar`).
-  - `lead-encuesta` (sin JWT, CORS solo arkencuesta): registra un prospecto en `clientes` según `?v=`. La encuesta la llama (función `enviarLead`) justo después de enviar a Netlify Forms; si falla, la encuesta sigue igual. Si existe el secreto `ANTHROPIC_API_KEY` (Supabase → Edge Functions → Secrets), después de responder le pide a Claude (API de Anthropic) un análisis del prospecto y lo agrega a sus `notas` (y a `analisisIA`).
+  - `lead-encuesta` (sin JWT, CORS solo arkencuesta): registra un prospecto en `clientes` según `?v=`. La encuesta la llama (función `enviarLead`) justo después de enviar a Netlify Forms; si falla, la encuesta sigue igual. Guarda las respuestas en `data.encuesta` y, después de responder, pide a `propuesta-claude` la propuesta comercial.
+  - `propuesta-claude` (verify_jwt): con `{id}` manda a Claude (API de Anthropic, Message Batches, `claude-opus-5-5`) el prompt de propuesta de Ricardo (`prompt.ts`) con las respuestas de la encuesta; solo admin o `lead-encuesta` (header `x-ark-interno` = sha256 de la service key). Con `{}` recoge los batches terminados y guarda resumen, alcance, precio, guion, preguntas y el JSON en `propuestas`; si el cliente no tenía valor, pone el precio recomendado. La llama pg_cron cada 5 min (`revisar-propuestas`). Necesita el secreto `ANTHROPIC_API_KEY` (llave de un workspace de la consola de Anthropic).
 - Después de cambios de esquema, revisar los avisos de seguridad (Supabase → Advisors).
 
 ## Empleados y claves
@@ -64,7 +65,7 @@ Las claves deben coincidir en tres lugares: `EQUIPO` en `encuesta/index.html`, `
 
 ## Archivos
 
-- `web/` — la app (se publica en arkdashboardmx).
+- `web/` — la app (se publica en arkdashboardmx). `web/propuesta.html?id=<cliente>` muestra la presentación comercial llenada con la propuesta de Claude (plantilla en `web/propuesta/plantilla.js`, copiada de la deck "ARK — Plantilla de Propuesta" de claude.ai; condiciones de pago, IVA y vigencia en `CONDICIONES` de esa página).
 - `encuesta/` — la encuesta (se publica en arkencuesta).
 - `supabase/migrations/` — esquema completo, en orden.
 - `supabase/functions/` — Edge Functions desplegadas.

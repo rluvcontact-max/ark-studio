@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Propuesta · ARK Studio</title>
+<link rel="icon" href="favicon-64.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Manrope:wght@300..800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0E0E0F;--panel:#1C1C1E;--line:#3A3A3E;--txt:#FAFAF8;--muted:#A1A1A6}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:Inter,-apple-system,system-ui,sans-serif}
+  .bar{position:fixed;inset:0 0 auto 0;height:56px;display:flex;align-items:center;gap:8px;padding:0 16px;background:rgba(14,14,15,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--line);z-index:5}
+  .bar a,.bar button{font:inherit;font-size:14px;color:var(--txt);background:transparent;border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;text-decoration:none;white-space:nowrap}
+  .bar button:hover,.bar a:hover{background:var(--panel)}
+  .bar .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;color:var(--muted)}
+  .bar .n{font-size:14px;color:var(--muted);min-width:56px;text-align:center}
+  .stage{position:fixed;inset:56px 0 0 0;overflow:hidden}
+  .frame{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;box-shadow:0 24px 80px rgba(0,0,0,.5)}
+  /* las slides traen display en línea; se ocultan con visibility */
+  .slide{position:absolute!important;inset:0;width:1920px;height:1080px;overflow:hidden;box-sizing:border-box;visibility:hidden}
+  .slide.on{visibility:visible}
+  .slide *{box-sizing:border-box}
+  .slide p,.slide h1,.slide h2,.slide h3{margin:0}
+  .slide aside{display:none}
+  .slide .ico{display:inline-flex;flex:none}
+  .slide .ico svg{width:100%;height:100%}
+  .msg{max-width:520px;margin:20vh auto 0;padding:0 16px;text-align:center;line-height:1.5;color:var(--muted)}
+  .msg b{display:block;color:var(--txt);font-size:20px;margin-bottom:8px}
+  .msg a{color:var(--txt)}
+  .notas{position:fixed;left:16px;right:16px;bottom:16px;max-height:30vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;font-size:15px;line-height:1.5;color:#E4E4E6;z-index:6}
+  :fullscreen .bar,:fullscreen .notas{display:none}
+  :fullscreen .stage{inset:0}
+  @media (max-width:640px){.bar .t{display:none}.bar .opc{display:none}}
+  @page{size:1920px 1080px;margin:0}
+  @media print{
+    html,body{background:#fff}
+    .bar,.notas{display:none!important}
+    .stage{position:static;overflow:visible}
+    .frame{position:static;transform:none!important;box-shadow:none}
+    .slide{position:relative!important;visibility:visible;break-after:page;page-break-after:always}
+  }
+</style>
+</head>
+<body>
+<div class="bar">
+  <a href="./">← ARK Studio</a>
+  <span class="t" id="titulo">Propuesta</span>
+  <button id="ant" aria-label="Diapositiva anterior">‹</button>
+  <span class="n" id="num"></span>
+  <button id="sig" aria-label="Diapositiva siguiente">›</button>
+  <button id="notas" class="opc" aria-pressed="false">Notas</button>
+  <button id="full" class="opc">Pantalla completa</button>
+  <button id="pdf" class="opc">Guardar PDF</button>
+</div>
+<div class="stage" id="stage"><div class="msg" id="msg">Cargando propuesta…</div></div>
+<div class="notas" id="caja-notas" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="propuesta/plantilla.js"></script>
+<script>
+/* Condiciones comerciales que no vienen de Claude. Ajustar aquí. */
+const CONDICIONES = {
+  moneda: 'MXN',
+  impuestos: 'Más IVA',
+  vigencia: '15 días',
+  garantia: '30 días',  // el precio base contempla 30 días para corrección de errores
+  pagos: [[50, 'Al firmar'], [30, 'Al aprobar el diseño'], [20, 'A la entrega']],
+  sinVendedor: {nombre: 'Ricardo Lua', telefono: '', email: ''},
+};
+
+const SB_URL = 'https://tuaxfleudqxmvoicssqw.supabase.co', SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1YXhmbGV1ZHF4bXZvaWNzc3F3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyOTUxMjEsImV4cCI6MjEwNjg3MTEyMX0.GBXnLj1xiPn7GsaXdysfoODsbfGuL-q6FFG78BZLGPQ';
+const sb = window.supabase.createClient(SB_URL, SB_KEY, {auth: {persistSession: true, autoRefreshToken: true}});
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+const limpio = v => (v == null ? '' : String(v)).trim();
+const dinero = n => '$' + Math.round(Number(n) || 0).toLocaleString('es-MX');
+const $ = id => document.getElementById(id);
+
+const ICONOS = {
+  Users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  Clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  Chart: '<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>',
+  Chat: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  Lock: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  Lightning: '<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>',
+  Settings: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9 7 7M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1 7 17M17 7l2.1-2.1"/>',
+  Star: '<path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21 7 14.2l-5-4.9 6.9-1z"/>',
+  Trust: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
+  Check: '<path d="M20 6 9 17l-5-5"/>',
+};
+const svgIcono = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONOS[n] || '<circle cx="12" cy="12" r="9"/>'}</svg>`;
+
+function variables(p, cliente, vendedor) {
+  const d = p.datos || {}, pr = d.pricing || {};
+  const precio = Number(pr.development_price_mxn) || 0, mensual = Number(pr.monthly_maintenance_mxn) || 0;
+  const v = {...(d.presentation || {})};
+  if (!limpio(v.cliente_nombre)) v.cliente_nombre = cliente.empresa;
+  if (!limpio(v.cliente_contacto)) v.cliente_contacto = cliente.contacto;
+  Object.assign(v, {
+    fecha_propuesta: new Date(p.generada || Date.now()).toLocaleDateString('es-MX', {day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Mexico_City'}),
+    representante_nombre: vendedor.nombre, representante_whatsapp: vendedor.telefono, representante_email: vendedor.email,
+    precio_total: precio ? dinero(precio) : '', precio_mensual: mensual ? dinero(mensual) : '',
+    moneda: CONDICIONES.moneda, impuestos_nota: CONDICIONES.impuestos, vigencia: CONDICIONES.vigencia, garantia: CONDICIONES.garantia,
+  });
+  CONDICIONES.pagos.forEach(([pct, momento], i) => {
+    v[`pago_${i + 1}_porcentaje`] = pct + '%';
+    v[`pago_${i + 1}_momento`] = momento;
+    v[`pago_${i + 1}_monto`] = precio ? dinero(precio * pct / 100) : '';
+  });
+  return v;
+}
+
+function construir(v) {
+  const frame = document.createElement('div');
+  frame.className = 'frame';
+  const notas = [];
+  for (const {html} of window.PLANTILLA_ARK) {
+    const lleno = html
+      .replace(/ · \{\{(\w+)\}\}/g, (m, k) => limpio(v[k]) ? ' · ' + esc(limpio(v[k])) : '')
+      .replace(/\{\{(\w+)\}\}/g, (m, k) => esc(limpio(v[k])));
+    const t = document.createElement('template');
+    t.innerHTML = lleno;
+    const s = t.content.querySelector('section');
+    if (!s) continue;
+    s.querySelectorAll('[data-vars]').forEach(el => {
+      if (el.dataset.vars.split(' ').every(k => !limpio(v[k]))) el.remove();
+    });
+    s.querySelectorAll('p,h1,h2,h3').forEach(el => { if (!el.textContent.replace(/[“”"\s]/g, '')) el.remove(); });
+    s.querySelectorAll('x-icon').forEach(el => {
+      const span = document.createElement('span');
+      span.className = 'ico';
+      span.setAttribute('style', el.getAttribute('style') || '');
+      span.innerHTML = svgIcono(el.getAttribute('name'));
+      el.replaceWith(span);
+    });
+    s.querySelectorAll('x-connector').forEach(el => {
+      const st = el.getAttribute('style') || '', w = parseInt((st.match(/width:\s*(\d+)/) || [])[1] || 48), color = (st.match(/color:\s*([^;]+)/) || [])[1] || 'currentColor';
+      const span = document.createElement('span');
+      span.className = 'ico';
+      span.style.cssText = `width:${w}px;height:24px;color:${color}`;
+      span.innerHTML = `<svg viewBox="0 0 ${w} 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h${w - 4}M${w - 10} 6l6 6-6 6"/></svg>`;
+      el.replaceWith(span);
+    });
+    const aside = s.querySelector('aside');
+    notas.push(aside ? aside.textContent.replace(/\s*Variables:[\s\S]*$/, '').trim() : '');
+    s.classList.add('slide');
+    frame.appendChild(s);
+  }
+  return {frame, notas};
+}
+
+let actual = 0, slides = [], notas = [];
+function mostrar(i) {
+  actual = Math.max(0, Math.min(slides.length - 1, i));
+  slides.forEach((s, k) => s.classList.toggle('on', k === actual));
+  $('num').textContent = `${actual + 1} / ${slides.length}`;
+  $('caja-notas').textContent = notas[actual] || 'Sin notas en esta diapositiva.';
+}
+function ajustar() {
+  const f = document.querySelector('.frame'), st = $('stage');
+  if (!f) return;
+  const w = st.clientWidth, h = st.clientHeight, pad = document.fullscreenElement ? 0 : 24;
+  const e = Math.min((w - pad * 2) / 1920, (h - pad * 2) / 1080);
+  f.style.transform = `translate(${(w - 1920 * e) / 2}px,${(h - 1080 * e) / 2}px) scale(${e})`;
+}
+
+function aviso(titulo, texto) {
+  $('stage').innerHTML = `<div class="msg"><b>${esc(titulo)}</b>${texto}</div>`;
+}
+
+async function iniciar() {
+  const id = new URLSearchParams(location.search).get('id');
+  if (!id) return aviso('Falta el cliente', 'Abre la presentación desde la ficha del cliente en <a href="./">ARK Studio</a>.');
+  const {data: {session}} = await sb.auth.getSession();
+  if (!session) return aviso('Inicia sesión', 'Entra a <a href="./">ARK Studio</a> y vuelve a abrir la presentación.');
+  const [{data: p}, {data: c}] = await Promise.all([
+    sb.from('propuestas').select('data').eq('id', id).maybeSingle(),
+    sb.from('clientes').select('data').eq('id', id).maybeSingle(),
+  ]);
+  if (!c) return aviso('No encontramos este cliente', 'Puede que no tengas acceso a él.');
+  const cliente = c.data || {};
+  $('titulo').textContent = `Propuesta para ${cliente.empresa || 'cliente'}`;
+  document.title = `Propuesta · ${cliente.empresa || 'ARK'}`;
+  const prop = p && p.data;
+  if (!prop || !prop.datos) {
+    const est = prop && prop.estado;
+    return aviso(est === 'pendiente' ? 'Claude está preparando la propuesta' : 'Aún no hay presentación',
+      est === 'pendiente' ? 'Suele tardar unos minutos. Vuelve a abrir esta página en un rato.' : esc((prop && prop.error) || 'Genera la propuesta desde la ficha del cliente.'));
+  }
+  let vendedor = CONDICIONES.sinVendedor;
+  if (cliente.empleadoId) {
+    const {data: e} = await sb.from('empleados').select('data').eq('id', cliente.empleadoId).maybeSingle();
+    if (e && e.data) vendedor = {nombre: e.data.nombre || '', telefono: e.data.telefono || '', email: e.data.email || ''};
+  }
+  const r = construir(variables(prop, cliente, vendedor));
+  $('stage').innerHTML = '';
+  $('stage').appendChild(r.frame);
+  slides = [...r.frame.children];
+  notas = r.notas;
+  mostrar(0);
+  ajustar();
+  encoger();
+}
+// La portada tiene posiciones fijas: si el título no cabe en 2 líneas, se reduce la letra.
+function encoger() {
+  const h1 = document.querySelector('#cover h1');
+  if (!h1) return;
+  let t = parseFloat(h1.style.fontSize) || 120;
+  while (h1.offsetHeight > 270 && t > 64) { t -= 6; h1.style.fontSize = t + 'px'; }
+}
+
+$('ant').onclick = () => mostrar(actual - 1);
+$('sig').onclick = () => mostrar(actual + 1);
+$('pdf').onclick = () => window.print();
+$('full').onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.();
+$('notas').onclick = e => { const on = $('caja-notas').hidden; $('caja-notas').hidden = !on; e.target.setAttribute('aria-pressed', String(on)); };
+$('stage').addEventListener('click', e => { if (!slides.length || e.target.closest('a')) return; mostrar(actual + (e.clientX < innerWidth / 3 ? -1 : 1)); });
+document.addEventListener('keydown', e => {
+  if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); mostrar(actual + 1); }
+  else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); mostrar(actual - 1); }
+  else if (e.key === 'Home') mostrar(0);
+  else if (e.key === 'End') mostrar(slides.length - 1);
+});
+addEventListener('resize', ajustar);
+document.fonts?.ready.then(encoger);
+document.addEventListener('fullscreenchange', () => setTimeout(ajustar, 50));
+iniciar().catch(e => { console.error(e); aviso('No se pudo cargar la propuesta', 'Revisa tu conexión e inténtalo de nuevo.'); });
+</script>
+</body>
+</html>

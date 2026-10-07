@@ -1,10 +1,9 @@
 // Recibe las respuestas de la encuesta pública (arkencuesta.netlify.app)
 // y las registra como cliente 'prospecto' asignado al vendedor del link (?v=...).
 // Desplegada con verify_jwt = false (es pública; valida origen, honeypot y datos).
-// Si existe el secreto ANTHROPIC_API_KEY, después de responder le pide a Claude
-// un análisis del prospecto y lo agrega a sus notas (si falla, el prospecto queda igual).
-import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
-import Anthropic from "npm:@anthropic-ai/sdk@0.131";
+// Después de responder pide a propuesta-claude que Claude prepare la propuesta comercial
+// (si falla, el prospecto queda registrado igual).
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 declare const EdgeRuntime: { waitUntil(p: Promise<unknown>): void };
 
@@ -29,42 +28,23 @@ function cors(origin: string | null) {
 }
 const txt = (v: unknown, max = 300) => String(v ?? "").trim().slice(0, max);
 
-const INSTRUCCIONES = `Eres el asistente comercial de ARK, empresa de Guadalajara que desarrolla apps a la medida.
-Te paso las respuestas que un prospecto dio en nuestra encuesta. Escribe un análisis breve para el vendedor
-que lo va a llamar, en español de México, en texto plano (sin markdown, sin asteriscos ni #), con estas partes:
-Resumen: 2 o 3 líneas de quién es y qué necesita.
-App sugerida: qué tipo de sistema le conviene y por qué.
-Alcance inicial: de 3 a 5 funciones clave para una primera versión, una por línea empezando con "- ".
-Preguntas para la llamada: 3 preguntas concretas para entender mejor el proyecto, una por línea con "- ".
-Prioridad: Alta, Media o Baja, con una frase de por qué (urgencia y qué tan claro tiene lo que quiere).
-No inventes datos que no estén en las respuestas ni des precios.`;
+// Firma interna que propuesta-claude reconoce (sha256 de la service key; la llave no viaja).
+async function firmaInterna() {
+  const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("ark-interno:" + Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")));
+  return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
+}
 
-async function analizarConClaude(sb: SupabaseClient, id: string, respuestas: string) {
-  const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
-  if (!apiKey) return;
+async function pedirPropuesta(id: string) {
   try {
-    const claude = new Anthropic({ apiKey });
-    const r = await claude.beta.messages.create({
-      model: "claude-opus-5-5",
-      max_tokens: 8000,
-      output_config: { effort: "medium" },
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
-      system: INSTRUCCIONES,
-      messages: [{ role: "user", content: respuestas }],
-    } as Anthropic.Beta.Messages.MessageCreateParamsNonStreaming);
-    if (r.stop_reason === "refusal") { console.warn("Claude no generó el análisis", r.stop_details); return; }
-    const analisis = r.content.flatMap((b) => (b.type === "text" ? [b.text] : [])).join("").trim();
-    if (!analisis) return;
-
-    const { data: fila, error } = await sb.from("clientes").select("data").eq("id", id).single();
-    if (error || !fila) { console.error(error); return; }
-    const d = fila.data as Record<string, unknown>;
-    const notas = `${txt(d.notas, 20000)}\n\n— Análisis de Claude —\n${analisis}`;
-    const { error: e2 } = await sb.from("clientes").update({ data: { ...d, notas, analisisIA: analisis } }).eq("id", id);
-    if (e2) console.error(e2);
+    const anon = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const r = await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/propuesta-claude`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${anon}`, apikey: anon, "x-ark-interno": await firmaInterna() },
+      body: JSON.stringify({ id }),
+    });
+    if (!r.ok) console.error("propuesta-claude respondió", r.status, await r.text());
   } catch (e) {
-    console.error("Error al pedir el análisis a Claude", e);
+    console.error("No se pudo pedir la propuesta", e);
   }
 }
 
@@ -106,11 +86,14 @@ Deno.serve(async (req) => {
       empleadoId, estado: "prospecto", tipoApp, valor: 0, notas,
       origen: "Encuesta", giro: txt(b.giro), sistemas: txt(b.sistemas, 1500), tiempo: txt(b.tiempo),
       creado: ahora, actualizado: ahora,
+      encuesta: {
+        negocio, nombre, giro: txt(b.giro), sistemas: txt(b.sistemas, 1500), usuarios: txt(b.usuarios),
+        plataforma, tiempo: txt(b.tiempo), comentarios: txt(b.comentarios, 1500),
+      },
     },
   }).select("id").single();
   if (error) { console.error(error); return new Response("No se pudo guardar", { status: 500, headers: h }); }
 
-  const respuestas = [`Negocio: ${negocio}`, `Contacto: ${nombre}`, notas].join("\n");
-  EdgeRuntime.waitUntil(analizarConClaude(sb, nuevo.id, respuestas));
+  EdgeRuntime.waitUntil(pedirPropuesta(nuevo.id));
   return new Response(JSON.stringify({ ok: true }), { headers: { ...h, "Content-Type": "application/json" } });
 });
