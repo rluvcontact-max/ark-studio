@@ -1,8 +1,8 @@
 // Recibe las respuestas de la encuesta pública (arkencuesta.netlify.app)
 // y las registra como cliente 'prospecto' asignado al vendedor del link (?v=...).
 // Desplegada con verify_jwt = false (es pública; valida origen, honeypot y datos).
-// Después de responder pide a propuesta-claude que Claude prepare la propuesta comercial
-// (si falla, el prospecto queda registrado igual).
+// Después de responder pide a propuesta-claude que Claude prepare la propuesta comercial y a
+// notificar que avise por push al vendedor (si algo falla, el prospecto queda registrado igual).
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 declare const EdgeRuntime: { waitUntil(p: Promise<unknown>): void };
@@ -34,17 +34,17 @@ async function firmaInterna() {
   return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
 }
 
-async function pedirPropuesta(id: string) {
+async function llamarInterna(funcion: string, body: Record<string, unknown>) {
   try {
     const anon = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const r = await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/propuesta-claude`, {
+    const r = await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/${funcion}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${anon}`, apikey: anon, "x-ark-interno": await firmaInterna() },
-      body: JSON.stringify({ id }),
+      body: JSON.stringify(body),
     });
-    if (!r.ok) console.error("propuesta-claude respondió", r.status, await r.text());
+    if (!r.ok) console.error(`${funcion} respondió`, r.status, await r.text());
   } catch (e) {
-    console.error("No se pudo pedir la propuesta", e);
+    console.error(`No se pudo llamar a ${funcion}`, e);
   }
 }
 
@@ -98,6 +98,9 @@ Deno.serve(async (req) => {
   }).select("id").single();
   if (error) { console.error(error); return new Response("No se pudo guardar", { status: 500, headers: h }); }
 
-  EdgeRuntime.waitUntil(pedirPropuesta(nuevo.id));
+  EdgeRuntime.waitUntil(Promise.all([
+    llamarInterna("propuesta-claude", { id: nuevo.id }),
+    llamarInterna("notificar", { tipo: "prospecto", clienteId: nuevo.id }),
+  ]));
   return new Response(JSON.stringify({ ok: true }), { headers: { ...h, "Content-Type": "application/json" } });
 });

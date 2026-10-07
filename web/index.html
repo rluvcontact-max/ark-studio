@@ -224,7 +224,7 @@ select.pill,.field-in{padding:9px 14px;border-radius:999px;border:1px solid var(
 .sheet h3{margin:0 0 18px;font-family:var(--display);font-weight:400;letter-spacing:.06em;font-size:18px}
 .form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .form label{display:flex;flex-direction:column;gap:6px;font-size:12px;letter-spacing:.06em;color:var(--muted);min-width:0}
-.form label.full{grid-column:1/-1}
+.form label.full,.form div.full{grid-column:1/-1}
 .form input,.form select,.form textarea{padding:11px 14px;border-radius:12px;border:1px solid var(--hair);background:var(--glass);font-size:15px;letter-spacing:0;color:var(--fg);width:100%;min-width:0}
 .form textarea{min-height:84px;resize:vertical}
 .form-actions{grid-column:1/-1;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px}
@@ -390,6 +390,51 @@ a.btn.primary{color:var(--on-ink)}
 @keyframes pf-in{from{opacity:0}to{opacity:1}}
 @media (max-width:820px){.perfil-x{position:fixed;top:max(16px,env(safe-area-inset-top));right:16px}.perfil-in{grid-template-columns:1fr}.perfil-izq{position:static;max-width:380px;width:100%;margin:0 auto}.pf-kpis{grid-template-columns:repeat(2,1fr)}}
 @media (prefers-reduced-motion:reduce){.perfil{animation:none}.foto3d,.foto3d.mueve{transition:none;transform:none}}
+.rapidas{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;margin-bottom:2px}
+.notas{grid-template-columns:1fr}
+.nota-nueva textarea{width:100%;resize:vertical}
+.nota-fila{display:flex;gap:10px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;margin-top:8px}
+.nota-fila label{font-size:12px;display:flex;flex-direction:column;gap:4px}
+.nota-lista{display:grid;gap:8px;max-height:260px;overflow:auto}
+.nota{padding:10px 12px;border-radius:12px;background:var(--glass-strong);border:1px solid var(--stroke)}
+.nota.hecha{opacity:.6}
+.nota-h{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.nota-h b{color:var(--fg);font-weight:600}
+.nota p{margin:4px 0 0;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.nota-rec{padding:2px 8px;border-radius:999px;border:1px solid var(--hair)}
+.nota-rec.vence{background:var(--ink);color:var(--on-ink);border-color:transparent}
+.nota-del{margin-left:auto;background:none;border:0;color:var(--muted);font-size:18px;cursor:pointer;line-height:1}
+.ayuda{font-size:12.5px;color:var(--muted);margin:10px 0 0;line-height:1.5}
+.esc-fila,.mat-fila{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin:8px 0}
+.mat-fila{grid-template-columns:1fr 1.6fr auto;align-items:start}
+.cli-fila{grid-template-columns:minmax(0,1fr) auto!important}
+.cli-main{background:none;border:0;padding:0;text-align:left;color:inherit;font:inherit;cursor:pointer;min-width:0}
+.cli-acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.prepara-in{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+.prepara-in>div:first-child b{display:block;font-size:18px}
+.prepara-in>div:first-child span{color:var(--muted);font-size:14px}
+.prepara-in .prop-sum{grid-column:1/-1;max-width:560px}
+.prepara-in .pf-acts{grid-column:1/-1}
+.meta-barra{height:12px;border-radius:999px;background:var(--hair);overflow:hidden}
+.meta-barra i{display:block;height:100%;border-radius:999px;background:var(--ink)}
+.meta-txt{margin:10px 0 0;font-size:14px}
+.bono-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px}
+.bono-kpis div{padding:10px 12px;border-radius:12px;background:var(--hair)}
+.bono-kpis span{display:block;font-size:11px;color:var(--muted)}
+.bono-kpis b{font-size:14px;font-variant-numeric:tabular-nums}
+.ranking{display:grid;gap:4px}
+.rk{display:grid;grid-template-columns:22px auto 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:12px}
+.rk.yo{background:var(--hair)}
+.rk .pos{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.rk .nom{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rk b{font-variant-numeric:tabular-nums}
+.avatar-btn{background:none;border:0;padding:0;cursor:zoom-in;border-radius:50%}
+#avisos{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));right:16px;left:16px;z-index:40;display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none}
+.aviso{pointer-events:auto;width:min(420px,100%);padding:14px 16px;border-radius:20px;display:grid;gap:10px;animation:pf-in .3s ease both}
+.aviso b{display:block}
+.aviso span{font-size:14px;color:var(--muted)}
+.aviso-acts{display:flex;gap:8px;justify-content:flex-end}
+@media (max-width:700px){.bono-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.esc-fila,.mat-fila{grid-template-columns:1fr}}
 .creds-box pre{margin:0 0 12px;padding:14px;border-radius:12px;background:var(--hair);font-family:var(--mono);font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere;user-select:all}
 @media (max-width:820px){.cred{grid-template-columns:1fr}}
 /* ---- acceso ---- */
@@ -555,7 +600,9 @@ const CAT_IN=['Anticipo de proyecto','Pago de proyecto','Mensualidad / mantenimi
 const CAT_OUT=['Nómina','Comisiones','Freelancers','Software y suscripciones','Servidores y hosting','Publicidad','Renta y oficina','Impuestos','Equipo y herramientas','Otro gasto'];
 const METODOS=['Transferencia','Efectivo','Tarjeta','Depósito'];
 
-const data={empleados:[],clientes:[],eventos:[],finanzas:[],accesos:[],juntas:[],config:[],propuestas:[]};
+const data={empleados:[],clientes:[],eventos:[],finanzas:[],accesos:[],juntas:[],config:[],propuestas:[],notas:[]};
+// Datos calculados en el servidor para el equipo (RPC): bonos/material, ranking del mes y ventas propias del empleado.
+const extra={ajustes:{},ranking:[],misVentas:null};
 
 const S={mode:'login',acct:null,demo:false,previewEmp:null,linkedEmp:null,names:{}};
 const ui={jEmp:'todos',jq:'',view:'panel',q:'',fEmp:'todos',fEst:'todos',calEmp:'todos',mes:null,dia:null,per:'mes',fMov:'todos'};
@@ -607,15 +654,16 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',paintThem
 /* ================= datos (Supabase) ================= */
 const SB_URL='https://tuaxfleudqxmvoicssqw.supabase.co', SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1YXhmbGV1ZHF4bXZvaWNzc3F3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyOTUxMjEsImV4cCI6MjEwNjg3MTEyMX0.GBXnLj1xiPn7GsaXdysfoODsbfGuL-q6FFG78BZLGPQ';
 const sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
-const TABLAS=['empleados','clientes','eventos','finanzas','juntas','config','propuestas'];
+const TABLAS=['empleados','clientes','eventos','finanzas','juntas','config','propuestas','notas'];
 const toRow=r=>({id:r.id,...(r.data||{})});
 async function load(col){
   if(col==='accesos'){
     const {data:rows,error}=await sb.from('perfiles').select('empleado_id,usuario').eq('rol','empleado');
     if(error)throw error;data.accesos=(rows||[]).map(r=>({id:r.empleado_id,usuario:r.usuario}));return;
   }
-  const {data:rows,error}=await sb.from(col).select('id,data').limit(5000);
-  if(error)throw error;data[col]=(rows||[]).map(toRow);
+  // notas: también el autor (columna) para saber quién puede borrarlas
+  const {data:rows,error}=await sb.from(col).select(col==='notas'?'id,data,autor':'id,data').limit(5000);
+  if(error)throw error;data[col]=(rows||[]).map(r=>col==='notas'?{...toRow(r),autor:r.autor}:toRow(r));
 }
 async function add(col,obj){
   obj.creado=Date.now();
@@ -645,7 +693,12 @@ function suscribir(cols){
   if(canal)sb.removeChannel(canal);
   canal=sb.channel('ark');
   cols.forEach(c=>canal.on('postgres_changes',{event:'*',schema:'public',table:c==='accesos'?'perfiles':c},()=>{
-    clearTimeout(pendientes[c]);pendientes[c]=setTimeout(async()=>{try{await load(c);refresh();
+    clearTimeout(pendientes[c]);pendientes[c]=setTimeout(async()=>{try{const antes=c==='clientes'?new Set(data.clientes.map(x=>x.id)):null;
+      await load(c);
+      if(antes){data.clientes.filter(x=>!antes.has(x.id)&&x.origen==='Encuesta'&&(!isEmp()||x.empleadoId===me().id)).forEach(avisoProspecto)}
+      if(c==='clientes'||c==='finanzas')await cargarExtras();
+      refresh();
+      if(c==='notas'){const b=document.getElementById('notas-box'),cl=b&&cli(b.dataset.cliente);if(cl)pintarNotas(cl)}
       if(c==='propuestas'){const b=document.getElementById('prop-box'),cl=b&&data.clientes.find(x=>x.id===b.dataset.cliente);if(cl)pintarProp(cl)}}catch(e){}},250)}));
   canal.subscribe(st=>{if(st==='SUBSCRIBED')setSync(true,'Sincronizado');else if(st==='CHANNEL_ERROR'||st==='TIMED_OUT')setSync(false,'Sin conexión en vivo')});
 }
@@ -695,9 +748,11 @@ async function iniciarSesion(){
   const {data:p,error}=await sb.from('perfiles').select('rol,empleado_id,usuario').eq('user_id',user.id).single();
   if(error||!p)throw error||new Error('sin perfil');
   S.acct={id:user.id,name:(user.user_metadata&&user.user_metadata.nombre)||'',email:user.email,avatarUrl:'',isOwner:p.rol==='admin'};
-  const cols=p.rol==='admin'?[...TABLAS,'accesos']:['empleados','clientes','eventos','propuestas'];
+  const cols=p.rol==='admin'?[...TABLAS,'accesos']:['empleados','clientes','eventos','propuestas','notas'];
   await Promise.all(cols.map(load));
+  await cargarExtras();
   suscribir(cols);
+  clearInterval(extrasTimer);extrasTimer=setInterval(()=>cargarExtras().then(refresh).catch(()=>{}),5*60*1000);
   if(p.rol==='admin'){S.mode='admin'}else{S.mode='emp';S.linkedEmp=p.empleado_id;S.previewEmp=null}
   enter();
 }
@@ -713,6 +768,7 @@ async function logout(){
   await sb.auth.signOut();
   if(canal){sb.removeChannel(canal);canal=null}
   TABLAS.forEach(c=>data[c]=[]);data.accesos=[];
+  clearInterval(extrasTimer);extra.ajustes={};extra.ranking=[];extra.misVentas=null;
   S.mode='login';S.previewEmp=null;S.linkedEmp=null;S.acct=null;
   document.getElementById('shell').hidden=true;
   document.getElementById('login').hidden=false;
@@ -938,10 +994,10 @@ function vFinanzas(){
   const cxcHtml=cxc.length?cxc.slice(0,6).map(r=>`<div class="cxc"><div style="min-width:0"><b style="font-weight:600">${esc(r.c.empresa)}</b><div class="s" style="font-size:13px;color:var(--muted)">Cobrado ${money(r.cob)} de ${money(r.c.valor)}</div></div>
       <button class="btn btn-sm" data-cobrar="${r.c.id}">Registrar pago</button><div class="track"><i style="width:${r.cob/Number(r.c.valor)*100}%"></i></div></div>`).join('')
     :`<div class="empty"><strong>Nada pendiente</strong>Aquí aparece lo que falta cobrar de cada cliente cerrado.</div>`;
-  // comisiones estimadas
-  const com=sortedEmps().filter(e=>Number(e.comision)>0).map(e=>{const v=data.clientes.filter(c=>c.empleadoId===e.id&&c.estado==='cerrado').reduce((s,c)=>s+(Number(c.valor)||0),0);return {e,v:v*Number(e.comision)/100}}).filter(r=>r.v>0);
-  const comHtml=com.length?com.map(r=>`<div class="hb"><span>${esc(r.e.nombre)} · ${esc(r.e.comision)}%</span><span class="v">${money(r.v)}</span></div>`).join('')
-    :`<div class="empty"><strong>Sin comisiones configuradas</strong>Asigna un % de comisión a cada empleado en Equipo.</div>`;
+  // comisiones del equipo: $ por venta + bonos (venta = primer pago del cliente)
+  const com=sortedEmps().map(e=>({e,r:resumenBonos(e.id)})).filter(x=>x.r.V.length||x.r.pagado);
+  const comHtml=com.length?com.map(({e,r})=>`<div class="hb"><span>${esc(e.nombre)} · ${r.V.length} venta${r.V.length===1?'':'s'}</span><span class="v">${r.pendiente?'Debes '+money(r.pendiente):'Al corriente'} · ganado ${money(r.ganado)}</span></div>`).join('')
+    :`<div class="empty"><strong>Aún no hay ventas pagadas</strong>Una venta cuenta cuando registras el primer ingreso de un cliente en Finanzas.</div>`;
   // movimientos
   let M=[...T.M];if(ui.fMov!=='todos')M=M.filter(x=>x.tipo===ui.fMov);
   M.sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||'')||(b.creado||0)-(a.creado||0));
@@ -968,40 +1024,80 @@ function vFinanzas(){
     </div>
     <div class="grid-2">
       <section class="glass panel"><h2>Movimientos <span class="chips">${movChips}</span></h2><div class="list">${movHtml}</div></section>
-      <section class="glass panel"><h2>Comisiones estimadas <span class="tag">sobre clientes cerrados</span></h2><div class="hbars">${comHtml}</div></section>
+      <section class="glass panel"><h2>Comisiones del equipo <span class="tag">${money(bonos().porVenta)} por venta + bonos</span></h2><div class="hbars">${comHtml}</div></section>
     </div>`;
 }
 
 /* ----- INICIO (empleado) ----- */
 function vInicio(){
   const m=me(),mine=data.clientes.filter(c=>c.empleadoId===m.id);
-  const act=mine.filter(c=>!['cerrado','perdido'].includes(c.estado)),cer=mine.filter(c=>c.estado==='cerrado');
+  const act=mine.filter(c=>!['cerrado','perdido'].includes(c.estado));
   const myEv=data.eventos.filter(e=>e.empleadoId===m.id&&e.fecha>=today).sort(sortEv);
   const hoyEv=myEv.filter(e=>e.fecha===today);
-  const com=Number(m.comision)>0?cer.reduce((s,c)=>s+(Number(c.valor)||0),0)*Number(m.comision)/100:null;
-  const seg=act.filter(c=>['prospecto','llamada','whatsapp','propuesta'].includes(c.estado)).sort((a,b)=>(a.actualizado||a.creado||0)-(b.actualizado||b.creado||0)).slice(0,6);
+  const R=resumenBonos(m.id),meta=Number(m.meta)||0;
+  const DIA=864e5,ahora=Date.now();
+  // qué sigue: los más viejos primero; enfriándose: 5+ días sin movimiento
   const sigue={prospecto:'Hacer la primera llamada',llamada:'Mandar el WhatsApp con la información',whatsapp:'Dar seguimiento y agendar reunión',propuesta:'Cerrar la propuesta'};
-  const segHtml=seg.length?seg.map(c=>`<button class="ev" data-edit-client="${c.id}" style="background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left;cursor:pointer;grid-template-columns:minmax(0,1fr) auto">
-      <div style="min-width:0"><div class="t">${esc(c.empresa)}</div><div class="s">${sigue[c.estado]}</div></div><span class="st ${c.estado}">${estado(c.estado).l}</span></button>`).join('')
-    :`<div class="empty"><strong>Todo al día</strong>Registra a tu próximo prospecto con “Nuevo cliente”.</div>`;
+  const mov=c=>c.actualizado||c.creado||0;
+  const seg=act.filter(c=>sigue[c.estado]).sort((a,b)=>mov(a)-mov(b));
+  const frios=seg.filter(c=>mov(c)&&ahora-mov(c)>5*DIA);
+  const nuevos=mine.filter(c=>c.origen==='Encuesta'&&c.estado==='prospecto'&&ahora-(c.creado||0)<2*DIA).sort((a,b)=>(b.creado||0)-(a.creado||0));
+  const filaCli=(c,sub)=>{const wa=linkWA(c);return `<div class="ev cli-fila"><button class="cli-main" data-edit-client="${c.id}"><div class="t">${esc(c.empresa)}</div><div class="s">${sub}</div></button>
+      <div class="cli-acts">${wa?`<a class="btn btn-sm" href="${esc(wa)}" target="_blank" rel="noopener" aria-label="WhatsApp a ${esc(c.empresa)}">WhatsApp</a>`:''}<span class="st ${c.estado}">${estado(c.estado).l}</span></div></div>`};
+  // prepara tu llamada: próxima cita (hoy o mañana) ligada a un cliente con propuesta lista
+  const manana=iso(new Date(ahora+DIA));
+  const clienteDeCita=e=>cli(e.clienteId)||mine.find(c=>c.empresa&&String(e.titulo||'').toLowerCase().includes(c.empresa.toLowerCase()));
+  const prep=myEv.filter(e=>e.fecha<=manana).map(e=>({e,c:clienteDeCita(e)})).find(x=>x.c&&propDe(x.c.id)&&propDe(x.c.id).datos);
+  let prepHtml='';
+  if(prep){const p=propDe(prep.c.id),pr=(p.datos&&p.datos.pricing)||{},obj=pr.target_price_mxn??pr.development_price_mxn,min=pr.minimum_acceptable_price_mxn??pr.minimum_negotiation_price_mxn;
+    const cuando=prep.e.fecha===today?'Hoy':'Mañana';
+    prepHtml=`<section class="glass panel prepara"><h2>Prepara tu llamada <span class="tag">${cuando}${prep.e.hora?' · '+esc(prep.e.hora):''}</span></h2>
+      <div class="prepara-in"><div><b>${esc(prep.c.empresa)}</b><span>${esc(prep.e.titulo||prep.e.tipo||'Cita')}</span></div>
+        <div class="prop-sum">${obj?`<div><span>Objetivo</span><b>${money(obj)}</b></div>`:''}${pr.offer_price_mxn?`<div><span>Oferta</span><b>${money(pr.offer_price_mxn)}</b></div>`:''}${min?`<div><span>Mínimo</span><b>${money(min)}</b></div>`:''}</div>
+        <div class="pf-acts"><button class="btn btn-sm primary" data-prepara="${prep.c.id}" data-paso="1">Ver guion y preguntas</button><button class="btn btn-sm" data-prepara="${prep.c.id}" data-paso="2">Presentación</button><button class="btn btn-sm ghost" data-edit-client="${prep.c.id}">Notas</button></div></div></section>`}
+  // recordatorios de notas que ya vencen
+  const recs=data.notas.filter(n=>n.recordatorio&&!n.hecho&&n.recordatorio<=today&&mine.some(c=>c.id===n.clienteId)).sort((a,b)=>a.recordatorio.localeCompare(b.recordatorio));
+  const recHtml=recs.length?`<section class="glass panel"><h2>Recordatorios <span class="tag">${recs.length}</span></h2><div class="list">${recs.map(n=>{const c=cli(n.clienteId);return `<div class="ev cli-fila"><button class="cli-main" data-edit-client="${c.id}"><div class="t">${esc(c.empresa)}</div><div class="s">${esc(n.texto)}</div></button><div class="cli-acts"><span class="s">${n.recordatorio<today?'Vencido':'Hoy'}</span><button class="btn btn-sm" data-nota-hecha="${n.id}">Hecho</button></div></div>`}).join('')}</div></section>`:'';
+  // meta, bonos y ranking
+  const pctMeta=meta?Math.min(100,Math.round(R.nMes/meta*100)):0;
+  const sigBono=R.siguiente?`Te ${R.siguiente.faltan===1?'falta 1 venta':'faltan '+R.siguiente.faltan+' ventas'} para el bono de <b>${money(R.siguiente.bono)}</b>`:(R.B.escalones.length?'Ya alcanzaste el bono más alto del mes':'');
+  const rk=rankingMes(),miPos=rk.findIndex(x=>x.e.id===m.id)+1;
+  const rkHtml=rk.length?`<div class="ranking">${rk.map((x,i)=>`<div class="rk${x.e.id===m.id?' yo':''}"><span class="pos">${i+1}</span>${av(x.e,'sm')}<span class="nom">${esc(x.e.nombre)}</span><b>${x.n}</b></div>`).join('')}</div>`:'<p class="pf-vacio">Sin ventas este mes todavía.</p>';
+  const mat=((extra.ajustes.material||{}).items||[]);
+  const matHtml=mat.length?`<section class="glass panel" style="grid-column:1/-1"><h2>Material de ventas</h2><div class="list">${mat.map(x=>`<div class="ev cli-fila"><div class="cli-main" style="cursor:default"><div class="t">${esc(x.titulo||'Material')}</div><div class="s">${esc(x.texto)}</div></div><div class="cli-acts"><button class="btn btn-sm" data-copy="${esc(x.texto)}">Copiar</button></div></div>`).join('')}</div></section>`:'';
+  const nuevosHtml=nuevos.length?`<section class="glass panel nuevos" style="grid-column:1/-1"><h2>Prospectos nuevos <span class="tag">${nuevos.length}</span></h2><div class="list">${nuevos.map(c=>filaCli(c,`Llenó la encuesta ${new Date(c.creado).toLocaleString('es-MX',{weekday:'short',hour:'2-digit',minute:'2-digit'})}${c.contacto?' · '+esc(c.contacto):''}`)).join('')}</div></section>`:'';
+  const segHtml=seg.length?seg.slice(0,6).map(c=>filaCli(c,sigue[c.estado])).join(''):`<div class="empty"><strong>Todo al día</strong>Registra a tu próximo prospecto con “Nuevo cliente”.</div>`;
+  const friosHtml=frios.length?`<section class="glass panel"><h2>Se están enfriando <span class="tag">5+ días sin movimiento</span></h2><div class="list">${frios.slice(0,5).map(c=>filaCli(c,'Sin movimiento hace '+Math.floor((ahora-mov(c))/DIA)+' días')).join('')}</div></section>`:'';
   const agHtml=myEv.slice(0,6).map(evRow).join('')||`<div class="empty"><strong>Agenda libre</strong>Agenda tu próxima llamada o reunión.</div>`;
   const hora=new Date().getHours(),sal=hora<12?'Buenos días':hora<19?'Buenas tardes':'Buenas noches';
   const misSG=sinGrabar(data.eventos.filter(e=>e.empleadoId===m.id));
   const bannerE=misSG.length?`<div class="banner"><span>Tienes ${misSG.length===1?'1 junta virtual':misSG.length+' juntas virtuales'} sin grabar. Revisa que Grain esté conectado a tu calendario antes de tu próxima llamada.</span></div>`:'';
-  return bannerE+`<div class="head"><div class="hello">${av(m)}<div><div class="eyebrow">${new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'})}</div><h1>${sal}, ${esc(m.nombre.split(' ')[0])}</h1>${m.rol?`<p>${esc(m.rol)}</p>`:''}</div></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="new-ev">${plus}Cita</button><button class="btn primary" data-act="new-client">${plus}Nuevo cliente</button></div></div>
+  const bannerPush=!pushActivo()&&!S.previewEmp?`<div class="banner"><span>Activa las notificaciones para enterarte al momento de prospectos nuevos y de tus citas, aunque tengas la app cerrada.</span><button class="btn btn-sm primary" data-act="push">Activar</button></div>`:'';
+  return bannerE+bannerPush+`<div class="head"><div class="hello"><button class="avatar-btn" data-act="mi-perfil" aria-label="Ver mi perfil">${av(m)}</button><div><div class="eyebrow">${new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'})}</div><h1>${sal}, ${esc(m.nombre.split(' ')[0])}</h1>${m.rol?`<p>${esc(m.rol)}</p>`:''}</div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="mi-perfil">Mi perfil</button><button class="btn" data-act="new-ev">${plus}Cita</button><button class="btn primary" data-act="new-client">${plus}Nuevo cliente</button></div></div>
+    ${nuevosHtml?`<div class="grid-2">${nuevosHtml}</div>`:''}
+    ${prepHtml}
     <section class="glass stats">
-      <div class="stat"><b>${act.length}</b><span>Mis clientes en proceso</span></div>
-      <div class="stat"><b>${cer.length}</b><span>Clientes cerrados</span></div>
+      <div class="stat"><b>${R.nMes}</b><span>Ventas este mes</span></div>
+      <div class="stat"><b>${moneyShort(R.ganadoMesActual)}</b><span>Ganado este mes</span></div>
+      <div class="stat"><b>${act.length}</b><span>Clientes en proceso</span></div>
       <div class="stat"><b>${hoyEv.length}</b><span>Citas hoy</span></div>
-      <div class="stat"><b>${com==null?mine.length:moneyShort(com)}</b><span>${com==null?'Clientes que he traído':'Mi comisión estimada'}</span></div>
     </section>
     <div class="grid-2">
+      <section class="glass panel"><h2>Meta del mes ${meta?`<span class="tag">${R.nMes} de ${meta}</span>`:''}</h2>
+        ${meta?`<div class="meta-barra" role="progressbar" aria-valuemin="0" aria-valuemax="${meta}" aria-valuenow="${R.nMes}"><i style="width:${pctMeta}%"></i></div><p class="meta-txt">${R.nMes>=meta?'¡Cumpliste tu meta del mes!':`Te ${meta-R.nMes===1?'falta 1 venta':'faltan '+(meta-R.nMes)+' ventas'} para tu meta.`}</p>`:'<p class="meta-txt">Tu meta del mes aún no está definida.</p>'}
+        ${sigBono?`<p class="meta-txt">${sigBono}</p>`:''}
+        <div class="bono-kpis"><div><span>Por venta</span><b>${money(R.B.porVenta)}</b></div><div><span>Ganado total</span><b>${money(R.ganado)}</b></div><div><span>Pagado</span><b>${money(R.pagado)}</b></div><div><span>Pendiente</span><b>${money(R.pendiente)}</b></div></div>
+        ${R.B.escalones.length?`<p class="meta-txt" style="margin-top:12px">Bonos: ${R.B.escalones.map(x=>`${x.ventas} ventas → ${money(x.bono)}`).join(' · ')}</p>`:''}
+        <p class="ayuda">Una venta cuenta cuando el cliente hace su primer pago.</p></section>
+      <section class="glass panel"><h2>Ranking del mes ${miPos?`<span class="tag">Vas en ${miPos}º</span>`:''}</h2>${rkHtml}</section>
+      ${recHtml}${friosHtml}
+      <section class="glass panel"><h2>Qué sigue con mis clientes</h2><div class="list">${segHtml}</div></section>
+      <section class="glass panel"><h2>Mi agenda <button class="btn btn-sm ghost" data-go="calendario">Ver calendario</button></h2><div class="list">${agHtml}</div></section>
       <section class="glass panel" style="grid-column:1/-1"><h2>Tu link de encuesta</h2>
         <div class="link-box"><code>${esc(linkEncuesta(m.id))}</code><button class="btn btn-sm primary" data-copy="${esc(linkEncuesta(m.id))}">Copiar link</button></div>
         <p class="s" style="font-size:13px;color:var(--muted);margin:10px 0 0">Compártelo con tus prospectos. Quien lo llene agenda en tu Google Calendar, y la cita aparece sola en tu agenda de ARK.</p></section>
-      <section class="glass panel"><h2>Qué sigue con mis clientes</h2><div class="list">${segHtml}</div></section>
-      <section class="glass panel"><h2>Mi agenda <button class="btn btn-sm ghost" data-go="calendario">Ver calendario</button></h2><div class="list">${agHtml}</div></section>
+      ${matHtml}
     </div>`;
 }
 
@@ -1088,7 +1184,7 @@ function vEquipo(){
     const acc=acceso(e.id);
     return `<article class="glass member">
       <div class="member-top"><button class="avatar" data-perfil-emp="${e.id}" aria-label="Ver perfil de ${esc(e.nombre)}">${e.foto?`<img src="${esc(e.foto)}" alt="">`:esc(initials(e.nombre))}</button>
-        <div style="min-width:0"><b>${esc(e.nombre)}</b><span>${esc(e.rol||'Equipo ARK')}${Number(e.comision)>0?' · '+esc(e.comision)+'% comisión':''}</span></div></div>
+        <div style="min-width:0"><b>${esc(e.nombre)}</b><span>${esc(e.rol||'Equipo ARK')}${(()=>{const r=resumenBonos(e.id);return ' · '+r.nMes+(Number(e.meta)?'/'+Number(e.meta):'')+' ventas este mes'})()}</span></div></div>
       <div class="kv"><div><b>${mine.length}</b><span>Clientes</span></div><div><b>${cer.length}</b><span>Cerrados</span></div><div><b>${moneyShort(val)}</b><span>Valor</span></div></div>
       <div class="access ${acc?'ok':''}"><i></i>${acc?'Usuario: <b>'+esc(acc.usuario)+'</b>':'Sin usuario: aún no puede entrar'}</div>
       <div class="link-row"><span>Link de encuesta</span><button class="btn btn-sm" data-copy="${esc(linkEncuesta(e.id))}">Copiar link</button></div>
@@ -1099,8 +1195,148 @@ function vEquipo(){
         <button class="btn btn-sm ghost" data-edit-emp="${e.id}">Editar</button>
       </div></article>`}).join('');
   return header(`${data.empleados.length} personas`,'Equipo','Crea un usuario y contraseña para cada empleado en “Editar”. Con eso entra a su app, sin ver finanzas.',
-      `<button class="btn primary" data-act="new-emp">${plus}Agregar empleado</button>`)+
+      `<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="bonos">Bonos y material</button><button class="btn primary" data-act="new-emp">${plus}Agregar empleado</button></div>`)+
     (cards?`<div class="team">${cards}</div>`:`<section class="glass panel"><div class="empty"><strong>Todavía no hay empleados</strong>Agrega a tu equipo para asignarle clientes y citas.</div></section>`);
+}
+
+/* ----- EQUIPO: ventas, bonos, notas, avisos y push ----- */
+let extrasTimer=null;
+async function cargarExtras(){
+  const [aj,rk,mv]=await Promise.all([sb.rpc('ajustes_equipo'),sb.rpc('ranking_mes',{p_mes:today.slice(0,7)}),
+    S.mode==='emp'?sb.rpc('mis_ventas'):Promise.resolve({data:null})]);
+  extra.ajustes=aj.data||{};extra.ranking=rk.data||[];extra.misVentas=mv.data||null;
+}
+// Bonos: $ fijo por venta + bono por escalón de ventas en el mes (se paga el escalón más alto alcanzado).
+function bonos(){const c=data.config.find(x=>x.id==='bonos')||extra.ajustes.bonos||{};
+  return {porVenta:Number(c.porVenta)||0,escalones:(c.escalones||[]).map(x=>({ventas:Number(x.ventas)||0,bono:Number(x.bono)||0})).filter(x=>x.ventas>0).sort((a,b)=>a.ventas-b.ventas)}}
+const bonoPara=(n,B=bonos())=>B.escalones.filter(x=>n>=x.ventas).reduce((m,x)=>Math.max(m,x.bono),0);
+const ganadoMes=(n,B=bonos())=>n*B.porVenta+bonoPara(n,B);
+// Venta = primer pago (ingreso) del cliente. El admin lo calcula con Finanzas; el empleado lo recibe del servidor.
+function ventasDe(empId){
+  if(S.acct&&S.acct.isOwner){const out=[];
+    data.clientes.filter(c=>c.empleadoId===empId).forEach(c=>{const f=data.finanzas.filter(m=>m.tipo==='ingreso'&&m.clienteId===c.id).map(m=>m.fecha).filter(Boolean).sort()[0];if(f)out.push({clienteId:c.id,empresa:c.empresa,fecha:f})});
+    return out.sort((a,b)=>b.fecha.localeCompare(a.fecha))}
+  return (extra.misVentas&&extra.misVentas.ventas)||[];
+}
+function pagosDe(empId){
+  if(S.acct&&S.acct.isOwner)return data.finanzas.filter(m=>m.tipo==='egreso'&&m.categoria==='Comisiones'&&m.empleadoId===empId).map(m=>({fecha:m.fecha,monto:Number(m.monto)||0}));
+  return (extra.misVentas&&extra.misVentas.pagos)||[];
+}
+function resumenBonos(empId){
+  const B=bonos(),V=ventasDe(empId),porMes={};V.forEach(v=>{const k=String(v.fecha).slice(0,7);porMes[k]=(porMes[k]||0)+1});
+  const ganado=Object.values(porMes).reduce((s,n)=>s+ganadoMes(n,B),0);
+  const pagado=pagosDe(empId).reduce((s,m)=>s+(Number(m.monto)||0),0);
+  const mes=today.slice(0,7),nMes=porMes[mes]||0,sig=B.escalones.find(x=>x.ventas>nMes);
+  return {B,V,porMes,ganado,pagado,pendiente:Math.max(0,ganado-pagado),nMes,ganadoMesActual:ganadoMes(nMes,B),
+    siguiente:sig?{faltan:sig.ventas-nMes,bono:sig.bono,ventas:sig.ventas}:null};
+}
+// Ranking del mes (solo totales) con nombre y foto de cada quien.
+function rankingMes(){
+  const r=extra.ranking.map(x=>({e:emp(x.empleado_id),n:Number(x.ventas)||0})).filter(x=>x.e);
+  return r.sort((a,b)=>b.n-a.n||a.e.nombre.localeCompare(b.e.nombre));
+}
+
+// WhatsApp con mensaje según la etapa del cliente.
+const SIG_ETAPA={prospecto:'llamada',llamada:'whatsapp',whatsapp:'propuesta',propuesta:'cerrado'};
+function mensajeWA(c){
+  const n=(String(c.contacto||'').split(' ')[0])||'',yo=(me()&&me().nombre.split(' ')[0])||'el equipo',emp_=c.empresa||'tu negocio';
+  const M={prospecto:`Hola ${n}, soy ${yo} de ARK. Recibimos tu información de ${emp_}. ¿Te parece si agendamos una llamada de 10 minutos para platicarte la idea que tenemos?`,
+    llamada:`Hola ${n}, gracias por tu tiempo en la llamada. Te comparto la información de ARK que platicamos para ${emp_}.`,
+    whatsapp:`Hola ${n}, ¿pudiste revisar la información? ¿Te queda bien una reunión esta semana para presentarte la propuesta para ${emp_}?`,
+    propuesta:`Hola ${n}, ¿qué te pareció la propuesta para ${emp_}? Quedo pendiente de tus dudas para arrancar.`};
+  return M[c.estado]||`Hola ${n}, te saluda ${yo} de ARK.`;
+}
+const telDigitos=t=>{const d=String(t||'').replace(/\D/g,'');return d.length===10?'52'+d:d};
+const linkWA=c=>telDigitos(c.telefono)?`https://wa.me/${telDigitos(c.telefono)}?text=${encodeURIComponent(mensajeWA(c))}`:'';
+
+// Aviso en vivo cuando llega un prospecto nuevo por la encuesta.
+function avisoProspecto(c){
+  let box=document.getElementById('avisos');
+  if(!box){box=document.createElement('div');box.id='avisos';document.body.appendChild(box)}
+  const d=document.createElement('div');d.className='glass aviso';d.setAttribute('role','status');
+  const wa=linkWA(c);
+  d.innerHTML=`<div><b>Nuevo prospecto</b><span>${esc(c.empresa||'Sin nombre')}${c.contacto?' · '+esc(c.contacto):''} llenó la encuesta</span></div>
+    <div class="aviso-acts">${wa?`<a class="btn btn-sm primary" href="${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>`:''}<button class="btn btn-sm" data-ver>Ver</button><button class="btn btn-sm ghost" data-x aria-label="Cerrar">×</button></div>`;
+  d.querySelector('[data-ver]').onclick=()=>{d.remove();clientForm(cli(c.id))};
+  d.querySelector('[data-x]').onclick=()=>d.remove();
+  box.appendChild(d);setTimeout(()=>d.remove(),20000);
+}
+
+// Notas por negocio (bitácora) dentro de la ficha del cliente.
+const notasDe=id=>data.notas.filter(n=>n.clienteId===id).sort((a,b)=>(b.creado||0)-(a.creado||0));
+function notasBox(c){
+  const N=notasDe(c.id),uid=S.acct&&S.acct.id;
+  return `<div class="cred notas" id="notas-box" data-cliente="${esc(c.id)}"><div class="cred-h"><span>Notas del negocio</span><span class="access">${N.length} nota${N.length===1?'':'s'}</span></div>
+    <div class="nota-nueva"><textarea id="nota-txt" rows="2" placeholder="Ej. Le llamé, pidió que le marque el lunes después de las 4"></textarea>
+      <div class="nota-fila"><label>Recordarme el<input type="date" id="nota-rec" min="${today}"></label><button type="button" class="btn btn-sm primary" id="nota-add">Agregar nota</button></div></div>
+    ${N.length?`<div class="nota-lista">${N.map(n=>`<div class="nota${n.hecho?' hecha':''}"><div class="nota-h"><b>${esc(n.autorNombre||'')}</b><span>${new Date(n.creado||Date.now()).toLocaleString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span>
+      ${n.recordatorio?`<span class="nota-rec${!n.hecho&&n.recordatorio<=today?' vence':''}">${n.hecho?'Hecho':'Recordar '+fmtShort(n.recordatorio).d+' '+fmtShort(n.recordatorio).m}</span>`:''}
+      ${(S.acct&&S.acct.isOwner)||n.autor===uid?`<button type="button" class="nota-del" data-nota-del="${esc(n.id)}" aria-label="Borrar nota">×</button>`:''}</div><p>${esc(n.texto)}</p></div>`).join('')}</div>`:''}
+  </div>`;
+}
+function pintarNotas(c){const b=document.getElementById('notas-box');if(b){b.outerHTML=notasBox(c);wireNotas(c)}}
+function wireNotas(c){
+  const b=document.getElementById('notas-box');if(!b)return;
+  document.getElementById('nota-add').onclick=async()=>{
+    const t=document.getElementById('nota-txt').value.trim(),r=document.getElementById('nota-rec').value;
+    if(!t){toast('Escribe la nota.');return}
+    const autorNombre=isEmp()?me().nombre:(S.acct.name||'Ricardo');
+    const {error}=await sb.from('notas').insert({cliente_id:c.id,data:{clienteId:c.id,texto:t,autorNombre,recordatorio:r||'',hecho:false,creado:Date.now()}});
+    if(error){writeError(error);return}
+    await load('notas');pintarNotas(c);toast('Nota guardada');
+  };
+  b.querySelectorAll('[data-nota-del]').forEach(x=>x.onclick=async()=>{
+    const {error}=await sb.from('notas').delete().eq('id',x.dataset.notaDel);if(error){writeError(error);return}
+    await load('notas');pintarNotas(c);
+  });
+}
+async function marcarNotaHecha(id){
+  const n=data.notas.find(x=>x.id===id);if(!n)return;const d={...n};delete d.id;delete d.autor;d.hecho=true;
+  const {error}=await sb.from('notas').update({data:d}).eq('id',id);if(error){writeError(error);return}
+  await load('notas');refresh();
+}
+
+// Notificaciones push (también con la app cerrada). En iPhone requiere tener la app agregada a la pantalla de inicio.
+const VAPID_PUBLICA='BDo8fxg5W3Hs62L_QeJqCdhTahDjnQuLXkFMNIZ3tUJdGun2eniThnj3juaBSJR7T5j3bN4HQwAWGeHzNG89ASg';
+const pushSoportado=()=>'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window;
+const esIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent),instalada=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+function b64aU8(b){const p='='.repeat((4-b.length%4)%4),r=atob((b+p).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from([...r].map(ch=>ch.charCodeAt(0)))}
+async function activarPush(){
+  if(esIOS()&&!instalada()){toast('En iPhone, primero agrega ARK a tu pantalla de inicio (Compartir → Agregar a inicio) y ábrela desde ahí.');return}
+  if(!pushSoportado()){toast('Este navegador no permite notificaciones.');return}
+  const perm=await Notification.requestPermission();
+  if(perm!=='granted'){toast('Las notificaciones quedaron bloqueadas. Actívalas en los ajustes del navegador.');return}
+  try{
+    const reg=await navigator.serviceWorker.ready;
+    const sub=(await reg.pushManager.getSubscription())||await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64aU8(VAPID_PUBLICA)});
+    const {error}=await sb.from('push_suscripciones').upsert({endpoint:sub.endpoint,data:sub.toJSON()},{onConflict:'endpoint'});
+    if(error)throw error;
+    toast('Listo: te avisaremos de prospectos nuevos y de tus citas.');refresh();
+  }catch(e){toast('No se pudieron activar las notificaciones.')}
+}
+const pushActivo=()=>pushSoportado()&&Notification.permission==='granted';
+
+// Ajustes de bonos y material de ventas (solo admin).
+function bonosForm(){
+  const B=bonos(),mat=(data.config.find(x=>x.id==='material')||{}).items||[];
+  const filaE=(x={})=>`<div class="esc-fila"><label>Ventas en el mes<input type="number" min="1" step="1" data-e="ventas" value="${esc(x.ventas||'')}" placeholder="3"></label><label>Bono (MXN)<input type="number" min="0" step="100" data-e="bono" value="${esc(x.bono||'')}" placeholder="1500"></label><button type="button" class="btn btn-sm ghost" data-quitar>Quitar</button></div>`;
+  const filaM=(x={})=>`<div class="mat-fila"><input data-m="titulo" value="${esc(x.titulo||'')}" placeholder="Título (ej. Portafolio)"><textarea data-m="texto" rows="2" placeholder="Texto o link para mandar por WhatsApp">${esc(x.texto||'')}</textarea><button type="button" class="btn btn-sm ghost" data-quitar>Quitar</button></div>`;
+  const fields=`<label class="full">Pago por venta (MXN)<input name="porVenta" id="f-porventa" type="number" min="0" step="100" value="${esc(B.porVenta)}"></label>
+    <div class="full"><p class="ayuda">Una venta cuenta cuando el cliente hace su primer pago (Finanzas → ingreso con ese cliente). Si en el mes llega a un escalón, gana además ese bono (solo el escalón más alto).</p>
+      <div id="esc-lista">${B.escalones.map(filaE).join('')}</div><button type="button" class="btn btn-sm" id="esc-add">${plus}Agregar escalón</button></div>
+    <div class="full"><p class="ayuda" style="margin-top:8px"><b>Material de ventas</b>: textos o links que el equipo puede copiar y mandar (portafolio, casos de éxito, mensajes modelo).</p>
+      <div id="mat-lista">${mat.map(filaM).join('')}</div><button type="button" class="btn btn-sm" id="mat-add">${plus}Agregar material</button></div>`;
+  const submit=async f=>{
+    const escalones=[...document.querySelectorAll('#esc-lista .esc-fila')].map(r=>({ventas:Number(r.querySelector('[data-e=ventas]').value)||0,bono:Number(r.querySelector('[data-e=bono]').value)||0})).filter(x=>x.ventas>0&&x.bono>0);
+    const items=[...document.querySelectorAll('#mat-lista .mat-fila')].map(r=>({titulo:r.querySelector('[data-m=titulo]').value.trim(),texto:r.querySelector('[data-m=texto]').value.trim()})).filter(x=>x.titulo||x.texto);
+    await setDoc('config','bonos',{porVenta:Number(f.porVenta)||0,escalones});
+    await setDoc('config','material',{items});
+    await cargarExtras();toast('Bonos y material guardados');
+  };
+  modal('Bonos y material de ventas',fields,{onSubmit:submit});
+  const lista=(id,fila)=>{const l=document.getElementById(id);l.addEventListener('click',e=>{const q=e.target.closest('[data-quitar]');if(q)q.parentElement.remove()});return ()=>l.insertAdjacentHTML('beforeend',fila())};
+  document.getElementById('esc-add').onclick=lista('esc-lista',filaE);
+  document.getElementById('mat-add').onclick=lista('mat-lista',filaM);
 }
 
 /* ----- PERFIL DEL EMPLEADO (foto grande en 3D + resultados) ----- */
@@ -1116,15 +1352,15 @@ function perfilEmp(e){
   const ids=new Set(mine.map(c=>c.id));
   const cobros=data.finanzas.filter(m=>m.tipo==='ingreso'&&ids.has(m.clienteId)).sort((a,b)=>String(b.fecha).localeCompare(String(a.fecha)));
   const cobrado=cobros.reduce((s,m)=>s+(Number(m.monto)||0),0);
-  const pct=Number(e.comision)||0,comEst=valCer*pct/100;
-  const comPag=data.finanzas.filter(m=>m.tipo==='egreso'&&m.empleadoId===e.id&&m.categoria==='Comisiones').reduce((s,m)=>s+(Number(m.monto)||0),0);
+  const R=resumenBonos(e.id),admin=!!(S.acct&&S.acct.isOwner),meta=Number(e.meta)||0;
   const evs=data.eventos.filter(v=>v.empleadoId===e.id),prox=evs.filter(v=>v.fecha>=today).sort(sortEv),hechas=evs.filter(v=>v.fecha<today).length;
   const props=data.propuestas.filter(p=>ids.has(p.id)&&p.estado==='lista').length;
   const acc=acceso(e.id);
-  // cobranza de sus clientes en los últimos 6 meses
+  // últimos 6 meses: el admin ve lo cobrado a sus clientes; el empleado (sin acceso a Finanzas), sus ventas
   const hoy=new Date(),meses=[];
   for(let i=5;i>=0;i--){const d=new Date(hoy.getFullYear(),hoy.getMonth()-i,1);meses.push({k:d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'),l:MESES_CORTOS[d.getMonth()],v:0})}
-  cobros.forEach(m=>{const x=meses.find(q=>String(m.fecha).startsWith(q.k));if(x)x.v+=Number(m.monto)||0});
+  if(admin)cobros.forEach(m=>{const x=meses.find(q=>String(m.fecha).startsWith(q.k));if(x)x.v+=Number(m.monto)||0});
+  else meses.forEach(q=>q.v=R.porMes[q.k]||0);
   const maxM=Math.max(...meses.map(q=>q.v),1);
   const embudo=ESTADOS.map(s=>({s,n:mine.filter(c=>(c.estado||'prospecto')===s.k).length}));
   const maxE=Math.max(...embudo.map(x=>x.n),1);
@@ -1143,7 +1379,7 @@ function perfilEmp(e){
         </div>
         <div class="glass perfil-datos" style="border-radius:22px">
           ${fila('Usuario',acc?esc(acc.usuario):'Sin acceso')}${fila('Correo',esc(e.email||''))}${fila('Teléfono',esc(e.telefono||''))}
-          ${fila('Comisión',pct?pct+'%':'')}${fila('Propuestas de Claude',props?String(props):'')}
+          ${fila('Meta del mes',meta?R.nMes+' de '+meta+' ventas':'')}${fila('Por venta',money(R.B.porVenta))}${fila('Propuestas de Claude',props?String(props):'')}
         </div>
       </aside>
       <section class="perfil-der">
@@ -1151,13 +1387,13 @@ function perfilEmp(e){
         <div class="pf-kpis">
           ${kpi('Ventas cerradas',moneyShort(valCer),cer.length+' proyecto'+(cer.length===1?'':'s'))}
           ${kpi('En proceso',moneyShort(valAb),abiertos.length+' abierto'+(abiertos.length===1?'':'s'))}
-          ${kpi('Cobrado',moneyShort(cobrado),cobros.length+' pago'+(cobros.length===1?'':'s'))}
+          ${admin?kpi('Cobrado',moneyShort(cobrado),cobros.length+' pago'+(cobros.length===1?'':'s')):kpi('Ventas pagadas',String(R.V.length),R.nMes+' este mes')}
           ${kpi('Tasa de cierre',tasa!==null?tasa+'%':'—',decididos?cer.length+' de '+decididos+' decididos':'Sin decisiones aún')}
-          ${kpi('Comisión',pct?moneyShort(comEst):'—',pct?'Pagado '+moneyShort(comPag)+(comEst>comPag?' · debe '+moneyShort(comEst-comPag):''):'Sin % asignado')}
+          ${kpi('Ganado',moneyShort(R.ganado),'Pagado '+moneyShort(R.pagado)+(R.pendiente?' · pendiente '+moneyShort(R.pendiente):''))}
           ${kpi('Citas',String(evs.length),hechas+' realizadas · '+prox.length+' próximas')}
         </div>
-        <div class="glass pf-sec"><h3>Cobrado de sus clientes <em>Últimos 6 meses</em></h3>
-          <div class="meses">${meses.map(q=>`<div class="m" data-tip="${q.l}: ${money(q.v)}" tabindex="0"><div class="col ${q.v?'':'cero'}" style="height:${q.v?Math.max(4,q.v/maxM*90):2}px"></div><span>${q.l}</span></div>`).join('')}</div>
+        <div class="glass pf-sec"><h3>${admin?'Cobrado de sus clientes':'Ventas por mes'} <em>Últimos 6 meses</em></h3>
+          <div class="meses">${meses.map(q=>`<div class="m" data-tip="${q.l}: ${admin?money(q.v):q.v+' venta'+(q.v===1?'':'s')}" tabindex="0"><div class="col ${q.v?'':'cero'}" style="height:${q.v?Math.max(4,q.v/maxM*90):2}px"></div><span>${q.l}</span></div>`).join('')}</div>
         </div>
         <div class="glass pf-sec"><h3>Embudo de clientes <em>${mine.length} en total</em></h3>
           ${mine.length?`<div class="embudo">${embudo.map(x=>`<div class="fila"><span>${x.s.l}</span><div class="barra"><i style="width:${x.n?x.n/maxE*100:0}%"></i></div><span class="n">${x.n}</span></div>`).join('')}</div>`:'<p class="pf-vacio">Todavía no tiene clientes asignados.</p>'}
@@ -1168,11 +1404,11 @@ function perfilEmp(e){
         <div class="glass pf-sec"><h3>Próximas citas</h3>
           ${prox.length?`<div class="pf-lista">${prox.slice(0,4).map(v=>{const f=fmtShort(v.fecha);return `<div class="it"><div style="min-width:0"><b>${esc(v.titulo||v.tipo||'Cita')}</b><small>${esc(v.tipo||'')}${v.origen==='google'?' · Google Calendar':''}</small></div><span>${f.d} ${f.m}</span><span class="v">${esc(v.hora||'')}</span></div>`}).join('')}</div>`:'<p class="pf-vacio">Sin citas próximas.</p>'}
         </div>
-        ${cobros.length?`<div class="glass pf-sec"><h3>Últimos pagos de sus clientes</h3><div class="pf-lista">${cobros.slice(0,4).map(m=>{const c=cli(m.clienteId),f=fmtShort(m.fecha);return `<div class="it"><div style="min-width:0"><b>${esc(m.concepto||m.categoria||'Pago')}</b><small>${esc(c?c.empresa:'')}</small></div><span>${f.d} ${f.m}</span><span class="v">${money(m.monto)}</span></div>`}).join('')}</div></div>`:''}
+        ${admin&&cobros.length?`<div class="glass pf-sec"><h3>Últimos pagos de sus clientes</h3><div class="pf-lista">${cobros.slice(0,4).map(m=>{const c=cli(m.clienteId),f=fmtShort(m.fecha);return `<div class="it"><div style="min-width:0"><b>${esc(m.concepto||m.categoria||'Pago')}</b><small>${esc(c?c.empresa:'')}</small></div><span>${f.d} ${f.m}</span><span class="v">${money(m.monto)}</span></div>`}).join('')}</div></div>`:''}
         <div class="pf-acts">
           <button class="btn btn-sm" data-pf="cli">Sus clientes</button>
           <button class="btn btn-sm" data-pf="cal">Su calendario</button>
-          <button class="btn btn-sm ghost" data-pf="edit">Editar</button>
+          ${admin?'<button class="btn btn-sm ghost" data-pf="edit">Editar</button>':''}
         </div>
       </section>
     </div></div>`;
@@ -1201,6 +1437,11 @@ main.addEventListener('click',async e=>{
   if(d.act==='new-client') return clientForm();
   if(d.act==='new-ev') return evForm(null,ui.dia);
   if(d.act==='new-emp') return empForm();
+  if(d.act==='bonos') return bonosForm();
+  if(d.act==='push') return activarPush();
+  if(d.act==='mi-perfil') return perfilEmp(me());
+  if(d.notaHecha) return marcarNotaHecha(d.notaHecha);
+  if(d.prepara){const c=cli(d.prepara);if(c)abrirPropuesta(c,+(d.paso||1));return}
   if(d.act==='new-ingreso') return movForm(null,'ingreso');
   if(d.act==='new-egreso') return movForm(null,'egreso');
   if(d.go) return go(d.go);
@@ -1270,7 +1511,9 @@ const cliSelect=(val)=>{const list=(isEmp()?data.clientes.filter(c=>c.empleadoId
 
 function clientForm(c){
   const v=c||{estado:'prospecto',empleadoId:ui.fEmp!=='todos'?ui.fEmp:''};
-  const fields=`
+  const sigE=c&&SIG_ETAPA[c.estado],wa=c&&linkWA(c),tel=c&&telDigitos(c.telefono);
+  const rapidas=c&&(wa||tel||sigE)?`<div class="rapidas">${wa?`<a class="btn btn-sm primary" href="${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>`:''}${tel?`<a class="btn btn-sm" href="tel:+${esc(tel)}">Llamar</a>`:''}${sigE?`<button type="button" class="btn btn-sm" id="f-avanza">Pasar a ${esc(estado(sigE).l)} →</button>`:''}</div>`:'';
+  const fields=`${rapidas}
     <label class="full">Empresa<input name="empresa" id="f-empresa" required value="${esc(v.empresa)}" placeholder="Nombre de la empresa"></label>
     <label>Contacto<input name="contacto" id="f-contacto" value="${esc(v.contacto)}" placeholder="Persona con quien hablas"></label>
     <label>Teléfono / WhatsApp<input name="telefono" id="f-telefono" type="tel" value="${esc(v.telefono)}" placeholder="33 1234 5678"></label>
@@ -1280,11 +1523,14 @@ function clientForm(c){
     <label>Tipo de proyecto<select name="tipoApp" id="f-tipoApp">${opt('','Por definir',!v.tipoApp)}${APPS.map(a=>opt(a,a,a===v.tipoApp)).join('')}</select></label>
     <label class="full">Valor estimado (MXN)<input name="valor" id="f-valor" type="number" min="0" step="1000" inputmode="numeric" value="${esc(v.valor)}" placeholder="120000"></label>
     ${c?propBox(c):''}
-    <label class="full">Notas<textarea name="notas" id="f-notas" placeholder="Qué necesita, cuándo se le llamó, qué se le mandó por WhatsApp…">${esc(v.notas)}</textarea></label>`;
+    <label class="full">Notas generales<textarea name="notas" id="f-notas" placeholder="Qué necesita, datos importantes del negocio…">${esc(v.notas)}</textarea></label>
+    ${c?notasBox(c):''}`;
   const submit=async f=>{f.valor=f.valor?Number(f.valor):0;f.actualizado=Date.now();if(c)await save('clientes',c.id,f);else await add('clientes',f);toast(c?'Cliente actualizado':'Cliente registrado')};
   submit.validate=f=>f.empresa.trim()?null:'Escribe el nombre de la empresa.';
   modal(c?'Editar cliente':'Nuevo cliente',fields,{onSubmit:submit,onDelete:c?async()=>{await remove('clientes',c.id);toast('Cliente eliminado')}:null});
-  if(c)wireProp(c);
+  if(c){wireProp(c);wireNotas(c);
+    const av_=document.getElementById('f-avanza');
+    if(av_)av_.onclick=async()=>{try{await save('clientes',c.id,{estado:sigE,actualizado:Date.now()});close();toast(`${c.empresa}: ${estado(sigE).l}`)}catch(e){writeError(e)}}}
 }
 
 /* ----- propuesta de Claude (tabla propuestas, Edge Function propuesta-claude) ----- */
@@ -1436,11 +1682,11 @@ function empForm(e,abrirFoto){
       ${acc?'<button type="button" class="btn btn-sm ghost danger" id="f-revoke" style="justify-self:start">Quitar acceso</button>':''}
     </div>
     <label>Rol<input name="rol" id="f-rol" value="${esc(v.rol)}" placeholder="Ventas, desarrollo…"></label>
-    <label>Comisión (%)<input name="comision" id="f-comision" type="number" min="0" max="100" step="0.5" value="${esc(v.comision)}" placeholder="10"></label>
+    <label>Meta de ventas al mes<input name="meta" id="f-meta" type="number" min="0" step="1" inputmode="numeric" value="${esc(v.meta)}" placeholder="4"></label>
     <label class="full">Teléfono<input name="telefono" id="f-etel" type="tel" value="${esc(v.telefono)}"></label>`;
   const submit=async f=>{
     const usuario=lower(f.usuario),pw=f.password;delete f.usuario;delete f.password;
-    f.foto=foto;f.comision=f.comision?Number(f.comision):0;f.email=lower(f.email);
+    f.foto=foto;f.meta=f.meta?Number(f.meta):0;f.email=lower(f.email);
     let id=e&&e.id;
     if(e)await save('empleados',e.id,f);else id=await add('empleados',f);
     if(usuario&&pw){await rpc('admin_guardar_acceso',{p_empleado:id,p_usuario:usuario,p_password:pw});
