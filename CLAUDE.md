@@ -65,7 +65,7 @@ Las claves deben coincidir en tres lugares: `EQUIPO` en `encuesta/index.html`, `
 
 ## Archivos
 
-- `web/` — la app (se publica en arkdashboardmx). En la ficha del cliente, "Ver propuesta" abre un recorrido de 3 pasos: Negocio (emoji del giro, link de Google y datos que encontró Claude) → Propuesta → Presentación. `web/propuesta.html?id=<cliente>` (con `&embed=1` dentro de la app) muestra la presentación comercial llenada con la propuesta de Claude (plantilla en `web/propuesta/plantilla.js`, copiada de la deck "ARK — Plantilla de Propuesta" de claude.ai; condiciones de pago, IVA y vigencia en `CONDICIONES` de esa página).
+- `web/` — la app (se publica en arkdashboardmx). En Equipo, tocar la foto de un empleado abre su perfil (`perfilEmp`): foto grande con efecto 3D y fondo con blur, ventas cerradas, en proceso, cobrado de sus clientes, tasa de cierre, comisión (estimada vs. pagada en Finanzas → Comisiones), citas, embudo y clientes recientes. Las fotos se guardan a 640×800 (4:5); las subidas antes de este cambio son de 320×320 y se ven menos nítidas en grande. En la ficha del cliente, "Ver propuesta" abre un recorrido de 3 pasos: Negocio (emoji del giro, link de Google y datos que encontró Claude) → Propuesta → Presentación. `web/propuesta.html?id=<cliente>` (con `&embed=1` dentro de la app) muestra la presentación comercial llenada con la propuesta de Claude (plantilla en `web/propuesta/plantilla.js`, copiada de la deck "ARK — Plantilla de Propuesta" de claude.ai; condiciones de pago, IVA y vigencia en `CONDICIONES` de esa página).
 - `encuesta/` — la encuesta (se publica en arkencuesta).
 - `supabase/migrations/` — esquema completo, en orden.
 - `supabase/functions/` — Edge Functions desplegadas.
