@@ -1204,7 +1204,9 @@ function abrirPropuesta(c,paso){
       <div class="negocio-acts">${/^https?:\/\//i.test(google)?`<a class="btn btn-sm" href="${esc(google)}" target="_blank" rel="noopener">Ver en Google ↗</a>`:'<span class="access"><i></i>Sin link de Google</span>'}
         ${wa?`<a class="btn btn-sm ghost" href="https://wa.me/${wa.length===10?'52'+wa:wa}" target="_blank" rel="noopener">WhatsApp</a>`:''}</div></div>${datosG}`;
   }else if(paso===1){
-    const sum=caja('Precio recomendado',pr.development_price_mxn?money(pr.development_price_mxn):'')+caja('Mínimo de negociación',pr.minimum_negotiation_price_mxn?money(pr.minimum_negotiation_price_mxn):'')+
+    // Tres precios; las propuestas anteriores traían "recomendado" y "mínimo de negociación".
+    const objetivo=pr.target_price_mxn??pr.development_price_mxn,minimo=pr.minimum_acceptable_price_mxn??pr.minimum_negotiation_price_mxn;
+    const sum=caja('Precio objetivo',objetivo?money(objetivo):'')+caja('Oferta',pr.offer_price_mxn?money(pr.offer_price_mxn):'')+caja('Mínimo aceptable',minimo?money(minimo):'')+
       caja('Mantenimiento',pr.monthly_maintenance_mxn?money(pr.monthly_maintenance_mxn)+'/mes':'')+caja('Nivel',pr.project_level);
     cuerpo=`${sum?`<div class="prop-sum" style="margin-bottom:12px">${sum}</div>`:''}
       ${p.incompleta?'<p class="prop-err" style="margin-bottom:8px">La respuesta de Claude quedó cortada; conviene volver a generarla.</p>':''}

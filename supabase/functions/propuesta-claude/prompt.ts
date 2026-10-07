@@ -2,6 +2,7 @@
 // Cambio respecto al PDF: las variables de la presentación usan los nombres de la plantilla
 // de slides de ARK ({{cliente_nombre}}, {{dolor_1}}, …) para poder llenarla automáticamente.
 // Los campos que llena el código (fecha, vendedor, precios formateados, pagos) no se le piden a Claude.
+// Agregado: tres precios (objetivo, oferta y mínimo aceptable) en lugar de recomendado + mínimo.
 // Agregado: análisis del perfil de Google del negocio (web_search / web_fetch) para afinar la propuesta y el presupuesto.
 
 export const VARIABLES_PRESENTACION: Record<string, string> = {
@@ -114,7 +115,7 @@ A partir de las respuestas de la encuesta debes generar:
 3. Alcance recomendado de la primera versión.
 4. Funcionalidades principales.
 5. Funcionalidades opcionales o futuras.
-6. Precio recomendado de desarrollo.
+6. Precios de desarrollo: objetivo, oferta y mínimo aceptable.
 7. Mantenimiento mensual recomendado.
 8. Justificación interna del precio.
 9. Guion completo para presentar la propuesta por videollamada.
@@ -390,11 +391,16 @@ Explica internamente qué quedaría fuera de la primera versión y por qué.
 
 Calcula:
 
-PRECIO RECOMENDADO
-El precio que ARK debería presentar al prospecto.
+Tres precios, siempre en este orden de mayor a menor (objetivo ≥ oferta ≥ mínimo aceptable):
 
-PRECIO MÍNIMO DE NEGOCIACIÓN
-El precio más bajo razonable que ARK debería aceptar sin perjudicar significativamente el proyecto.
+PRECIO OBJETIVO
+El precio que ARK presenta al prospecto y quiere cobrar por el alcance propuesto. Es el que aparece en la presentación.
+
+PRECIO DE OFERTA
+Un precio especial para cerrar: el vendedor lo ofrece si el cliente pide un mejor precio o para que decida dentro de la vigencia de la propuesta. Debe ser un descuento razonable sobre el objetivo, normalmente entre 5% y 15%, usando precios comerciales cuando tenga sentido.
+
+PRECIO MÍNIMO ACEPTABLE
+El precio más bajo que ARK debería aceptar sin perjudicar significativamente el proyecto. Por debajo de él conviene reducir alcance en lugar de bajar precio.
 
 No hagas descuentos excesivos.
 
@@ -452,6 +458,7 @@ Presenta el precio de forma segura y profesional.
 No te disculpes por el precio.
 No digas: "Es un poco caro."
 Utiliza lenguaje como: "Por el alcance que estamos planteando, la inversión sería de..."
+Presenta el precio objetivo. La oferta no se dice de entrada: incluye en el guion una nota para el vendedor sobre cuándo y cómo ofrecerla (por ejemplo, si el cliente pide mejor precio o para cerrar dentro de la vigencia), y recuérdale que nunca baje del mínimo aceptable.
 Después presenta el mantenimiento.
 
 QUÉ INCLUYE
@@ -526,17 +533,20 @@ No incluir inicialmente:
 ────────────
 3. PRECIO
 ────────────
-Precio recomendado:
+Precio objetivo:
 $XX,XXX MXN
 
-Precio mínimo de negociación:
+Precio de oferta:
+$XX,XXX MXN
+
+Precio mínimo aceptable:
 $XX,XXX MXN
 
 Mantenimiento:
 $X,XXX MXN / mes
 
 Razón interna del precio:
-[Explicación, incluyendo cómo influyó el perfil de Google del negocio en el presupuesto]
+[Explicación del objetivo, de cuánto y por qué se descuenta en la oferta y por qué ese es el mínimo; incluye cómo influyó el perfil de Google del negocio en el presupuesto]
 
 ────────────
 4. GUION DE LA PROPUESTA
@@ -576,8 +586,9 @@ Utiliza esta estructura:
 "future_features": []
 },
 "pricing": {
-"development_price_mxn": 0,
-"minimum_negotiation_price_mxn": 0,
+"target_price_mxn": 0,
+"offer_price_mxn": 0,
+"minimum_acceptable_price_mxn": 0,
 "monthly_maintenance_mxn": 0,
 "project_level": ""
 },

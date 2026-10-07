@@ -159,8 +159,9 @@ async function revisar(sb: SupabaseClient) {
           incompleta: m.stop_reason === "max_tokens",
         });
         listas++;
-        // Si el cliente no tiene valor estimado, se toma el precio recomendado.
-        const precio = Number((datos?.pricing as Record<string, unknown> | undefined)?.development_price_mxn) || 0;
+        // Si el cliente no tiene valor estimado, se toma el precio objetivo (o el recomendado de propuestas anteriores).
+        const pr = (datos?.pricing ?? {}) as Record<string, unknown>;
+        const precio = Number(pr.target_price_mxn ?? pr.development_price_mxn) || 0;
         if (precio > 0) {
           const { data: cli } = await sb.from("clientes").select("data").eq("id", f.id).single();
           const cd = (cli?.data ?? {}) as Record<string, unknown>;

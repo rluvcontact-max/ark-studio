@@ -95,7 +95,8 @@ const svgIcono = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor
 
 function variables(p, cliente, vendedor) {
   const d = p.datos || {}, pr = d.pricing || {};
-  const precio = Number(pr.development_price_mxn) || 0, mensual = Number(pr.monthly_maintenance_mxn) || 0;
+  // La presentación muestra el precio objetivo (o el recomendado de propuestas anteriores).
+  const precio = Number(pr.target_price_mxn ?? pr.development_price_mxn) || 0, mensual = Number(pr.monthly_maintenance_mxn) || 0;
   const v = {...(d.presentation || {})};
   if (!limpio(v.cliente_nombre)) v.cliente_nombre = cliente.empresa;
   if (!limpio(v.cliente_contacto)) v.cliente_contacto = cliente.contacto;
