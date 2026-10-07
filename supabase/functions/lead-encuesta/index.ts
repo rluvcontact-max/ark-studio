@@ -65,6 +65,9 @@ Deno.serve(async (req) => {
   const clave = txt(b.v, 40).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]/g, "");
   const empleadoId = VENDEDORES[clave] || "";
 
+  // Link del perfil de Google del negocio (opcional): solo se acepta http(s).
+  const google = /^https?:\/\/\S+$/i.test(txt(b.google, 500)) ? txt(b.google, 500) : "";
+
   const notas = [
     "Llegó por la encuesta" + (empleadoId ? "" : " (link general)") + ".",
     `Giro: ${txt(b.giro)}`,
@@ -72,6 +75,7 @@ Deno.serve(async (req) => {
     `Para quién: ${txt(b.usuarios)}`,
     `Plataforma: ${txt(b.plataforma)}`,
     `Lo quiere: ${txt(b.tiempo)}`,
+    google ? `Google: ${google}` : "",
     txt(b.comentarios, 1500) ? `Comentarios: ${txt(b.comentarios, 1500)}` : "",
   ].filter(Boolean).join("\n");
 
@@ -84,10 +88,10 @@ Deno.serve(async (req) => {
     data: {
       empresa: negocio, contacto: nombre, telefono: whatsapp, email: txt(b.correo, 160),
       empleadoId, estado: "prospecto", tipoApp, valor: 0, notas,
-      origen: "Encuesta", giro: txt(b.giro), sistemas: txt(b.sistemas, 1500), tiempo: txt(b.tiempo),
+      origen: "Encuesta", google, giro: txt(b.giro), sistemas: txt(b.sistemas, 1500), tiempo: txt(b.tiempo),
       creado: ahora, actualizado: ahora,
       encuesta: {
-        negocio, nombre, giro: txt(b.giro), sistemas: txt(b.sistemas, 1500), usuarios: txt(b.usuarios),
+        negocio, nombre, google, giro: txt(b.giro), sistemas: txt(b.sistemas, 1500), usuarios: txt(b.usuarios),
         plataforma, tiempo: txt(b.tiempo), comentarios: txt(b.comentarios, 1500),
       },
     },

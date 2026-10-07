@@ -202,7 +202,7 @@ h2{font-size:clamp(21px,4.4vw,26px);line-height:1.18;font-weight:650;letter-spac
 
 <!-- Formulario estático para que Netlify detecte los campos -->
 <form hidden method='post' name='encuesta-app'><input type='hidden' name='form-name' value='encuesta-app' />
-  <input name="bot-field"><input name="nombre"><input name="negocio"><input name="whatsapp"><input name="correo">
+  <input name="bot-field"><input name="nombre"><input name="negocio"><input name="google"><input name="whatsapp"><input name="correo">
   <input name="giro"><input name="sistemas"><input name="usuarios"><input name="plataforma"><input name="tiempo"><input name="comentarios"><input name="vendedor">
 </form>
 
@@ -227,6 +227,8 @@ h2{font-size:clamp(21px,4.4vw,26px);line-height:1.18;font-weight:650;letter-spac
         <p class="sub">Elige lo que te gustaría que tuviera tu aplicación. Con tus respuestas preparamos una idea a tu medida y, al final, puedes agendar una llamada rápida de 10 minutos para presentártela.</p>
         <div class="field"><label for="nombre">Tu nombre</label><input class="input" id="nombre" name="nombre" autocomplete="name" placeholder="Ej. Ana López" required></div>
         <div class="field"><label for="negocio">Nombre de tu negocio</label><input class="input" id="negocio" name="negocio" autocomplete="organization" placeholder="Ej. Café La Esquina" required></div>
+        <div class="field"><label for="google">Link de tu negocio en Google <span style="color:var(--ink-3)">(opcional)</span></label><input class="input" id="google" name="google" type="url" inputmode="url" autocomplete="url" placeholder="https://maps.app.goo.gl/…">
+          <p style="color:var(--ink-3);font-size:12.5px;margin:6px 0 0">Búscalo en Google Maps, toca <b>Compartir</b> y pega aquí el enlace. Nos ayuda a conocer mejor tu negocio.</p></div>
         <div class="field"><label for="whatsapp">WhatsApp</label><input class="input" id="whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="33 1234 5678" required></div>
         <div class="field"><label for="correo">Correo <span style="color:var(--ink-3)">(opcional)</span></label><input class="input" id="correo" name="correo" type="email" autocomplete="email" placeholder="tu@negocio.com"></div>
       </div>

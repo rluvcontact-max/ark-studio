@@ -17,6 +17,15 @@ const SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ANON = Deno.env.get("SUPABASE_ANON_KEY")!;
 const ORIGENES = ["https://arkdashboardmx.netlify.app"];
 const MAX_HORAS = 26; // un batch puede tardar hasta 24 h
+const MAX_CONTINUACIONES = 4; // si Claude se pausa a mitad de sus búsquedas (pause_turn)
+// Búsqueda y lectura web (del lado de Anthropic) para analizar el perfil de Google del negocio.
+const HERRAMIENTAS: Anthropic.Messages.ToolUnion[] = [
+  {
+    type: "web_search_20260209", name: "web_search", max_uses: 5,
+    user_location: { type: "approximate", country: "MX", region: "Jalisco", city: "Guadalajara", timezone: "America/Mexico_City" },
+  },
+  { type: "web_fetch_20260209", name: "web_fetch", max_uses: 3 },
+];
 
 function cors(origin: string | null) {
   const ok = origin && (ORIGENES.includes(origin) || /^https:\/\/[a-z0-9]+--arkdashboardmx\.netlify\.app$/.test(origin));
@@ -44,15 +53,15 @@ function respuestasDe(c: Record<string, unknown>) {
       `Negocio: ${t(e.negocio)}`, `Nombre de quien respondió: ${t(e.nombre)}`, `Giro: ${t(e.giro)}`,
       `Sistemas que le interesan: ${t(e.sistemas)}`, `Para quién es la app: ${t(e.usuarios)}`,
       `Plataforma: ${t(e.plataforma)}`, `Para cuándo lo quiere: ${t(e.tiempo)}`, `Comentarios: ${t(e.comentarios)}`,
+      `Link del perfil de Google del negocio: ${t(e.google)}`,
     ]
     : [`Negocio: ${t(c.empresa)}`, `Nombre de quien respondió: ${t(c.contacto)}`, t(c.notas)];
   return lineas.filter((l) => !/:\s*$/.test(l)).join("\n");
 }
 
-async function solicitar(sb: SupabaseClient, id: string) {
-  const { data: fila, error } = await sb.from("clientes").select("data").eq("id", id).single();
-  if (error || !fila) throw new Error("Cliente no encontrado");
-  const batch = await claude().messages.batches.create({
+// Manda la conversación como batch. `mensajes` se guarda para poder continuar si hay pause_turn.
+async function mandarBatch(id: string, mensajes: Anthropic.Messages.MessageParam[]) {
+  return await claude().messages.batches.create({
     requests: [{
       custom_id: id.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 64) || "propuesta",
       params: {
@@ -60,14 +69,27 @@ async function solicitar(sb: SupabaseClient, id: string) {
         max_tokens: 32000,
         output_config: { effort: "high" },
         system: PROMPT_PROPUESTA,
-        messages: [{ role: "user", content: "RESPUESTAS:\n\n" + respuestasDe(fila.data as Record<string, unknown>) }],
+        tools: HERRAMIENTAS,
+        messages: mensajes,
       },
     }],
   });
+}
+
+async function solicitar(sb: SupabaseClient, id: string) {
+  const { data: fila, error } = await sb.from("clientes").select("data").eq("id", id).single();
+  if (error || !fila) throw new Error("Cliente no encontrado");
+  const mensajes: Anthropic.Messages.MessageParam[] = [
+    { role: "user", content: "RESPUESTAS:\n\n" + respuestasDe(fila.data as Record<string, unknown>) },
+  ];
+  const batch = await mandarBatch(id, mensajes);
   const { data: prev } = await sb.from("propuestas").select("data").eq("id", id).maybeSingle();
   const { error: e2 } = await sb.from("propuestas").upsert({
     id,
-    data: { ...(prev?.data ?? {}), estado: "pendiente", batchId: batch.id, solicitada: Date.now(), error: "" },
+    data: {
+      ...(prev?.data ?? {}), estado: "pendiente", batchId: batch.id, solicitada: Date.now(), error: "",
+      mensajes, continuaciones: 0,
+    },
   });
   if (e2) throw e2;
 }
@@ -81,9 +103,11 @@ function separar(texto: string) {
   }
   let datos: Record<string, unknown> | null = null;
   try { datos = JSON.parse(crudo); } catch { datos = null; }
-  // El texto para leer termina antes de la sección del JSON.
+  // El texto para leer empieza en el resumen (sin lo que Claude dijo mientras buscaba) y termina antes del JSON.
   const corte = texto.search(/\n[─\-—=\s]*\n?\s*6\.\s*JSON/);
-  const legible = (corte > 0 ? texto.slice(0, corte) : texto.replace(/```json[\s\S]*?```/g, "")).trim();
+  let legible = (corte > 0 ? texto.slice(0, corte) : texto.replace(/```json[\s\S]*?```/g, "")).trim();
+  const inicio = legible.search(/[─\-—=]*\s*\n?\s*1\.\s*RESUMEN INTERNO/);
+  if (inicio > 0) legible = legible.slice(inicio).trim();
   return { legible, datos };
 }
 
@@ -104,15 +128,33 @@ async function revisar(sb: SupabaseClient) {
       }
       for await (const r of await c.messages.batches.results(batch.id)) {
         if (r.result.type !== "succeeded") {
-          await guardar({ estado: "error", error: `La petición terminó como "${r.result.type}".` });
+          await guardar({ estado: "error", error: `La petición terminó como "${r.result.type}".`, mensajes: null });
           continue;
         }
         const m = r.result.message;
-        if (m.stop_reason === "refusal") { await guardar({ estado: "error", error: "Claude no generó esta propuesta." }); continue; }
-        const texto = m.content.flatMap((b) => (b.type === "text" ? [b.text] : [])).join("").trim();
+        if (m.stop_reason === "refusal") { await guardar({ estado: "error", error: "Claude no generó esta propuesta.", mensajes: null }); continue; }
+        const previos = ((d.mensajes ?? []) as Anthropic.Messages.MessageParam[]);
+        // Claude se pausó a mitad de sus búsquedas: se le regresa su turno tal cual y continúa.
+        if (m.stop_reason === "pause_turn") {
+          const n = Number(d.continuaciones) || 0;
+          if (!previos.length || n >= MAX_CONTINUACIONES) {
+            await guardar({ estado: "error", error: "Claude no terminó la propuesta. Intenta de nuevo.", mensajes: null });
+            continue;
+          }
+          const mensajes = [...previos, { role: "assistant" as const, content: m.content }];
+          const nuevo = await mandarBatch(f.id, mensajes);
+          await guardar({ batchId: nuevo.id, mensajes, continuaciones: n + 1 });
+          continue;
+        }
+        // Texto de todos los turnos de Claude (los pausados y el último).
+        const bloques = [
+          ...previos.filter((x) => x.role === "assistant").flatMap((x) => Array.isArray(x.content) ? x.content : []),
+          ...m.content,
+        ];
+        const texto = bloques.flatMap((b) => (b.type === "text" ? [b.text] : [])).join("").trim();
         const { legible, datos } = separar(texto);
         await guardar({
-          estado: "lista", texto: legible, datos, generada: Date.now(), modelo: m.model,
+          estado: "lista", texto: legible, datos, generada: Date.now(), modelo: m.model, mensajes: null, continuaciones: null,
           error: datos ? "" : "No se pudo leer el JSON; la presentación queda vacía.",
           incompleta: m.stop_reason === "max_tokens",
         });

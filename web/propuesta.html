@@ -46,7 +46,7 @@
 </head>
 <body>
 <div class="bar">
-  <a href="./">← ARK Studio</a>
+  <a href="./" id="volver">← ARK Studio</a>
   <span class="t" id="titulo">Propuesta</span>
   <button id="ant" aria-label="Diapositiva anterior">‹</button>
   <span class="n" id="num"></span>
@@ -212,6 +212,8 @@ function encoger() {
   while (h1.offsetHeight > 270 && t > 64) { t -= 6; h1.style.fontSize = t + 'px'; }
 }
 
+// Dentro de la app (paso 3 de la propuesta) se muestra sin el botón de regresar.
+if (new URLSearchParams(location.search).has('embed')) { $('volver').hidden = true; $('titulo').style.visibility = 'hidden'; }
 $('ant').onclick = () => mostrar(actual - 1);
 $('sig').onclick = () => mostrar(actual + 1);
 $('pdf').onclick = () => window.print();

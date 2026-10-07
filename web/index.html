@@ -317,6 +317,21 @@ a.btn.primary{color:var(--on-ink)}
 .prop-txt h4:first-child{margin-top:0}
 .prop-txt table{border-collapse:collapse;margin:0 0 10px;width:100%}
 .prop-txt td,.prop-txt th{border-bottom:1px solid var(--stroke);padding:6px 8px;text-align:left;vertical-align:top}
+.sheet.wide{width:min(980px,100%)}
+.pasos{display:flex;gap:6px;flex-wrap:wrap;margin:-6px 0 18px}
+.pasos button{display:inline-flex;align-items:center;gap:6px}
+.pasos b{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--hair);font-size:11px}
+.negocio-card{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;padding:22px;border-radius:20px;background:var(--hair)}
+.negocio-emoji{width:72px;height:72px;border-radius:20px;display:grid;place-items:center;font-size:40px;background:var(--glass-strong);border:1px solid var(--stroke)}
+.negocio-card h4{margin:0;font-family:var(--display);font-weight:400;font-size:24px;letter-spacing:.02em}
+.negocio-card p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.negocio-acts{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}
+.negocio-g{margin-top:14px;display:grid;gap:10px}
+.negocio-g .prop-sum{grid-column:auto}
+.negocio-g p{margin:0;font-size:14px;line-height:1.5}
+.prop-frame{width:100%;aspect-ratio:16/9;border:0;border-radius:14px;background:#0E0E0F;display:block}
+.paso-nav{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:18px}
+.paso-nav .spacer{margin-right:auto}
 .creds-box pre{margin:0 0 12px;padding:14px;border-radius:12px;background:var(--hair);font-family:var(--mono);font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere;user-select:all}
 @media (max-width:820px){.cred{grid-template-columns:1fr}}
 /* ---- acceso ---- */
@@ -1132,7 +1147,6 @@ function propBox(c){
     :p.estado==='error'?'<span class="access"><i></i>No se pudo generar</span>'
     :`<span class="access ok"><i></i>Lista${p.generada?' · '+esc(new Date(p.generada).toLocaleDateString('es-MX',{day:'numeric',month:'short'})):''}</span>`;
   const acts=(hay?`<button type="button" class="btn btn-sm" data-prop="ver">Ver propuesta</button>`:'')+
-    (hay&&p.datos?`<a class="btn btn-sm" href="propuesta.html?id=${encodeURIComponent(c.id)}" target="_blank" rel="noopener">Presentación</a>`:'')+
     (A&&(!p||p.estado!=='pendiente')?`<button type="button" class="btn btn-sm ghost" data-prop="generar">${p&&p.estado?'Volver a generar':'Generar con Claude'}</button>`:'');
   return `<div class="cred prop-box" id="prop-box" data-cliente="${esc(c.id)}"><div class="cred-h"><span>Propuesta de Claude</span>${est}</div>
     ${p&&p.error?`<p class="prop-err">${esc(p.error)}</p>`:''}${p&&p.estado==='pendiente'?'<p class="prop-err">Suele tardar unos minutos; esta ficha se actualiza sola.</p>':''}
@@ -1141,7 +1155,7 @@ function propBox(c){
 function wireProp(c){
   const box=document.getElementById('prop-box');if(!box)return;
   box.querySelectorAll('[data-prop]').forEach(b=>b.onclick=async()=>{
-    if(b.dataset.prop==='ver')return verPropuesta(c);
+    if(b.dataset.prop==='ver')return abrirPropuesta(c,0);
     b.disabled=true;
     const {error}=await sb.functions.invoke('propuesta-claude',{body:{id:c.id}});
     if(error){b.disabled=false;toast('No se pudo pedir la propuesta. Inténtalo de nuevo.');return}
@@ -1169,18 +1183,51 @@ function mdBasico(t){
   }
   cerrar();return out.join('');
 }
-function verPropuesta(c){
-  const p=propDe(c.id),pr=(p.datos&&p.datos.pricing)||{};
+const GIRO_EMOJI={'Restaurante o cafetería':'🍽️','Tienda o comercio':'🛍️','Salud o clínica':'🩺','Belleza o spa':'💇','Gimnasio o deporte':'🏋️',
+  'Servicios profesionales':'💼','Educación o cursos':'🎓','Inmobiliaria o construcción':'🏠','Logística o distribución':'🚚','Otro':'✨'};
+const PASOS_PROP=['Negocio','Propuesta','Presentación'];
+// Recorrido de la propuesta: 1) el negocio (rubro, Google), 2) la propuesta de Claude, 3) la presentación.
+function abrirPropuesta(c,paso){
+  const p=propDe(c.id)||{},d=p.datos||{},pr=d.pricing||{},g=d.google_profile||{},enc=c.encuesta||{};
+  const google=c.google||enc.google||'',giro=c.giro||enc.giro||'';
   const caja=(l,v)=>v?`<div><span>${l}</span><b>${esc(v)}</b></div>`:'';
-  const sum=caja('Precio recomendado',pr.development_price_mxn?money(pr.development_price_mxn):'')+caja('Mínimo de negociación',pr.minimum_negotiation_price_mxn?money(pr.minimum_negotiation_price_mxn):'')+
-    caja('Mantenimiento',pr.monthly_maintenance_mxn?money(pr.monthly_maintenance_mxn)+'/mes':'')+caja('Nivel',pr.project_level);
-  modal(`Propuesta · ${c.empresa||''}`,`${sum?`<div class="prop-sum">${sum}</div>`:''}
-    ${p.incompleta?'<p class="prop-err" style="grid-column:1/-1">La respuesta de Claude quedó cortada; conviene volver a generarla.</p>':''}
-    <div class="prop-txt" id="prop-txt">${mdBasico(p.texto)}</div>
-    <div style="grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn btn-sm" id="prop-copy">Copiar texto</button>
-    ${p.datos?`<a class="btn btn-sm" href="propuesta.html?id=${encodeURIComponent(c.id)}" target="_blank" rel="noopener">Abrir presentación</a>`:''}</div>`,
-    {onSubmit:async()=>{},submitLabel:'Cerrar'});
-  document.getElementById('prop-copy').onclick=()=>navigator.clipboard.writeText(p.texto).then(()=>toast('Copiado')).catch(()=>toast('Selecciona y copia el texto'));
+  const wa=String(c.telefono||'').replace(/\D/g,'');
+  let cuerpo='';
+  if(paso===0){
+    const datosG=g.found?`<div class="negocio-g"><div class="prop-sum">${caja('Calificación',g.rating?'★ '+g.rating:'')+caja('Reseñas',g.reviews)+caja('Categoría en Google',g.category)}</div>
+        ${g.address?`<p><b>Dirección:</b> ${esc(g.address)}</p>`:''}${g.website?`<p><b>Sitio:</b> ${esc(g.website)}</p>`:''}${g.summary?`<p>${esc(g.summary)}</p>`:''}</div>`
+      :google?'<p class="prop-err" style="margin-top:12px">Claude no pudo consultar el perfil de Google; la propuesta se hizo solo con la encuesta.</p>':'';
+    cuerpo=`<div class="negocio-card"><div class="negocio-emoji" aria-hidden="true">${GIRO_EMOJI[giro]||'✨'}</div>
+      <div><h4>${esc(c.empresa||'Sin nombre')}</h4><p>${esc(giro||'Giro sin definir')}${c.contacto?' · '+esc(c.contacto):''}</p></div>
+      <div class="negocio-acts">${/^https?:\/\//i.test(google)?`<a class="btn btn-sm" href="${esc(google)}" target="_blank" rel="noopener">Ver en Google ↗</a>`:'<span class="access"><i></i>Sin link de Google</span>'}
+        ${wa?`<a class="btn btn-sm ghost" href="https://wa.me/${wa.length===10?'52'+wa:wa}" target="_blank" rel="noopener">WhatsApp</a>`:''}</div></div>${datosG}`;
+  }else if(paso===1){
+    const sum=caja('Precio recomendado',pr.development_price_mxn?money(pr.development_price_mxn):'')+caja('Mínimo de negociación',pr.minimum_negotiation_price_mxn?money(pr.minimum_negotiation_price_mxn):'')+
+      caja('Mantenimiento',pr.monthly_maintenance_mxn?money(pr.monthly_maintenance_mxn)+'/mes':'')+caja('Nivel',pr.project_level);
+    cuerpo=`${sum?`<div class="prop-sum" style="margin-bottom:12px">${sum}</div>`:''}
+      ${p.incompleta?'<p class="prop-err" style="margin-bottom:8px">La respuesta de Claude quedó cortada; conviene volver a generarla.</p>':''}
+      <div class="prop-txt" id="prop-txt">${mdBasico(p.texto)}</div>
+      <div style="margin-top:10px"><button type="button" class="btn btn-sm" id="prop-copy">Copiar texto</button></div>`;
+  }else{
+    const url=`propuesta.html?id=${encodeURIComponent(c.id)}`;
+    cuerpo=p.datos?`<iframe class="prop-frame" src="${url}&embed=1" title="Presentación de la propuesta" allow="fullscreen"></iframe>
+      <div style="margin-top:10px"><a class="btn btn-sm" href="${url}" target="_blank" rel="noopener">Abrir en pantalla completa ↗</a></div>`
+      :'<p class="prop-err">Aún no hay presentación para este cliente.</p>';
+  }
+  root.innerHTML=`<div class="scrim"><div class="glass sheet wide" role="dialog" aria-modal="true" aria-label="Propuesta de ${esc(c.empresa||'')}">
+    <h3>Propuesta · ${esc(c.empresa||'')}</h3>
+    <div class="pasos">${PASOS_PROP.map((t,i)=>`<button type="button" class="chip-btn" data-paso="${i}" aria-pressed="${i===paso}"><b>${i+1}</b>${t}</button>`).join('')}</div>
+    ${cuerpo}
+    <div class="paso-nav">${paso>0?'<button type="button" class="btn ghost spacer" data-ir="-1">← Anterior</button>':''}
+      <button type="button" class="btn ghost" id="paso-cerrar">Cerrar</button>
+      ${paso<PASOS_PROP.length-1?'<button type="button" class="btn primary" data-ir="1">Siguiente →</button>':''}</div></div></div>`;
+  root.querySelector('.scrim').addEventListener('click',e=>{if(e.target.classList.contains('scrim'))close()});
+  document.addEventListener('keydown',escKey);
+  document.getElementById('paso-cerrar').onclick=close;
+  root.querySelectorAll('[data-paso]').forEach(b=>b.onclick=()=>abrirPropuesta(c,+b.dataset.paso));
+  root.querySelectorAll('[data-ir]').forEach(b=>b.onclick=()=>abrirPropuesta(c,paso+(+b.dataset.ir)));
+  const cp=document.getElementById('prop-copy');
+  if(cp)cp.onclick=()=>navigator.clipboard.writeText(p.texto||'').then(()=>toast('Copiado')).catch(()=>toast('Selecciona y copia el texto'));
 }
 
 function evForm(ev,fecha){
