@@ -318,6 +318,21 @@ a.btn.primary{color:var(--on-ink)}
 .prop-txt table{border-collapse:collapse;margin:0 0 10px;width:100%}
 .prop-txt td,.prop-txt th{border-bottom:1px solid var(--stroke);padding:6px 8px;text-align:left;vertical-align:top}
 .sheet.wide{width:min(980px,100%)}
+.guion{display:flex;flex-direction:column;gap:10px}
+.guion-d{padding:16px 18px;border-radius:14px;background:var(--hair)}
+.guion-d header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.guion-d header b{font-size:15px}
+.guion-d header .btn{margin-left:auto}
+.guion-n{font:600 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em;color:var(--muted)}
+.guion-t p{margin:0 0 8px;font-size:16px;line-height:1.6}
+.guion-t p:last-child{margin-bottom:0}
+.guion-nota{margin:10px 0 0;padding-top:8px;border-top:1px solid var(--stroke);font-size:13px;color:var(--muted)}
+.prop-det{margin-top:12px}
+.prop-det summary{cursor:pointer;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:6px 0}
+.prop-det .prop-sum,.prop-det .prop-txt{margin-top:8px}
+.guion-q{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.guion-q b{display:block;font-size:14.5px}
+.guion-q p{margin:2px 0 0;font-size:14.5px;line-height:1.5;color:var(--muted)}
 .pasos{display:flex;gap:6px;flex-wrap:wrap;margin:-6px 0 18px}
 .pasos button{display:inline-flex;align-items:center;gap:6px}
 .pasos b{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--hair);font-size:11px}
@@ -1580,9 +1595,17 @@ function mdBasico(t){
 }
 const GIRO_EMOJI={'Restaurante o cafetería':'🍽️','Tienda o comercio':'🛍️','Salud o clínica':'🩺','Belleza o spa':'💇','Gimnasio o deporte':'🏋️',
   'Servicios profesionales':'💼','Educación o cursos':'🎓','Inmobiliaria o construcción':'🏠','Logística o distribución':'🚚','Otro':'✨'};
-const PASOS_PROP=['Negocio','Propuesta','Presentación'];
-// Recorrido de la propuesta: 1) el negocio (rubro, Google), 2) la propuesta de Claude, 3) la presentación.
-function abrirPropuesta(c,paso){
+const PASOS_PROP=['Negocio','Guion','Presentación'];
+// Diapositivas de la presentación en orden (ids de web/propuesta/plantilla.js y DIAPOSITIVAS de propuesta-claude/prompt.ts).
+const DIAPOS=[['cover','Portada'],['agenda','Agenda'],['entendimos','Lo que entendimos'],['necesidad','La necesidad'],['oportunidad','La oportunidad'],
+  ['solucion','La propuesta'],['funciones','Funciones'],['flujo','Cómo funciona'],['concepto','Así se vería'],['plan','Plan de trabajo'],
+  ['inversion','Inversión'],['incluye','Qué incluye'],['porque','Por qué ARK'],['pasos','Siguientes pasos'],['cierre','Cierre']];
+// Guion por diapositiva que generó Claude (las propuestas anteriores no lo traen).
+const guionDe=d=>(Array.isArray(d&&d.script)?d.script:[]).filter(x=>x&&String(x.guion||'').trim())
+  .map(x=>{const i=DIAPOS.findIndex(([id])=>id===x.slide);return {i,nombre:i>=0?DIAPOS[i][1]:String(x.slide||''),guion:String(x.guion).trim(),nota:String(x.nota||'').trim()}});
+const parrafos=t=>String(t||'').split(/\n+/).map(x=>x.trim()).filter(Boolean).map(x=>`<p>${esc(x)}</p>`).join('');
+// Recorrido de la propuesta: 1) el negocio (rubro, Google), 2) el guion para presentar, 3) la presentación.
+function abrirPropuesta(c,paso,diapo){
   const p=propDe(c.id)||{},d=p.datos||{},pr=d.pricing||{},g=d.google_profile||{},enc=c.encuesta||{};
   const google=c.google||enc.google||'',giro=c.giro||enc.giro||'';
   const caja=(l,v)=>v?`<div><span>${l}</span><b>${esc(v)}</b></div>`:'';
@@ -1603,13 +1626,21 @@ function abrirPropuesta(c,paso){
     const objetivo=pr.target_price_mxn??pr.development_price_mxn,minimo=pr.minimum_acceptable_price_mxn??pr.minimum_negotiation_price_mxn;
     const sum=caja('Precio objetivo',objetivo?money(objetivo):'')+caja('Oferta',pr.offer_price_mxn?money(pr.offer_price_mxn):'')+caja('Mínimo aceptable',minimo?money(minimo):'')+
       caja('Mantenimiento',pr.monthly_maintenance_mxn?money(pr.monthly_maintenance_mxn)+'/mes':'')+caja('Nivel',pr.project_level);
-    cuerpo=`${sum?`<div class="prop-sum" style="margin-bottom:12px">${sum}</div>`:''}
-      ${p.incompleta?'<p class="prop-err" style="margin-bottom:8px">La respuesta de Claude quedó cortada; conviene volver a generarla.</p>':''}
-      <div class="prop-txt" id="prop-txt">${mdBasico(p.texto)}</div>
-      <div style="margin-top:10px"><button type="button" class="btn btn-sm" id="prop-copy">Copiar texto</button></div>`;
+    const G=guionDe(d),Q=(Array.isArray(d.questions)?d.questions:[]).filter(x=>x&&x.question);
+    const analisis=p.texto?`<details class="prop-det"${G.length?'':' open'}><summary>Análisis interno y precio</summary><div class="prop-txt" id="prop-txt">${mdBasico(p.texto)}</div></details>`:'';
+    cuerpo=`${p.incompleta?'<p class="prop-err" style="margin-bottom:8px">La respuesta de Claude quedó cortada; conviene volver a generarla.</p>':''}
+      ${G.length?`<p class="ayuda" style="margin:0 0 12px">Léelo mientras compartes la presentación: cada parte va con su diapositiva. Las notas en gris son solo para ti.</p>
+        <div class="guion">${G.map(x=>`<article class="guion-d"><header><span class="guion-n">${x.i>=0?String(x.i+1).padStart(2,'0'):'·'}</span><b>${esc(x.nombre)}</b>
+          ${x.i>=0&&p.datos?`<button type="button" class="btn btn-sm ghost" data-diapo="${x.i}">Ver diapositiva</button>`:''}</header>
+          <div class="guion-t">${parrafos(x.guion)}</div>${x.nota?`<p class="guion-nota">${esc(x.nota)}</p>`:''}</article>`).join('')}</div>`
+      :'<p class="prop-err" style="margin-bottom:10px">Esta propuesta se generó antes del guion por diapositiva. Vuelve a generarla desde la ficha del cliente para tenerlo.</p>'}
+      ${sum?`<details class="prop-det"${G.length?'':' open'}><summary>Precios para negociar (solo para ti)</summary><div class="prop-sum">${sum}</div></details>`:''}
+      ${Q.length?`<details class="prop-det"><summary>Preguntas que te pueden hacer (${Q.length})</summary><div class="guion-q">${Q.map(x=>`<div><b>${esc(x.question)}</b><p>${esc(x.answer||'')}</p></div>`).join('')}</div></details>`:''}
+      ${analisis}
+      <div style="margin-top:12px"><button type="button" class="btn btn-sm" id="prop-copy">${G.length?'Copiar guion':'Copiar texto'}</button></div>`;
   }else{
     const url=`propuesta.html?id=${encodeURIComponent(c.id)}`;
-    cuerpo=p.datos?`<iframe class="prop-frame" src="${url}&embed=1" title="Presentación de la propuesta" allow="fullscreen"></iframe>
+    cuerpo=p.datos?`<iframe class="prop-frame" src="${url}&embed=1${diapo>0?'&diapo='+(diapo+1):''}" title="Presentación de la propuesta" allow="fullscreen"></iframe>
       <div style="margin-top:10px"><a class="btn btn-sm" href="${url}" target="_blank" rel="noopener">Abrir en pantalla completa ↗</a></div>`
       :'<p class="prop-err">Aún no hay presentación para este cliente.</p>';
   }
@@ -1625,8 +1656,10 @@ function abrirPropuesta(c,paso){
   document.getElementById('paso-cerrar').onclick=close;
   root.querySelectorAll('[data-paso]').forEach(b=>b.onclick=()=>abrirPropuesta(c,+b.dataset.paso));
   root.querySelectorAll('[data-ir]').forEach(b=>b.onclick=()=>abrirPropuesta(c,paso+(+b.dataset.ir)));
+  root.querySelectorAll('[data-diapo]').forEach(b=>b.onclick=()=>abrirPropuesta(c,2,+b.dataset.diapo));
   const cp=document.getElementById('prop-copy');
-  if(cp)cp.onclick=()=>navigator.clipboard.writeText(p.texto||'').then(()=>toast('Copiado')).catch(()=>toast('Selecciona y copia el texto'));
+  const G=guionDe(d),copia=G.length?G.map(x=>`${x.i>=0?x.i+1+'. ':''}${x.nombre.toUpperCase()}\n\n${x.guion}${x.nota?`\n\n(Nota: ${x.nota})`:''}`).join('\n\n'):(p.texto||'');
+  if(cp)cp.onclick=()=>navigator.clipboard.writeText(copia).then(()=>toast('Copiado')).catch(()=>toast('Selecciona y copia el texto'));
 }
 
 function evForm(ev,fecha){

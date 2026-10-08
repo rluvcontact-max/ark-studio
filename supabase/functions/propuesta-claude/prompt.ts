@@ -4,6 +4,7 @@
 // Los campos que llena el código (fecha, vendedor, precios formateados, pagos) no se le piden a Claude.
 // Agregado: tres precios (objetivo, oferta y mínimo aceptable) en lugar de recomendado + mínimo.
 // Agregado: análisis del perfil de Google del negocio (web_search / web_fetch) para afinar la propuesta y el presupuesto.
+// Agregado: guion listo para leer, una parte por diapositiva (JSON `script`), y preguntas probables (JSON `questions`).
 
 export const VARIABLES_PRESENTACION: Record<string, string> = {
   cliente_nombre: "Nombre del negocio o empresa.",
@@ -85,6 +86,41 @@ export const VARIABLES_PRESENTACION: Record<string, string> = {
   paso_siguiente_4_fecha: "Cuándo los primeros diseños.",
 };
 
+// Diapositivas de la plantilla (web/propuesta/plantilla.js), en orden. Los ids deben coincidir con los de la plantilla:
+// el guion de cada una aparece en la app (paso "Guion") y como notas del presentador en la presentación.
+export const DIAPOSITIVAS: { id: string; nombre: string; muestra: string; guion: string }[] = [
+  { id: "cover", nombre: "Portada", muestra: "nombre_app para cliente_nombre, frase_valor, preparado para cliente_contacto, presenta el vendedor.", guion: "Saluda por su nombre, agradece el tiempo, preséntate y di que la llamada dura unos 30 minutos. Menciona el nombre de la app y la frase de valor." },
+  { id: "agenda", nombre: "Agenda", muestra: "Lo que veremos hoy: Tu negocio, La necesidad, La aplicación, Funciones, Cómo funciona, Cómo se vería, Inversión, Qué incluye, Siguientes pasos.", guion: "Explica la ruta de la llamada en una o dos frases, que al final se habla de inversión y siguientes pasos, y que puede interrumpir cuando quiera." },
+  { id: "entendimos", nombre: "Lo que entendimos", muestra: "resumen_negocio, contexto_adicional, industria, tamaño, ubicación, cómo operan hoy, objetivo.", guion: "Explica que ARK revisó sus respuestas (y su perfil de Google si se consultó). Resume cómo funciona el negocio y qué buscan, con una frase como \"Por lo que entendimos...\" y pregunta: \"¿Lo entendimos bien? ¿Falta algo?\"" },
+  { id: "necesidad", nombre: "La necesidad", muestra: "necesidad_principal entre comillas y los tres problemas (dolor_1..3).", guion: "Nombra la necesidad principal en una frase clara y luego explica los tres problemas concretos, sin criticar su forma actual de trabajar." },
+  { id: "oportunidad", nombre: "La oportunidad", muestra: "Lo que cambia si lo resolvemos: tres valores cortos con su explicación y nota_estimacion.", guion: "Explica qué se podría simplificar o centralizar y qué cambia para el negocio, sin prometer resultados garantizados ni cifras inventadas." },
+  { id: "solucion", nombre: "La propuesta", muestra: "nombre_app, descripcion_app, plataformas y quién la usa (usuario_1..3 con su uso).", guion: "Presenta la app por su nombre, como un producto propio del cliente: qué es, qué resuelve, en qué plataformas y quién la usa." },
+  { id: "funciones", nombre: "Funciones", muestra: "Lo que hará nombre_app: funcion_1..6 con su descripción (la 6 es la función estrella).", guion: "Recorre las funciones una por una, en el orden de la diapositiva: qué hace, cómo la usarían y qué beneficio práctico tendría, conectándola con los problemas de la diapositiva de la necesidad." },
+  { id: "flujo", nombre: "Cómo funciona", muestra: "Un día con nombre_app: paso_1..4 con su descripción y resultado_flujo.", guion: "Cuenta el flujo como una historia: quién hace qué, en qué orden y qué obtiene el negocio al final. Haz que el cliente pueda visualizarse usándola." },
+  { id: "concepto", nombre: "Así se vería", muestra: "descripcion_visual, tres pantallas (pantalla_1..3) y la aclaración de que el diseño es conceptual.", guion: "Describe cómo sería entrar a la app y moverse por esas pantallas; aclara que el diseño final se define con ellos en la fase de diseño." },
+  { id: "plan", nombre: "Plan de trabajo", muestra: "Entrega estimada tiempo_total y las fases Descubrimiento, Diseño, Desarrollo y Lanzamiento con su tiempo y descripción; revisiones al cierre de cada fase y avances cada semana.", guion: "Explica que el proceso es ordenado y transparente, fase por fase, y qué incluye la primera versión. Menciona brevemente las funciones futuras solo si tienen sentido, como algo para después." },
+  { id: "inversion", nombre: "Inversión", muestra: "Precio objetivo + IVA, mantenimiento mensual y mensualidad_concepto, esquema de pagos con porcentajes, momentos y montos, y vigencia.", guion: "Ver las reglas de la diapositiva de inversión." },
+  { id: "incluye", nombre: "Qué incluye", muestra: "Diseño UX/UI a la medida, desarrollo de la app, panel de administración, incluye_extra_1, publicación en tiendas, capacitación al equipo, garantía, incluye_extra_2; y lo que no incluye (no_incluye_1..3).", guion: "Explica brevemente qué recibe y qué no incluye, para evitar malentendidos. Si la app es solo web, aclara que no aplica la publicación en tiendas." },
+  { id: "porque", nombre: "Por qué ARK", muestra: "A la medida, Diseño premium, Cercanía, Tu app es tuya.", guion: "Explica en pocas frases por qué ARK: hecho a la medida de su negocio, diseño moderno, acompañamiento antes y después del lanzamiento, y que la app es suya." },
+  { id: "pasos", nombre: "Siguientes pasos", muestra: "Aprobación de la propuesta, firma de contrato y anticipo, sesión de arranque, primeros diseños, con sus fechas (paso_siguiente_1..4_fecha).", guion: "Explica qué pasaría si quiere continuar y propone una fecha concreta para el primer paso." },
+  { id: "cierre", nombre: "Cierre", muestra: "Hagamos realidad nombre_app y los datos de contacto del vendedor.", guion: "Agradece, di que hoy mismo le mandas la propuesta y el resumen por WhatsApp, y termina con una pregunta abierta para escuchar su reacción." },
+];
+
+// Condiciones comerciales: deben coincidir con CONDICIONES de web/propuesta.html.
+export const CONDICIONES_PROPUESTA = {
+  impuestos: "más IVA",
+  vigencia: "15 días",
+  garantia: "30 días para corrección de errores",
+  pagos: [[50, "al firmar"], [30, "al aprobar el diseño"], [20, "a la entrega"]] as [number, string][],
+};
+
+const listaDiapositivas = "Las diapositivas de la presentación, en orden (id — nombre: qué se ve | qué decir):\n" +
+  DIAPOSITIVAS.map((d, i) => `${i + 1}. ${d.id} — ${d.nombre}: ${d.muestra} | ${d.guion}`).join("\n");
+const condicionesTexto = `Condiciones que aparecen en la presentación: el precio es ${CONDICIONES_PROPUESTA.impuestos}; ` +
+  `esquema de pagos: ${CONDICIONES_PROPUESTA.pagos.map(([p, m]) => `${p}% ${m}`).join(", ")}; ` +
+  `vigencia de la propuesta: ${CONDICIONES_PROPUESTA.vigencia}; garantía: ${CONDICIONES_PROPUESTA.garantia}.`;
+const jsonGuion = DIAPOSITIVAS.map((d) => `{ "slide": "${d.id}", "guion": "", "nota": "" }`).join(",\n");
+
 const listaVariables = Object.entries(VARIABLES_PRESENTACION)
   .map(([k, d]) => `${k}: ${d}`).join("\n");
 const jsonPresentacion = Object.keys(VARIABLES_PRESENTACION).map((k) => `"${k}": ""`).join(",\n");
@@ -118,9 +154,9 @@ A partir de las respuestas de la encuesta debes generar:
 6. Precios de desarrollo: objetivo, oferta y mínimo aceptable.
 7. Mantenimiento mensual recomendado.
 8. Justificación interna del precio.
-9. Guion completo para presentar la propuesta por videollamada.
-10. Posibles preguntas del cliente y respuestas sugeridas.
-11. Contenido completo para llenar la presentación comercial de ARK.
+9. Contenido completo para llenar la presentación comercial de ARK.
+10. Guion listo para leer al presentar, diapositiva por diapositiva, que concuerde con la presentación.
+11. Posibles preguntas del cliente y respuestas sugeridas.
 12. Información estructurada para que posteriormente pueda ser usada por código.
 
 ARK no vende funciones innecesarias únicamente para aumentar el precio.
@@ -412,66 +448,33 @@ Explica por qué llegaste a ese precio.
 
 Este desglose es SOLO para ARK y NO debe decirse al cliente como una suma exacta de cada función.
 
-Crea un guion completo y natural para que un representante de ARK pueda usarlo durante la videollamada.
+GUION DE LA PRESENTACIÓN
 
-Debe sonar hablado.
+El vendedor va a presentar la propuesta en videollamada compartiendo la presentación comercial de ARK y leyendo un guion. Escribe ese guion: un texto por diapositiva, en el mismo orden de la presentación, listo para leerse en voz alta.
 
-No como un documento legal.
+Reglas del guion:
+- Debe sonar hablado y natural, en primera persona del vendedor ("yo" y "nosotros en ARK"), hablándole de tú al cliente salvo que la encuesta sugiera un trato más formal.
+- No como un documento legal ni como texto generado por IA.
+- Debe CONCORDAR con lo que se ve en cada diapositiva: usa exactamente los mismos nombres, funciones, pasos, plataformas, tiempos y cifras que pusiste en las variables de la presentación, en el mismo orden en que aparecen. No menciones nada que contradiga la diapositiva.
+- Puede explicar más de lo que dice la diapositiva (el porqué, un ejemplo práctico, cómo lo usarían), pero sin introducir funciones o datos que no estén en la propuesta.
+- Cada diapositiva: entre 2 y 6 frases (la de funciones y la de inversión pueden ser más largas). Separa las ideas en párrafos cortos con salto de línea.
+- Si una diapositiva conviene usarla para preguntarle algo al cliente, escribe la pregunta dentro del guion.
+- No uses Markdown, viñetas ni acotaciones entre corchetes dentro del guion: solo lo que se dice.
+- Las indicaciones para el vendedor que NO se leen en voz alta (cuándo hacer una pausa, qué escuchar, cuándo ofrecer el precio de oferta) van aparte, en "nota".
 
-No como texto generado por IA.
+${listaDiapositivas}
 
-Divide el guion en:
+${condicionesTexto}
 
-APERTURA
-Agradece brevemente y explica que ARK revisó sus respuestas.
+En la diapositiva de inversión:
+- Presenta el precio objetivo de forma segura y profesional. No te disculpes por el precio. No digas: "Es un poco caro." Usa lenguaje como: "Por el alcance que estamos planteando, la inversión sería de..."
+- Di el precio objetivo, el mantenimiento mensual y lo que cubre, el esquema de pagos con sus montos calculados sobre el precio objetivo, que es más IVA y la vigencia, tal como aparecen en la diapositiva.
+- El precio de oferta NUNCA va en el guion leído: en la "nota" de esa diapositiva explica cuándo y cómo ofrecerlo (por ejemplo, si el cliente pide mejor precio o para cerrar dentro de la vigencia) y recuerda no bajar del mínimo aceptable; ahí sí escribe las cifras de oferta y mínimo.
+- Menciona costos externos solo cuando apliquen.
 
-LO QUE ENTENDIMOS
-Resume cómo funciona el negocio y qué están buscando.
-Incluye alguna frase que invite al cliente a confirmar: "Por lo que entendimos..."
+En la última diapositiva cierra con una pregunta abierta y natural para escuchar la reacción del cliente.
 
-LA OPORTUNIDAD
-Explica qué podría simplificarse o centralizarse.
-No critiques su forma actual de trabajar.
-
-LA PROPUESTA
-Explica la aplicación que ARK propone construir.
-
-FUNCIONES
-Explica las principales funciones una por una.
-Para cada función incluye:
-- Qué hace.
-- Cómo la usarían.
-- Qué beneficio práctico tendría.
-
-EXPERIENCIA DE USO
-Describe brevemente cómo sería entrar a la aplicación y utilizarla.
-Haz que el cliente pueda visualizarla.
-
-PRIMERA VERSIÓN
-Explica qué incluiría la V1.
-
-FUNCIONES FUTURAS
-Menciona solo las que tengan sentido.
-
-INVERSIÓN
-Presenta el precio de forma segura y profesional.
-No te disculpes por el precio.
-No digas: "Es un poco caro."
-Utiliza lenguaje como: "Por el alcance que estamos planteando, la inversión sería de..."
-Presenta el precio objetivo. La oferta no se dice de entrada: incluye en el guion una nota para el vendedor sobre cuándo y cómo ofrecerla (por ejemplo, si el cliente pide mejor precio o para cerrar dentro de la vigencia), y recuérdale que nunca baje del mínimo aceptable.
-Después presenta el mantenimiento.
-
-QUÉ INCLUYE
-Explica brevemente qué recibe.
-
-COSTOS EXTERNOS
-Solo cuando apliquen.
-
-SIGUIENTE PASO
-Explica qué ocurriría si el cliente quiere continuar.
-
-CIERRE
-Haz una pregunta abierta y natural para escuchar su reacción.
+POSIBLES PREGUNTAS DEL CLIENTE
 
 Genera entre 5 y 10 preguntas que probablemente haga ese cliente.
 
@@ -481,9 +484,9 @@ Deben estar relacionadas con la propuesta.
 
 Ejemplos de temas: precio, tiempo, cambios, soporte, propiedad, capacitación, mantenimiento, usuarios, seguridad, crecimiento.
 
-Para cada pregunta escribe una respuesta corta que el vendedor pueda usar.
+Para cada pregunta escribe una respuesta corta que el vendedor pueda usar, coherente con el guion y la presentación.
 
-Genera contenido para la presentación comercial de ARK (aproximadamente 14 diapositivas).
+Genera contenido para la presentación comercial de ARK (15 diapositivas, las de la lista del guion).
 
 IMPORTANTE:
 
@@ -548,24 +551,10 @@ $X,XXX MXN / mes
 Razón interna del precio:
 [Explicación del objetivo, de cuánto y por qué se descuenta en la oferta y por qué ese es el mínimo; incluye cómo influyó el perfil de Google del negocio en el presupuesto]
 
-────────────
-4. GUION DE LA PROPUESTA
-────────────
-[Aquí coloca el guion completo.]
+El guion y las preguntas NO los escribas en el texto: van solo en el JSON (script y questions), para no repetirlos.
 
 ────────────
-5. POSIBLES PREGUNTAS Y RESPUESTAS
-────────────
-Pregunta:
-Respuesta:
-
-Pregunta:
-Respuesta:
-
-etc.
-
-────────────
-6. JSON
+4. JSON
 ────────────
 Finalmente entrega toda la información principal en JSON válido, dentro de un bloque \`\`\`json.
 
@@ -604,7 +593,13 @@ Utiliza esta estructura:
 },
 "presentation": {
 ${jsonPresentacion}
-}
+},
+"script": [
+${jsonGuion}
+],
+"questions": [
+{ "question": "", "answer": "" }
+]
 }
 
 El JSON debe ser válido y fácil de procesar automáticamente.
@@ -615,10 +610,14 @@ No uses símbolos de moneda dentro de los campos numéricos de pricing.
 
 En google_profile: found es true solo si consultaste el perfil y es el mismo negocio; rating y reviews como texto tal como aparecen en Google (ej. "4.6", "312"); summary es una o dos frases de lo más relevante para la propuesta. Si no hay datos, deja found en false y los textos vacíos.
 
+En script: exactamente una entrada por diapositiva, en el mismo orden y con el mismo id en "slide"; "guion" es el texto que el vendedor lee en voz alta (párrafos separados con \\n) y "nota" una indicación breve solo para el vendedor, o vacía.
+
+En questions: entre 5 y 10 preguntas probables del cliente con su respuesta corta.
+
 Si una variable no aplica, utiliza una cadena vacía: ""
 
 Nunca inventes contenido únicamente para llenar una variable.
 
-A continuación, en el mensaje del usuario, aparecen las respuestas del prospecto.
+A continuación, en el mensaje del usuario, aparecen las respuestas del prospecto y el nombre del vendedor que va a presentar.
 
 Analízalas profundamente antes de responder.`;

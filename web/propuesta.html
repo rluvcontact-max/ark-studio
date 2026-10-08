@@ -30,7 +30,7 @@
   .msg{max-width:520px;margin:20vh auto 0;padding:0 16px;text-align:center;line-height:1.5;color:var(--muted)}
   .msg b{display:block;color:var(--txt);font-size:20px;margin-bottom:8px}
   .msg a{color:var(--txt)}
-  .notas{position:fixed;left:16px;right:16px;bottom:16px;max-height:30vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;font-size:15px;line-height:1.5;color:#E4E4E6;z-index:6}
+  .notas{position:fixed;left:16px;right:16px;bottom:16px;max-height:30vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;font-size:15px;line-height:1.5;color:#E4E4E6;z-index:6;white-space:pre-line}
   :fullscreen .bar,:fullscreen .notas{display:none}
   :fullscreen .stage{inset:0}
   @media (max-width:640px){.bar .t{display:none}.bar .opc{display:none}}
@@ -51,7 +51,7 @@
   <button id="ant" aria-label="Diapositiva anterior">‹</button>
   <span class="n" id="num"></span>
   <button id="sig" aria-label="Diapositiva siguiente">›</button>
-  <button id="notas" class="opc" aria-pressed="false">Notas</button>
+  <button id="notas" class="opc" aria-pressed="false">Guion</button>
   <button id="full" class="opc">Pantalla completa</button>
   <button id="pdf" class="opc">Guardar PDF</button>
 </div>
@@ -114,11 +114,11 @@ function variables(p, cliente, vendedor) {
   return v;
 }
 
-function construir(v) {
+function construir(v, guion = {}) {
   const frame = document.createElement('div');
   frame.className = 'frame';
   const notas = [];
-  for (const {html} of window.PLANTILLA_ARK) {
+  for (const {id, html} of window.PLANTILLA_ARK) {
     const lleno = html
       .replace(/ · \{\{(\w+)\}\}/g, (m, k) => limpio(v[k]) ? ' · ' + esc(limpio(v[k])) : '')
       .replace(/\{\{(\w+)\}\}/g, (m, k) => esc(limpio(v[k])));
@@ -145,8 +145,10 @@ function construir(v) {
       span.innerHTML = `<svg viewBox="0 0 ${w} 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h${w - 4}M${w - 10} 6l6 6-6 6"/></svg>`;
       el.replaceWith(span);
     });
-    const aside = s.querySelector('aside');
-    notas.push(aside ? aside.textContent.replace(/\s*Variables:[\s\S]*$/, '').trim() : '');
+    // Notas del presentador: el guion de Claude para esta diapositiva; si no hay, la indicación de la plantilla.
+    // La "nota" del guion (trae el precio de oferta y el mínimo) no se muestra aquí: se vería al compartir pantalla.
+    const aside = s.querySelector('aside'), g = guion[id];
+    notas.push(g ? g.guion.trim() : aside ? aside.textContent.replace(/\s*Variables:[\s\S]*$/, '').trim() : '');
     s.classList.add('slide');
     frame.appendChild(s);
   }
@@ -196,12 +198,14 @@ async function iniciar() {
     const {data: e} = await sb.from('empleados').select('data').eq('id', cliente.empleadoId).maybeSingle();
     if (e && e.data) vendedor = {nombre: e.data.nombre || '', telefono: e.data.telefono || '', email: e.data.email || ''};
   }
-  const r = construir(variables(prop, cliente, vendedor));
+  const guion = Object.fromEntries((Array.isArray(prop.datos.script) ? prop.datos.script : [])
+    .filter(x => x && x.slide && String(x.guion || '').trim()).map(x => [x.slide, x]));
+  const r = construir(variables(prop, cliente, vendedor), guion);
   $('stage').innerHTML = '';
   $('stage').appendChild(r.frame);
   slides = [...r.frame.children];
   notas = r.notas;
-  mostrar(0);
+  mostrar((Number(new URLSearchParams(location.search).get('diapo')) || 1) - 1);
   ajustar();
   encoger();
 }

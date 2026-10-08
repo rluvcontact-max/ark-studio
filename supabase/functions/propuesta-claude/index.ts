@@ -1,6 +1,7 @@
 // Genera con Claude (API de Anthropic) la propuesta comercial de un prospecto y la guarda en `propuestas`.
 // Usa la Message Batches API: la petición se manda y el resultado se recoge después, así no
-// dependemos del límite de 150 s de las Edge Functions (el prompt genera guion, preguntas y JSON).
+// dependemos del límite de 150 s de las Edge Functions (el prompt genera análisis y un JSON con la
+// presentación, el guion por diapositiva y las preguntas probables).
 //
 // POST {"id": "<cliente>"}  → manda a generar (o regenerar) la propuesta de ese cliente.
 //   Solo admin (sesión del panel) o lead-encuesta (header x-ark-interno).
@@ -79,8 +80,16 @@ async function mandarBatch(id: string, mensajes: Anthropic.Messages.MessageParam
 async function solicitar(sb: SupabaseClient, id: string) {
   const { data: fila, error } = await sb.from("clientes").select("data").eq("id", id).single();
   if (error || !fila) throw new Error("Cliente no encontrado");
+  // El guion lo lee el vendedor del cliente (o Ricardo si no tiene), así que va con su nombre.
+  const cd = fila.data as Record<string, unknown>;
+  let vendedor = "Ricardo Lua";
+  if (cd.empleadoId) {
+    const { data: e } = await sb.from("empleados").select("data").eq("id", String(cd.empleadoId)).maybeSingle();
+    const nombre = String((e?.data as Record<string, unknown> | undefined)?.nombre ?? "").trim();
+    if (nombre) vendedor = nombre;
+  }
   const mensajes: Anthropic.Messages.MessageParam[] = [
-    { role: "user", content: "RESPUESTAS:\n\n" + respuestasDe(fila.data as Record<string, unknown>) },
+    { role: "user", content: `VENDEDOR QUE PRESENTA: ${vendedor}\n\nRESPUESTAS:\n\n` + respuestasDe(cd) },
   ];
   const batch = await mandarBatch(id, mensajes);
   const { data: prev } = await sb.from("propuestas").select("data").eq("id", id).maybeSingle();
@@ -104,7 +113,7 @@ function separar(texto: string) {
   let datos: Record<string, unknown> | null = null;
   try { datos = JSON.parse(crudo); } catch { datos = null; }
   // El texto para leer empieza en el resumen (sin lo que Claude dijo mientras buscaba) y termina antes del JSON.
-  const corte = texto.search(/\n[─\-—=\s]*\n?\s*6\.\s*JSON/);
+  const corte = texto.search(/\n[─\-—=\s]*\n?\s*\d\.\s*JSON/);
   let legible = (corte > 0 ? texto.slice(0, corte) : texto.replace(/```json[\s\S]*?```/g, "")).trim();
   const inicio = legible.search(/[─\-—=]*\s*\n?\s*1\.\s*RESUMEN INTERNO/);
   if (inicio > 0) legible = legible.slice(inicio).trim();
