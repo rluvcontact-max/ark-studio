@@ -438,6 +438,53 @@ a.btn.primary{color:var(--on-ink)}
 .bono-kpis span{display:block;font-size:11px;color:var(--muted)}
 .bono-kpis b{font-size:14px;font-variant-numeric:tabular-nums}
 .ranking{display:grid;gap:4px}
+.avatar.xl{width:76px;height:76px;font-size:20px}
+.premios{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.premio{padding:18px;border-radius:22px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.premio .pr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.pr-emoji{font-size:30px;line-height:1;width:54px;height:54px;border-radius:16px;display:grid;place-items:center;background:var(--hair);flex:none}
+.pr-meta{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.premio h3{margin:0;font-size:18px;line-height:1.25}
+.pr-barra{height:6px;border-radius:999px;background:var(--hair);overflow:hidden;margin-top:8px}
+.pr-barra i{display:block;height:100%;border-radius:999px;background:var(--ink)}
+.pr-txt{margin:2px 0 0;font-size:13px;color:var(--muted)}
+.pr-txt b{color:var(--fg)}
+.pr-gan{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13.5px}
+.premio.en-juego{box-shadow:0 0 0 1.5px var(--ink),0 18px 40px -22px var(--shadow)}
+.premio.ganado{background:var(--ink);color:var(--on-ink)}
+.premio.ganado .pr-meta,.premio.ganado .tag{color:var(--on-ink);opacity:.7}
+.premio.ganado .tag{border-color:currentColor}
+.premio.ganado .pr-emoji{background:rgba(127,127,127,.25)}
+.podio{display:flex;align-items:flex-end;justify-content:center;gap:14px;padding-top:6px}
+.pd{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;max-width:150px;text-align:center;min-width:0}
+.pd b{font-size:15px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pd>span:not(.pd-med){font-size:13px;color:var(--muted)}
+.pd-med{font-size:26px;line-height:1}
+.pd .avatar.xl{margin:2px 0 4px}
+.pd-2 .avatar.xl,.pd-3 .avatar.xl{width:60px;height:60px;font-size:16px}
+.pd-base{width:100%;margin-top:6px;border-radius:14px 14px 6px 6px;background:var(--hair);display:grid;place-items:center;font:600 20px/1 var(--mono);color:var(--muted)}
+.pd-1 .pd-base{height:92px;background:var(--ink);color:var(--on-ink)}
+.pd-2 .pd-base{height:64px}
+.pd-3 .pd-base{height:44px}
+.pd.yo b{text-decoration:underline;text-underline-offset:4px}
+.carrera{display:grid;gap:4px}
+.cr{display:grid;grid-template-columns:22px auto minmax(90px,170px) 1fr 34px 70px;gap:10px;align-items:center;padding:10px;border-radius:14px}
+.cr.yo{background:var(--hair)}
+.cr .pos{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.cr .nom{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cr b{text-align:right;font-variant-numeric:tabular-nums;font-size:16px}
+.cr-sig{font-size:12px;color:var(--muted);white-space:nowrap;text-align:right}
+.pista{position:relative;height:8px;border-radius:999px;background:var(--hair);margin:0 10px 0 0}
+.pista i{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:var(--ink)}
+.pista .mk{position:absolute;top:50%;transform:translate(-50%,-50%);font-size:14px;line-height:1;filter:grayscale(1);opacity:.55}
+.pista .mk.ok{filter:none;opacity:1}
+.carrera-mini{display:flex;align-items:center;gap:12px;width:100%;padding:12px;margin:0 0 10px;border-radius:16px;border:1px solid var(--stroke);background:var(--hair);color:inherit;font:inherit;text-align:left;cursor:pointer}
+.carrera-mini .pr-emoji{width:42px;height:42px;font-size:22px;border-radius:12px;background:var(--glass-strong)}
+.carrera-mini>span:nth-child(2){flex:1;min-width:0}
+.carrera-mini b{display:block;font-size:14.5px}
+.carrera-mini span span{font-size:13px;color:var(--muted)}
+.cm-ir{font-size:13px;font-weight:600;white-space:nowrap}
+.prem-fila{display:grid;grid-template-columns:90px 1fr 80px auto;gap:8px;align-items:end;margin:8px 0}
 .rk{display:grid;grid-template-columns:22px auto 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:12px}
 .rk.yo{background:var(--hair)}
 .rk .pos{font-family:var(--mono);font-size:12px;color:var(--muted)}
@@ -449,6 +496,8 @@ a.btn.primary{color:var(--on-ink)}
 .aviso b{display:block}
 .aviso span{font-size:14px;color:var(--muted)}
 .aviso-acts{display:flex;gap:8px;justify-content:flex-end}
+@media (max-width:900px){.premios{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:700px){.cr{grid-template-columns:22px auto 1fr 30px;row-gap:6px}.cr .pista{grid-column:3/-1;grid-row:2;margin:0 10px 0 0}.cr-sig{display:none}.prem-fila{grid-template-columns:70px 1fr 60px}.prem-fila .btn{grid-column:1/-1;justify-self:start}.premio{padding:14px}.premio h3{font-size:15.5px}.pr-emoji{width:44px;height:44px;font-size:24px}}
 @media (max-width:700px){.bono-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.esc-fila,.mat-fila{grid-template-columns:1fr}}
 .creds-box pre{margin:0 0 12px;padding:14px;border-radius:12px;background:var(--hair);font-family:var(--mono);font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere;user-select:all}
 @media (max-width:820px){.cred{grid-template-columns:1fr}}
@@ -546,6 +595,7 @@ a.btn.primary{color:var(--on-ink)}
   <symbol id="i-clients" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 20V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v14"/><path d="M16 10h2a2 2 0 0 1 2 2v8M2 20h20M8 8h4M8 12h4M8 16h4"/></g></symbol>
   <symbol id="i-cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></g></symbol>
   <symbol id="i-team" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.4 3.2-5.5 6.5-5.5s5.9 2.1 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M17 14.5c2.4 0 4.1 1.6 4.6 4"/></g></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H4.5a2.5 2.5 0 0 0 2.6 4M17 6h2.5a2.5 2.5 0 0 1-2.6 4M12 14v3.5M8.5 20.5h7M9.5 20.5c0-1.8 1-3 2.5-3s2.5 1.2 2.5 3"/></g></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4-4"/></g></symbol>
   <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
@@ -617,7 +667,7 @@ const METODOS=['Transferencia','Efectivo','Tarjeta','Depósito'];
 
 const data={empleados:[],clientes:[],eventos:[],finanzas:[],accesos:[],juntas:[],config:[],propuestas:[],notas:[]};
 // Datos calculados en el servidor para el equipo (RPC): bonos/material, ranking del mes y ventas propias del empleado.
-const extra={ajustes:{},ranking:[],misVentas:null};
+const extra={ajustes:{},ranking:[],misVentas:null,carrera:null};
 
 const S={mode:'login',acct:null,demo:false,previewEmp:null,linkedEmp:null,names:{}};
 const ui={jEmp:'todos',jq:'',view:'panel',q:'',fEmp:'todos',fEst:'todos',calEmp:'todos',mes:null,dia:null,per:'mes',fMov:'todos'};
@@ -783,7 +833,7 @@ async function logout(){
   await sb.auth.signOut();
   if(canal){sb.removeChannel(canal);canal=null}
   TABLAS.forEach(c=>data[c]=[]);data.accesos=[];
-  clearInterval(extrasTimer);extra.ajustes={};extra.ranking=[];extra.misVentas=null;
+  clearInterval(extrasTimer);extra.ajustes={};extra.ranking=[];extra.misVentas=null;extra.carrera=null;
   S.mode='login';S.previewEmp=null;S.linkedEmp=null;S.acct=null;
   document.getElementById('shell').hidden=true;
   document.getElementById('login').hidden=false;
@@ -793,8 +843,8 @@ async function logout(){
 
 /* ================= navegación ================= */
 const NAV={
-  admin:[['panel','Panel','i-panel'],['finanzas','Finanzas','i-money'],['clientes','Clientes','i-clients'],['calendario','Calendario','i-cal'],['juntas','Juntas','i-rec'],['equipo','Equipo','i-team']],
-  emp:[['inicio','Inicio','i-panel'],['clientes','Mis clientes','i-clients'],['calendario','Mi agenda','i-cal']]
+  admin:[['panel','Panel','i-panel'],['finanzas','Finanzas','i-money'],['clientes','Clientes','i-clients'],['calendario','Calendario','i-cal'],['juntas','Juntas','i-rec'],['equipo','Equipo','i-team'],['ranking','Ranking','i-trophy']],
+  emp:[['inicio','Inicio','i-panel'],['clientes','Mis clientes','i-clients'],['calendario','Mi agenda','i-cal'],['ranking','Ranking','i-trophy']]
 };
 function renderChrome(){
   const items=NAV[isEmp()?'emp':'admin'];
@@ -833,7 +883,7 @@ function refresh(){
     if(S.previewEmp){S.mode='admin';S.previewEmp=null}else{logout();return}
   }
   if(isEmp()){ui.fEmp=me().id;ui.calEmp=me().id}
-  const views=isEmp()?{inicio:vInicio,clientes:vClientes,calendario:vCal}:{panel:vPanel,finanzas:vFinanzas,clientes:vClientes,calendario:vCal,juntas:vJuntas,equipo:vEquipo};
+  const views=isEmp()?{inicio:vInicio,clientes:vClientes,calendario:vCal,ranking:vRanking}:{panel:vPanel,finanzas:vFinanzas,clientes:vClientes,calendario:vCal,juntas:vJuntas,equipo:vEquipo,ranking:vRanking};
   if(!views[ui.view])ui.view=Object.keys(views)[0];
   renderChrome();
   const fid=document.activeElement&&document.activeElement.id,keepFocus=fid==='q'||fid==='jq';
@@ -1105,7 +1155,7 @@ function vInicio(){
         <div class="bono-kpis"><div><span>Por venta</span><b>${money(R.B.porVenta)}</b></div><div><span>Ganado total</span><b>${money(R.ganado)}</b></div><div><span>Pagado</span><b>${money(R.pagado)}</b></div><div><span>Pendiente</span><b>${money(R.pendiente)}</b></div></div>
         ${R.B.escalones.length?`<p class="meta-txt" style="margin-top:12px">Bonos: ${R.B.escalones.map(x=>`${x.ventas} ventas → ${money(x.bono)}`).join(' · ')}</p>`:''}
         <p class="ayuda">Una venta cuenta cuando el cliente hace su primer pago.</p></section>
-      <section class="glass panel"><h2>Ranking del mes ${miPos?`<span class="tag">Vas en ${miPos}º</span>`:''}</h2>${rkHtml}</section>
+      <section class="glass panel"><h2>Ranking del mes ${miPos?`<span class="tag">Vas en ${miPos}º</span>`:''}</h2>${carreraMini()}${rkHtml}</section>
       ${recHtml}${friosHtml}
       <section class="glass panel"><h2>Qué sigue con mis clientes</h2><div class="list">${segHtml}</div></section>
       <section class="glass panel"><h2>Mi agenda <button class="btn btn-sm ghost" data-go="calendario">Ver calendario</button></h2><div class="list">${agHtml}</div></section>
@@ -1217,9 +1267,10 @@ function vEquipo(){
 /* ----- EQUIPO: ventas, bonos, notas, avisos y push ----- */
 let extrasTimer=null;
 async function cargarExtras(){
-  const [aj,rk,mv]=await Promise.all([sb.rpc('ajustes_equipo'),sb.rpc('ranking_mes',{p_mes:today.slice(0,7)}),
-    S.mode==='emp'?sb.rpc('mis_ventas'):Promise.resolve({data:null})]);
-  extra.ajustes=aj.data||{};extra.ranking=rk.data||[];extra.misVentas=mv.data||null;
+  const [aj,rk,mv,cp]=await Promise.all([sb.rpc('ajustes_equipo'),sb.rpc('ranking_mes',{p_mes:today.slice(0,7)}),
+    S.mode==='emp'?sb.rpc('mis_ventas'):Promise.resolve({data:null}),sb.rpc('carrera_premios')]);
+  extra.ajustes=aj.data||{};extra.ranking=rk.data||[];extra.misVentas=mv.data||null;extra.carrera=cp.data||null;
+  celebrarPremios();
 }
 // Bonos: $ fijo por venta + bono por escalón de ventas en el mes (se paga el escalón más alto alcanzado).
 function bonos(){const c=data.config.find(x=>x.id==='bonos')||extra.ajustes.bonos||{};
@@ -1249,6 +1300,109 @@ function resumenBonos(empId){
 function rankingMes(){
   const r=extra.ranking.map(x=>({e:emp(x.empleado_id),n:Number(x.ventas)||0})).filter(x=>x.e);
   return r.sort((a,b)=>b.n-a.n||a.e.nombre.localeCompare(b.e.nombre));
+}
+
+/* ----- RANKING: carrera de premios (RPC carrera_premios) ----- */
+// El primero en llegar a N ventas acumuladas desde `inicio` se lleva el premio; cada premio lo gana una sola persona.
+const MEDALLAS=['🥇','🥈','🥉'];
+function carrera(){
+  const c=extra.carrera||{},yo=isEmp()&&me()?me().id:null;
+  const premios=(c.premios||[]).map(p=>({...p,ventas:Number(p.ventas)||0,g:p.ganador?emp(p.ganador):null})).filter(p=>p.ventas>0).sort((a,b)=>a.ventas-b.ventas);
+  // tabla: más ventas primero; empate: quien llegó antes a su última venta
+  const tabla=(c.tabla||[]).map(x=>({e:emp(x.empleado_id),n:Number(x.ventas)||0,ultima:x.ultima||''})).filter(x=>x.e)
+    .sort((a,b)=>b.n-a.n||(a.ultima||'9').localeCompare(b.ultima||'9')||a.e.nombre.localeCompare(b.e.nombre));
+  const enJuego=premios.find(p=>!p.ganador)||null;
+  return {inicio:c.inicio||'',premios,tabla,enJuego,yo};
+}
+// Avance en la pista: cada tramo entre premios ocupa lo mismo, para que la primera meta no se vea diminuta.
+function pctPista(n,metas){
+  if(!metas.length)return 0;
+  let prev=0;for(let i=0;i<metas.length;i++){const m=metas[i];if(n<=m)return ((i+(n-prev)/(m-prev))/metas.length)*100;prev=m}
+  return 100;
+}
+function vRanking(){
+  const K=carrera(),A=!isEmp(),metas=K.premios.map(p=>p.ventas);
+  const fecha=s=>s?parse(s).toLocaleDateString('es-MX',{day:'numeric',month:'long'}):'';
+  const lider=K.tabla[0]&&K.tabla[0].n>0?K.tabla[0]:null;
+  const yoFila=K.yo?K.tabla.find(x=>x.e.id===K.yo):null,miPos=yoFila?K.tabla.indexOf(yoFila)+1:0;
+  // tarjetas de premios
+  const cards=K.premios.map(p=>{
+    const gane=p.g&&p.g.id===K.yo,enJuego=K.enJuego&&K.enJuego.ventas===p.ventas;
+    let estado;
+    if(p.g)estado=`<div class="pr-gan">${av(p.g,'sm')}<span>${gane?'¡Lo ganaste tú!':'Lo ganó <b>'+esc(p.g.nombre.split(' ')[0])+'</b>'}${p.fecha?' · '+esc(fecha(p.fecha)):''}</span></div>`;
+    else{
+      const cerca=K.tabla.filter(x=>x.n>0)[0],mio=yoFila?yoFila.n:null;
+      const barra=n=>`<div class="pr-barra"><i style="width:${Math.min(100,n/p.ventas*100)}%"></i></div>`;
+      estado=K.yo?`${barra(mio)}<p class="pr-txt">Tú: <b>${mio}/${p.ventas}</b> · ${mio>=p.ventas?'¡Llegaste!':'te faltan '+(p.ventas-mio)}</p>${cerca&&cerca.e.id!==K.yo?`<p class="pr-txt">Va adelante ${esc(cerca.e.nombre.split(' ')[0])} con ${cerca.n}</p>`:''}`
+        :cerca?`${barra(cerca.n)}<p class="pr-txt">Va adelante <b>${esc(cerca.e.nombre.split(' ')[0])}</b> · ${cerca.n}/${p.ventas}</p>`:`${barra(0)}<p class="pr-txt">Nadie ha vendido todavía.</p>`;
+    }
+    return `<article class="glass premio${p.g?' ganado':''}${enJuego?' en-juego':''}">
+      <div class="pr-top"><span class="pr-emoji" aria-hidden="true">${esc(p.emoji||'🏆')}</span><span class="tag">${p.g?'Ganado':enJuego?'En juego':'Disponible'}</span></div>
+      <div class="pr-meta">${p.ventas} ventas</div><h3>${esc(p.premio)}</h3>${estado}</article>`}).join('');
+  // podio (2º, 1º, 3º)
+  const top=K.tabla.filter(x=>x.n>0).slice(0,3);
+  const podio=top.length?`<section class="glass panel podio-box"><h2>Podio</h2><div class="podio">${[1,0,2].filter(i=>top[i]).map(i=>{const x=top[i];
+      return `<div class="pd pd-${i+1}${x.e.id===K.yo?' yo':''}"><span class="pd-med" aria-hidden="true">${MEDALLAS[i]}</span>${av(x.e,'xl')}<b>${esc(x.e.nombre.split(' ')[0])}</b><span>${x.n} ${x.n===1?'venta':'ventas'}</span><div class="pd-base">${i+1}</div></div>`}).join('')}</div></section>`
+    :`<section class="glass panel"><div class="empty"><strong>La carrera ya empezó</strong>La primera venta pone a alguien en el podio.</div></section>`;
+  // tabla general con pista y marcas de premios
+  const marcas=K.premios.map((p,i)=>`<span class="mk${p.ganador?' ok':''}" style="left:${(i+1)/K.premios.length*100}%" title="${esc(p.premio)} · ${p.ventas} ventas">${esc(p.emoji||'🏆')}</span>`).join('');
+  const filas=K.tabla.map((x,i)=>{const sig=K.premios.find(p=>!p.ganador&&p.ventas>x.n);
+    return `<div class="cr${x.e.id===K.yo?' yo':''}"><span class="pos">${i+1}</span>${av(x.e,'sm')}<span class="nom">${esc(x.e.nombre)}</span>
+      <div class="pista"><i style="width:${pctPista(x.n,metas)}%"></i>${marcas}</div><b>${x.n}</b>
+      <span class="cr-sig">${sig?`${esc(sig.emoji||'🏆')} en ${sig.ventas-x.n}`:''}</span></div>`}).join('');
+  const mes=rankingMes();
+  const mesHtml=mes.length?`<div class="ranking">${mes.map((x,i)=>`<div class="rk${x.e.id===K.yo?' yo':''}"><span class="pos">${i+1}</span>${av(x.e,'sm')}<span class="nom">${esc(x.e.nombre)}</span><b>${x.n}</b></div>`).join('')}</div>`:'<p class="pf-vacio">Sin ventas este mes todavía.</p>';
+  const sub=`El primero en llegar a cada meta se lleva el premio, y solo hay uno de cada uno.${K.inicio?` Cuentan las ventas desde el ${esc(fecha(K.inicio))}.`:''}`;
+  const yoTxt=K.yo&&K.enJuego?`<div class="banner"><span>${miPos?`Vas en <b>${miPos}º</b> lugar. `:''}Te ${K.enJuego.ventas-(yoFila?yoFila.n:0)===1?'falta 1 venta':'faltan '+(K.enJuego.ventas-(yoFila?yoFila.n:0))+' ventas'} para ${esc(K.enJuego.emoji||'')} ${esc(K.enJuego.premio)}.</span></div>`:'';
+  return header('Competencia','La carrera de ARK',sub,A?'<button class="btn" data-act="premios">Editar premios</button>':'')+yoTxt+
+    (K.premios.length?`<div class="premios">${cards}</div>`:'<section class="glass panel"><div class="empty"><strong>Sin premios</strong>Agrega los premios de la carrera.</div></section>')+
+    `<div class="grid-2 ranking-g">${podio}
+      <section class="glass panel"><h2>Ventas de este mes</h2>${mesHtml}</section>
+      <section class="glass panel" style="grid-column:1/-1"><h2>Tabla general${lider?` <span class="tag">Líder: ${esc(lider.e.nombre.split(' ')[0])}</span>`:''}</h2>
+        <div class="carrera">${filas||'<p class="pf-vacio">Aún no hay empleados.</p>'}</div>
+        <p class="ayuda">Una venta cuenta cuando el cliente hace su primer pago. Si dos llegan a la misma meta el mismo día, gana quien registró la venta primero.</p></section></div>`;
+}
+// Resumen de la carrera para el Inicio del empleado.
+function carreraMini(){
+  const K=carrera(),p=K.enJuego;if(!p)return '';
+  const f=K.tabla.find(x=>x.e.id===K.yo),n=f?f.n:0,falta=p.ventas-n;
+  return `<button class="carrera-mini" data-go="ranking"><span class="pr-emoji" aria-hidden="true">${esc(p.emoji||'🏆')}</span>
+    <span><b>${esc(p.premio)} en juego</b><span>${n}/${p.ventas} · ${falta<=0?'¡llegaste!':falta===1?'te falta 1 venta':'te faltan '+falta+' ventas'}</span></span><span class="cm-ir">Ver carrera →</span></button>`;
+}
+// Avisa en la app (una vez por celular) cuando alguien gana un premio.
+function celebrarPremios(){
+  const K=carrera();let vistos=[];
+  try{vistos=JSON.parse(localStorage.getItem('ark-premios-vistos')||'[]')}catch(e){}
+  const nuevos=K.premios.filter(p=>p.g&&!vistos.includes(p.ventas+':'+p.premio));
+  if(!nuevos.length)return;
+  try{localStorage.setItem('ark-premios-vistos',JSON.stringify([...vistos,...nuevos.map(p=>p.ventas+':'+p.premio)]))}catch(e){}
+  nuevos.forEach(p=>{
+    let box=document.getElementById('avisos');
+    if(!box){box=document.createElement('div');box.id='avisos';document.body.appendChild(box)}
+    const d=document.createElement('div');d.className='glass aviso';d.setAttribute('role','status');
+    const yo=K.yo&&p.g.id===K.yo;
+    d.innerHTML=`<div><b>${esc(p.emoji||'🏆')} ${yo?'¡Ganaste '+esc(p.premio)+'!':esc(p.g.nombre)+' ganó '+esc(p.premio)}</b><span>${yo?'Fuiste':'Fue'} el primero en llegar a ${p.ventas} ventas.</span></div>
+      <div class="aviso-acts"><button class="btn btn-sm primary" data-ver>Ver ranking</button><button class="btn btn-sm ghost" data-x aria-label="Cerrar">×</button></div>`;
+    d.querySelector('[data-ver]').onclick=()=>{d.remove();go('ranking')};
+    d.querySelector('[data-x]').onclick=()=>d.remove();
+    box.appendChild(d);
+  });
+}
+function premiosForm(){
+  const c=data.config.find(x=>x.id==='premios')||extra.carrera||{},lista=c.premios||[];
+  const fila=(x={})=>`<div class="prem-fila"><label>Ventas<input type="number" min="1" step="1" data-p="ventas" value="${esc(x.ventas||'')}" placeholder="10"></label><label>Premio<input data-p="premio" value="${esc(x.premio||'')}" placeholder="AirPods Pro"></label><label>Emoji<input data-p="emoji" value="${esc(x.emoji||'')}" placeholder="🎧" maxlength="4"></label><button type="button" class="btn btn-sm ghost" data-quitar>Quitar</button></div>`;
+  const fields=`<label class="full">La carrera empieza el<input name="inicio" id="f-inicio" type="date" value="${esc(c.inicio||today)}"></label>
+    <div class="full"><p class="ayuda" style="margin-top:0">Cada premio lo gana solo el primero en llegar a ese número de ventas, contadas desde la fecha de inicio. Si cambias la fecha o las metas, el ranking se recalcula.</p>
+      <div id="prem-lista">${lista.map(fila).join('')}</div><button type="button" class="btn btn-sm" id="prem-add">${plus}Agregar premio</button></div>`;
+  modal('Premios de la carrera',fields,{onSubmit:async f=>{
+    const premios=[...document.querySelectorAll('#prem-lista .prem-fila')].map(r=>({ventas:Number(r.querySelector('[data-p=ventas]').value)||0,premio:r.querySelector('[data-p=premio]').value.trim(),emoji:r.querySelector('[data-p=emoji]').value.trim()}))
+      .filter(x=>x.ventas>0&&x.premio).sort((a,b)=>a.ventas-b.ventas);
+    await setDoc('config','premios',{inicio:f.inicio||today,premios});
+    await cargarExtras();toast('Premios guardados');
+  }});
+  const l=document.getElementById('prem-lista');
+  l.addEventListener('click',e=>{const q=e.target.closest('[data-quitar]');if(q)q.parentElement.remove()});
+  document.getElementById('prem-add').onclick=()=>l.insertAdjacentHTML('beforeend',fila());
 }
 
 // WhatsApp con mensaje según la etapa del cliente.
@@ -1453,6 +1607,7 @@ main.addEventListener('click',async e=>{
   if(d.act==='new-ev') return evForm(null,ui.dia);
   if(d.act==='new-emp') return empForm();
   if(d.act==='bonos') return bonosForm();
+  if(d.act==='premios') return premiosForm();
   if(d.act==='push') return activarPush();
   if(d.act==='mi-perfil') return perfilEmp(me());
   if(d.notaHecha) return marcarNotaHecha(d.notaHecha);

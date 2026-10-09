@@ -3,6 +3,7 @@
 //   Solo lead-encuesta (header x-ark-interno = sha256 de la service key).
 // POST {}                                   → citas que empiezan en los próximos 35 min (hora de Ciudad de México).
 //   La llama pg_cron cada 5 min (`avisar-citas`); cada cita se avisa una sola vez (tabla push_avisos).
+//   En la misma vuelta avisa a todo el equipo cuando alguien gana un premio de la carrera (RPC carrera_premios).
 // Desplegada con verify_jwt = true. Las llaves VAPID están en la tabla push_config (solo service role).
 import { createClient } from "npm:@supabase/supabase-js@2";
 import webpush from "npm:web-push@3.6.7";
@@ -28,12 +29,14 @@ async function vapid() {
 
 type Aviso = { title: string; body: string; url?: string; tag?: string };
 
-// Manda el aviso a las suscripciones del empleado indicado y, si se pide, a las de los admins.
+// Manda el aviso a las suscripciones del empleado indicado y, si se pide, a las de los admins ("*" = a todos).
 async function enviar(empleadoId: string, admins: boolean, aviso: Aviso) {
   await vapid();
-  const filtros = [empleadoId ? `empleado_id.eq.${empleadoId}` : "", admins ? "es_admin.eq.true" : ""].filter(Boolean).join(",");
-  if (!filtros) return 0;
-  const { data: subs } = await sb.from("push_suscripciones").select("id,data").or(filtros);
+  const todos = empleadoId === "*";
+  const filtros = [empleadoId && !todos ? `empleado_id.eq.${empleadoId}` : "", admins ? "es_admin.eq.true" : ""].filter(Boolean).join(",");
+  if (!filtros && !todos) return 0;
+  const consulta = sb.from("push_suscripciones").select("id,data");
+  const { data: subs } = await (todos ? consulta : consulta.or(filtros));
   let enviados = 0;
   for (const s of subs ?? []) {
     try {
@@ -76,6 +79,27 @@ async function avisarCitas() {
   return { avisadas };
 }
 
+// Carrera de premios: el primero en llegar a N ventas gana; se avisa a todos una sola vez por premio.
+async function avisarPremios() {
+  const { data, error } = await sb.rpc("carrera_premios");
+  if (error) { console.error("carrera_premios", error); return 0; }
+  const premios = ((data ?? {}) as { premios?: { ventas: number; premio: string; emoji?: string; ganador?: string | null }[] }).premios ?? [];
+  let avisados = 0;
+  for (const p of premios) {
+    if (!p.ganador) continue;
+    const { error: dup } = await sb.from("push_avisos").insert({ clave: `premio:${p.ventas}:${p.premio}` });
+    if (dup) continue; // ya se avisó
+    const { data: e } = await sb.from("empleados").select("data").eq("id", p.ganador).maybeSingle();
+    const nombre = String((e?.data as Record<string, unknown> | undefined)?.nombre ?? "") || "Alguien del equipo";
+    await enviar("*", true, {
+      title: `🏆 ${nombre} ganó ${p.premio}`,
+      body: `Fue el primero en llegar a ${p.ventas} ventas. La carrera sigue: ve el ranking.`, url: "/", tag: `premio-${p.ventas}`,
+    });
+    avisados++;
+  }
+  return avisados;
+}
+
 Deno.serve(async (req) => {
   const json = (o: unknown, status = 200) => new Response(JSON.stringify(o), { status, headers: { "Content-Type": "application/json" } });
   if (req.method !== "POST") return json({ error: "Método no permitido" }, 405);
@@ -91,7 +115,8 @@ Deno.serve(async (req) => {
       });
       return json({ ok: true, enviados });
     }
-    return json(await avisarCitas());
+    const citas = await avisarCitas();
+    return json({ ...citas, premios: await avisarPremios() });
   } catch (e) {
     console.error(e);
     return json({ error: e instanceof Error ? e.message : "Error" }, 500);
