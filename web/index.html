@@ -697,7 +697,7 @@ async function remove(col,id){
 }
 async function rpc(fn,args){const {error}=await sb.rpc(fn,args);if(error)throw error;await load('accesos');refresh()}
 function showCreds(nombre,usuario,pw){
-  const txt=`ARK · ${nombre}\nUsuario: ${usuario}\nContraseña: ${pw}`;
+  const txt=`ARK · ${nombre}\nCorreo: ${usuario}\nContraseña: ${pw}\nEntra en: https://arkdashboardmx.netlify.app`;
   modal('Acceso listo',`<div class="full creds-box" style="grid-column:1/-1"><p style="margin:0 0 12px;color:var(--muted)">Comparte estos datos con ${esc(nombre)}. La contraseña no se vuelve a mostrar; si se pierde, crea una nueva.</p>
     <pre id="creds-txt">${esc(txt)}</pre><button type="button" class="btn btn-sm" id="creds-copy">Copiar</button></div>`,{onSubmit:async()=>{},submitLabel:'Listo'});
   document.getElementById('creds-copy').onclick=()=>{navigator.clipboard.writeText(txt).then(()=>toast('Copiado')).catch(()=>{const r=document.createRange();r.selectNodeContents(document.getElementById('creds-txt'));const sl=getSelection();sl.removeAllRanges();sl.addRange(r);toast('Selecciona y copia el texto')})};
@@ -738,12 +738,12 @@ function renderLogin(){
   if(S.cargando){card.innerHTML=head+'<p>Cargando…</p>';return}
   if(card.querySelector('#login-form'))return;
   card.innerHTML=head+`<form class="login-form" id="login-form" novalidate>
-      <label>Usuario o correo<input id="lg-user" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>
+      <label>Correo<input id="lg-user" type="email" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="tu@correo.com" required></label>
       <label>Contraseña<input id="lg-pass" type="password" autocomplete="current-password" required></label>
       <p class="err" id="lg-err" hidden></p>
       <button class="btn primary" type="submit" id="lg-btn">Entrar</button>
     </form>
-    <span class="fine">¿No tienes usuario? Pídelo al administrador de ARK.</span>`;
+    <span class="fine">¿No tienes acceso? Pídelo al administrador de ARK.</span>`;
 }
 document.getElementById('login').addEventListener('submit',async e=>{
   if(e.target.id!=='login-form')return;
@@ -751,10 +751,10 @@ document.getElementById('login').addEventListener('submit',async e=>{
   const u=lower(document.getElementById('lg-user').value),pw=document.getElementById('lg-pass').value;
   const err=document.getElementById('lg-err'),btn=document.getElementById('lg-btn');
   const fail=m=>{err.textContent=m;err.hidden=false;btn.disabled=false;btn.textContent='Entrar'};
-  if(!u||!pw)return fail('Escribe tu usuario y tu contraseña.');
+  if(!u||!pw)return fail('Escribe tu correo y tu contraseña.');
   btn.disabled=true;btn.textContent='Verificando…';
   const {error}=await sb.auth.signInWithPassword({email:emailDe(u),password:pw});
-  if(error)return fail(/invalid/i.test(error.message)?'Usuario o contraseña incorrectos.':'No se pudo iniciar sesión. Revisa tu conexión.');
+  if(error)return fail(/invalid/i.test(error.message)?'Correo o contraseña incorrectos.':'No se pudo iniciar sesión. Revisa tu conexión.');
   try{await iniciarSesion()}catch(x){await sb.auth.signOut();fail('Tu cuenta no tiene un perfil en ARK. Habla con el administrador.')}
 });
 async function iniciarSesion(){
@@ -1201,7 +1201,7 @@ function vEquipo(){
       <div class="member-top"><button class="avatar" data-perfil-emp="${e.id}" aria-label="Ver perfil de ${esc(e.nombre)}">${e.foto?`<img src="${esc(e.foto)}" alt="">`:esc(initials(e.nombre))}</button>
         <div style="min-width:0"><b>${esc(e.nombre)}</b><span>${esc(e.rol||'Equipo ARK')}${(()=>{const r=resumenBonos(e.id);return ' · '+r.nMes+(Number(e.meta)?'/'+Number(e.meta):'')+' ventas este mes'})()}</span></div></div>
       <div class="kv"><div><b>${mine.length}</b><span>Clientes</span></div><div><b>${cer.length}</b><span>Cerrados</span></div><div><b>${moneyShort(val)}</b><span>Valor</span></div></div>
-      <div class="access ${acc?'ok':''}"><i></i>${acc?'Usuario: <b>'+esc(acc.usuario)+'</b>':'Sin usuario: aún no puede entrar'}</div>
+      <div class="access ${acc?'ok':''}"><i></i>${acc?'Entra con <b>'+esc(acc.usuario)+'</b>':'Sin acceso: aún no puede entrar'}</div>
       <div class="link-row"><span>Link de encuesta</span><button class="btn btn-sm" data-copy="${esc(linkEncuesta(e.id))}">Copiar link</button></div>
       <div class="next">${nx?`Próxima cita: <b>${esc(nx.titulo||nx.tipo)}</b> · ${fmtShort(nx.fecha).d} ${fmtShort(nx.fecha).m}${nx.hora?' '+esc(nx.hora):''}`:'Sin citas próximas'}</div>
       <div class="member-actions">
@@ -1209,7 +1209,7 @@ function vEquipo(){
         <button class="btn btn-sm" data-emp-cli="${e.id}">Sus clientes</button>
         <button class="btn btn-sm ghost" data-edit-emp="${e.id}">Editar</button>
       </div></article>`}).join('');
-  return header(`${data.empleados.length} personas`,'Equipo','Crea un usuario y contraseña para cada empleado en “Editar”. Con eso entra a su app, sin ver finanzas.',
+  return header(`${data.empleados.length} personas`,'Equipo','Da acceso a cada empleado en “Editar”, con su correo y una contraseña. Con eso entra a su app, sin ver finanzas.',
       `<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="bonos">Bonos y material</button><button class="btn primary" data-act="new-emp">${plus}Agregar empleado</button></div>`)+
     (cards?`<div class="team">${cards}</div>`:`<section class="glass panel"><div class="empty"><strong>Todavía no hay empleados</strong>Agrega a tu equipo para asignarle clientes y citas.</div></section>`);
 }
@@ -1710,7 +1710,7 @@ function empForm(e,abrirFoto){
     <label class="full">Nombre completo<input name="nombre" id="f-nombre" required value="${esc(v.nombre)}"></label>
     <label class="full">Correo<input name="email" id="f-eemail" type="email" value="${esc(v.email)}"></label>
     <div class="cred"><div class="cred-h"><span>Cuenta para la app de empleados</span>${acc?'<span class="access ok"><i></i>Activa</span>':'<span class="access"><i></i>Sin cuenta</span>'}</div>
-      <label>Usuario<input name="usuario" id="f-usuario" autocapitalize="none" spellcheck="false" value="${esc(acc?acc.usuario:'')}" placeholder="${esc(sugerirUsuario(v.nombre)||'jtorres')}"></label>
+      <label>Correo para iniciar sesión<input name="usuario" id="f-usuario" type="email" inputmode="email" autocapitalize="none" spellcheck="false" value="${esc(acc?acc.usuario:(v.email||''))}" placeholder="nombre@gmail.com"></label>
       <label>${acc?'Nueva contraseña':'Contraseña'}<span class="pw-row"><input name="password" id="f-pass" type="text" autocomplete="new-password" placeholder="${acc?'Vacía = no cambiarla':'Mínimo 6 caracteres'}"><button type="button" class="btn btn-sm" id="f-gen">Generar</button></span></label>
       ${acc?'<button type="button" class="btn btn-sm ghost danger" id="f-revoke" style="justify-self:start">Quitar acceso</button>':''}
     </div>
@@ -1730,9 +1730,9 @@ function empForm(e,abrirFoto){
   submit.validate=f=>{
     if(!f.nombre.trim())return 'Escribe el nombre.';
     const u=lower(f.usuario);
-    if(!u&&!f.password)return acc?'Escribe un usuario, o usa “Quitar acceso”.':null;
-    if(!/^[a-z0-9._-]{3,30}$/.test(u))return 'El usuario debe tener al menos 3 caracteres: letras, números, punto o guion.';
-    if(data.accesos.some(a=>a.usuario===u&&(!e||a.id!==e.id)))return 'Ese usuario ya lo tiene otra persona.';
+    if(!u&&!f.password)return acc?'Escribe su correo, o usa “Quitar acceso”.':null;
+    if(!/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(u))return 'Escribe un correo válido, por ejemplo nombre@gmail.com.';
+    if(data.accesos.some(a=>a.usuario===u&&(!e||a.id!==e.id)))return 'Ese correo ya lo usa otra persona.';
     if(!acc&&!f.password)return 'Escribe una contraseña o toca “Generar”.';
     if(f.password&&f.password.length<6)return 'La contraseña debe tener al menos 6 caracteres.';
     return null;
@@ -1748,7 +1748,7 @@ function empForm(e,abrirFoto){
   document.getElementById('f-nombre').addEventListener('input',()=>{if(!foto)pinta()});
   inp.onchange=async()=>{const file=inp.files[0];inp.value='';if(!file)return;
     try{foto=await fotoDeArchivo(file);pinta()}catch(err){toast('No se pudo leer esa imagen. Usa un JPG o PNG.')}};
-  document.getElementById('f-gen').onclick=()=>{document.getElementById('f-pass').value=genPw();const u=document.getElementById('f-usuario');if(!u.value)u.value=sugerirUsuario(document.getElementById('f-nombre').value)};
+  document.getElementById('f-gen').onclick=()=>{document.getElementById('f-pass').value=genPw();const u=document.getElementById('f-usuario');if(!u.value)u.value=document.getElementById('f-eemail').value.trim().toLowerCase()};
   const rv=document.getElementById('f-revoke');let rvArmed=false;
   if(rv) rv.onclick=async()=>{if(!rvArmed){rvArmed=true;rv.textContent='Toca otra vez para quitarle el acceso';return}
     try{await rpc('admin_quitar_acceso',{p_empleado:e.id});toast('Acceso retirado');close()}catch(err){writeError(err)}};

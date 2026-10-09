@@ -33,7 +33,7 @@ Deploys: hoy se hacen arrastrando la carpeta a Netlify (Deploys → drag & drop)
   - admin (`es_admin()`) ve y escribe todo.
   - empleado: solo `clientes`/`eventos` con su `empleado_id` (`mi_empleado()`); lee `empleados`; nunca `finanzas`, `juntas`, `config`.
   - anon: nada, salvo las RPC públicas `reserva_*`/`reservar` (hoy sin uso).
-- **Cuentas**: Supabase Auth con email/contraseña. Los empleados entran con usuario corto; el front y `_email_de()` lo convierten a `<usuario>@arkstudio.app`. Ricardo entra con su correo. Crear/cambiar/quitar cuentas: RPC `admin_guardar_acceso(p_empleado, p_usuario, p_password)` y `admin_quitar_acceso(p_empleado)` (solo admin).
+- **Cuentas**: Supabase Auth con correo y contraseña. Todos entran con su correo (los empleados, con su cuenta de Google de ARK). `perfiles.usuario` guarda ese correo y `admin_guardar_acceso` lo copia a `empleados.data.email`. `_email_de()` solo sigue convirtiendo usuarios cortos viejos a `<usuario>@arkstudio.app`. Crear/cambiar/quitar cuentas: RPC `admin_guardar_acceso(p_empleado, p_usuario, p_password)` y `admin_quitar_acceso(p_empleado)` (solo admin).
 - **Edge Functions** (`supabase/functions/`):
   - `sync-google` (verify_jwt): lee el iCal secreto de cada empleado y hace upsert de sus citas en `eventos` con id `gcal-…`, `origen: "google"`. La llama pg_cron cada 15 min (`sync-google-calendar`).
   - `lead-encuesta` (sin JWT, CORS solo arkencuesta): registra un prospecto en `clientes` según `?v=`. La encuesta la llama (función `enviarLead`) justo después de enviar a Netlify Forms; si falla, la encuesta sigue igual. Guarda las respuestas en `data.encuesta` (incluido el link opcional del perfil de Google, `google`) y, después de responder, pide a `propuesta-claude` la propuesta comercial.
@@ -43,14 +43,14 @@ Deploys: hoy se hacen arrastrando la carpeta a Netlify (Deploys → drag & drop)
 
 ## Empleados y claves
 
-| empleado_id | Clave de encuesta (`?v=`) | Usuario de la app |
+| empleado_id | Clave de encuesta (`?v=`) | Correo para iniciar sesión |
 |---|---|---|
-| andres-mayo | andres | a_mayo |
-| patricio-schnabel | patricio | p_schnabel |
-| guillermo-munoz | guillermo | g_munoz |
-| juan-pablo-suro | juanpablo | j_suro |
-| jorge-torres | jorge | j_torres |
-| bruno-rodriguez | bruno | b_rodriguez |
+| andres-mayo | andres | andres.arkmx@gmail.com |
+| patricio-schnabel | patricio | patricio.arkmx@gmail.com |
+| guillermo-munoz | guillermo | guillermo.arkmx@gmail.com |
+| juan-pablo-suro | juanpablo | juanp.arkmx@gmail.com |
+| jorge-torres | jorge | jorge.arkmx@gmail.com |
+| bruno-rodriguez | bruno | bruno.arkmx@gmail.com |
 
 Las claves deben coincidir en tres lugares: `EQUIPO` en `encuesta/index.html`, `VENDEDORES` en `lead-encuesta` y `CLAVES_ENCUESTA` en `web/index.html`. Las contraseñas no se guardan en el repo.
 
