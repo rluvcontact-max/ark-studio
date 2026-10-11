@@ -1771,7 +1771,8 @@ function propBox(c){
     :`<span class="access ok"><i></i>Lista${p.generada?' · '+esc(new Date(p.generada).toLocaleDateString('es-MX',{day:'numeric',month:'short'})):''}</span>`;
   const tieneEnc=c.encuesta&&Object.keys(c.encuesta).length;
   const acts=(hay||tieneEnc?`<button type="button" class="btn btn-sm" data-prop="ver">${hay?'Ver encuesta y propuesta':'Ver encuesta'}</button>`:'')+
-    (A&&(!p||p.estado!=='pendiente')?`<button type="button" class="btn btn-sm ghost" data-prop="generar">${p&&p.estado?'Volver a generar':'Generar con Claude'}</button>`:'');
+    // el admin siempre; el vendedor cuando aún no hay propuesta o la anterior falló
+    ((A&&(!p||p.estado!=='pendiente'))||(!A&&(!p||p.estado==='error'))?`<button type="button" class="btn btn-sm ghost" data-prop="generar">${p&&p.estado?'Volver a generar':'Generar con Claude'}</button>`:'');
   return `<div class="cred prop-box" id="prop-box" data-cliente="${esc(c.id)}"><div class="cred-h"><span>Propuesta de Claude</span>${est}</div>
     ${p&&p.error?`<p class="prop-err">${esc(p.error)}</p>`:''}${p&&p.estado==='pendiente'?'<p class="prop-err">Suele tardar unos minutos; esta ficha se actualiza sola.</p>':''}
     ${acts?`<div class="prop-acts">${acts}</div>`:''}</div>`;
@@ -1782,7 +1783,7 @@ function wireProp(c){
     if(b.dataset.prop==='ver')return abrirPropuesta(c,0);
     b.disabled=true;
     const {error}=await sb.functions.invoke('propuesta-claude',{body:{id:c.id}});
-    if(error){b.disabled=false;toast('No se pudo pedir la propuesta. Inténtalo de nuevo.');return}
+    if(error){try{await load('propuestas')}catch(e){}pintarProp(c);toast('No se pudo pedir la propuesta. Revisa el aviso en la ficha.');return}
     toast('Claude está preparando la propuesta. Tarda unos minutos.');
     try{await load('propuestas')}catch(e){}
     pintarProp(c);
