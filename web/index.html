@@ -781,7 +781,16 @@ function writeError(e){
 /* ================= acceso (Supabase Auth) ================= */
 const acceso=id=>data.accesos.find(a=>a.id===id);
 function genPw(){const c='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';const r=crypto.getRandomValues(new Uint8Array(10));return [...r].map(x=>c[x%c.length]).join('')}
-const emailDe=u=>u.includes('@')?u:u+'@arkstudio.app';
+// Usuario → correo de Supabase Auth. Debe dar lo mismo que _usuario_norm/_email_de en la base de datos:
+// si parece correo se usa tal cual, si es sencillo (a-z 0-9 . _ -) va con @arkstudio.app, y si no, con un hash.
+const normUsuario=u=>String(u||'').trim().toLowerCase().replace(/\s+/g,' ').normalize('NFC');
+async function emailDe(usuario){
+  const u=normUsuario(usuario);
+  if(/^[!-~]+@[!-~]+\.[!-~]+$/.test(u)&&!/@.*@/.test(u))return u;
+  if(/^[a-z0-9._-]+$/.test(u))return u+'@arkstudio.app';
+  const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(u));
+  return 'u-'+[...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,'0')).join('').slice(0,24)+'@arkstudio.app';
+}
 function renderLogin(){
   const card=document.getElementById('login-card');
   const head=`<svg class="mark"><use href="#ark-mark"/></svg><span class="wordmark">ARK</span><span class="tagline">Apps a la medida</span>`;
@@ -798,12 +807,12 @@ function renderLogin(){
 document.getElementById('login').addEventListener('submit',async e=>{
   if(e.target.id!=='login-form')return;
   e.preventDefault();
-  const u=lower(document.getElementById('lg-user').value),pw=document.getElementById('lg-pass').value;
+  const u=normUsuario(document.getElementById('lg-user').value),pw=document.getElementById('lg-pass').value;
   const err=document.getElementById('lg-err'),btn=document.getElementById('lg-btn');
   const fail=m=>{err.textContent=m;err.hidden=false;btn.disabled=false;btn.textContent='Entrar'};
   if(!u||!pw)return fail('Escribe tu usuario y tu contraseña.');
   btn.disabled=true;btn.textContent='Verificando…';
-  const {error}=await sb.auth.signInWithPassword({email:emailDe(u),password:pw});
+  const {error}=await sb.auth.signInWithPassword({email:await emailDe(u),password:pw});
   if(error)return fail(/invalid/i.test(error.message)?'Usuario o contraseña incorrectos.':'No se pudo iniciar sesión. Revisa tu conexión.');
   try{await iniciarSesion()}catch(x){await sb.auth.signOut();fail('Tu cuenta no tiene un perfil en ARK. Habla con el administrador.')}
 });
@@ -1863,7 +1872,7 @@ function empForm(e,abrirFoto){
       <div style="font-size:12px;color:var(--muted);margin-top:6px">JPG o PNG, de preferencia vertical y nítida: se ve en grande en el perfil.</div></div>
       <input type="file" id="f-foto" accept="image/*" hidden></div>
     <label class="full">Nombre completo<input name="nombre" id="f-nombre" required value="${esc(v.nombre)}"></label>
-    <label class="full">Correo<input name="email" id="f-eemail" type="email" value="${esc(v.email)}"></label>
+    <label class="full">Correo<input name="email" id="f-eemail" type="text" inputmode="email" autocapitalize="none" spellcheck="false" value="${esc(v.email)}"></label>
     <div class="cred"><div class="cred-h"><span>Cuenta para la app de empleados</span>${acc?'<span class="access ok"><i></i>Activa</span>':'<span class="access"><i></i>Sin cuenta</span>'}</div>
       <label>Usuario<input name="usuario" id="f-usuario" autocapitalize="none" spellcheck="false" value="${esc(acc?acc.usuario:'')}" placeholder="${esc(sugerirUsuario(v.nombre)||'jtorres')}"></label>
       <label>${acc?'Nueva contraseña':'Contraseña'}<span class="pw-row"><input name="password" id="f-pass" type="text" autocomplete="new-password" placeholder="${acc?'Vacía = no cambiarla':'Mínimo 6 caracteres'}"><button type="button" class="btn btn-sm" id="f-gen">Generar</button></span></label>
@@ -1873,8 +1882,8 @@ function empForm(e,abrirFoto){
     <label>Meta de ventas al mes<input name="meta" id="f-meta" type="number" min="0" step="1" inputmode="numeric" value="${esc(v.meta)}" placeholder="4"></label>
     <label class="full">Teléfono<input name="telefono" id="f-etel" type="tel" value="${esc(v.telefono)}"></label>`;
   const submit=async f=>{
-    const usuario=lower(f.usuario),pw=f.password;delete f.usuario;delete f.password;
-    f.foto=foto;f.meta=f.meta?Number(f.meta):0;f.email=lower(f.email);
+    const usuario=normUsuario(f.usuario),pw=f.password;delete f.usuario;delete f.password;
+    f.foto=foto;f.meta=f.meta?Number(f.meta):0;f.email=String(f.email||'').trim();
     let id=e&&e.id;
     if(e)await save('empleados',e.id,f);else id=await add('empleados',f);
     if(usuario&&pw){await rpc('admin_guardar_acceso',{p_empleado:id,p_usuario:usuario,p_password:pw});
@@ -1884,9 +1893,9 @@ function empForm(e,abrirFoto){
   };
   submit.validate=f=>{
     if(!f.nombre.trim())return 'Escribe el nombre.';
-    const u=lower(f.usuario);
+    const u=normUsuario(f.usuario);
     if(!u&&!f.password)return acc?'Escribe un usuario, o usa “Quitar acceso”.':null;
-    if(!/^[a-z0-9._-]{3,30}$/.test(u))return 'El usuario debe tener al menos 3 caracteres: letras, números, punto o guion.';
+    if(!u)return 'Escribe un usuario.';
     if(data.accesos.some(a=>a.usuario===u&&(!e||a.id!==e.id)))return 'Ese usuario ya lo tiene otra persona.';
     if(!acc&&!f.password)return 'Escribe una contraseña o toca “Generar”.';
     if(f.password&&f.password.length<6)return 'La contraseña debe tener al menos 6 caracteres.';
