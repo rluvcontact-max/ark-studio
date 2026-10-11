@@ -3,8 +3,11 @@
 // dependemos del límite de 150 s de las Edge Functions (el prompt genera análisis y un JSON con la
 // presentación, el guion por diapositiva y las preguntas probables).
 //
-// POST {"id": "<cliente>"}  → manda a generar (o regenerar) la propuesta de ese cliente.
-//   Admin, lead-encuesta (header x-ark-interno) o el vendedor del cliente si aún no hay propuesta o falló.
+// POST {"id": "<cliente>", "version"?: n}  → manda a generar (o regenerar) la propuesta de ese cliente con la cotización
+//   indicada (o la última; si no hay, la Edge Function cotizacion crea la v1 desde la encuesta).
+//   Admin, lead-encuesta / cotizacion (header x-ark-interno) o el vendedor del cliente si aún no hay propuesta o falló.
+// Claude NO calcula precios: recibe la cotización del motor de precios y escribe los montos con marcadores ({{precio}}…);
+// al terminar se guarda la misma versión en `cotizacion` y los 3 precios (oferta, referencia, piso) en datos.pricing.
 // POST {}                   → revisa las propuestas pendientes y guarda las que ya terminaron, y vuelve a intentar
 //   las de la encuesta que no se pudieron empezar (sin saldo, error temporal). La llama pg_cron cada 5 min (`revisar-propuestas`).
 // Desplegada con verify_jwt = true. Necesita el secreto ANTHROPIC_API_KEY.
@@ -50,7 +53,6 @@ async function firmaInterna() {
 const claude = () => new Anthropic({ apiKey: Deno.env.get("ANTHROPIC_API_KEY") });
 
 function respuestasDe(c: Record<string, unknown>) {
-  const t = (v: unknown) => String(v ?? "").trim();
   const e = (c.encuesta ?? {}) as Record<string, unknown>;
   const lineas = Object.keys(e).length
     ? [
@@ -70,6 +72,67 @@ function respuestasDe(c: Record<string, unknown>) {
   return lineas.filter((l) => !/:\s*$/.test(l)).join("\n");
 }
 
+const t = (v: unknown) => String(v ?? "").trim();
+const dinero = (n: unknown) => "$" + Math.round(Number(n) || 0).toLocaleString("es-MX");
+type O = Record<string, unknown>;
+
+// Cotización vigente del cliente (la indicada, la última o la v1 que crea la función cotizacion a partir de la encuesta).
+async function cotizacionDe(sb: SupabaseClient, id: string, version?: number) {
+  let q = sb.from("cotizaciones").select("data").eq("cliente_id", id);
+  q = version ? q.eq("version", version) : q.order("version", { ascending: false }).limit(1);
+  const { data } = await q;
+  if (data && data.length) return data[0].data as O;
+  if (version) throw new Error("No existe esa versión de la cotización");
+  const r = await fetch(`${URL_SB}/functions/v1/cotizacion`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${ANON}`, apikey: ANON, "x-ark-interno": await firmaInterna() },
+    body: JSON.stringify({ accion: "inicial", clienteId: id }),
+  });
+  const j = await r.json().catch(() => ({})) as O;
+  if (!r.ok) throw new Error(String(j.error || "No se pudo calcular la cotización"));
+  return j;
+}
+
+// Lo que se guarda en propuestas (misma estructura que paraPropuesta de la función cotizacion).
+function paraPropuesta(v: O) {
+  const r = v.resultado as O;
+  return {
+    version: v.version, alcance: v.alcance, estatus: r.estatus,
+    precios: { oferta: r.oferta, referencia: r.pr, piso: r.piso, piso_definitivo: r.piso_definitivo, negociado: r.negociado, descuento: (r.descuento as O)?.monto ?? 0 },
+    mantenimiento: r.mantenimiento, cliente: v.cliente,
+  };
+}
+function preciosDeCotizacion(pr: O | undefined, snap: ReturnType<typeof paraPropuesta>) {
+  return {
+    ...(pr ?? {}),
+    offer_price_mxn: snap.precios.oferta, target_price_mxn: snap.precios.referencia, minimum_acceptable_price_mxn: snap.precios.piso,
+    negotiated_price_mxn: snap.precios.negociado, monthly_maintenance_mxn: (snap.mantenimiento as O | null)?.precio ?? 0,
+  };
+}
+
+// La cotización en texto para Claude: alcance, niveles y montos (que él escribirá solo con marcadores).
+function textoCotizacion(v: O) {
+  const r = v.resultado as O, lineas = (r.lineas ?? []) as O[];
+  const est: Record<string, string> = { validado: "precio validado", desde: "estimado \"desde\" (hay conceptos por confirmar)", revision: "requiere revisión técnica" };
+  const desc = (l: O) => `${t(l.nombre)}${l.nivel ? ` (nivel ${t(l.nivel)})` : ""}${l.revision ? " — requiere revisión" : l.provisional ? " — nivel por definir" : l.desde && Number(l.monto) > 0 ? " — precio desde" : ""}`;
+  const cobrados = lineas.filter((l) => Number(l.monto) > 0 && l.grupo !== "base");
+  const incluidos = lineas.filter((l) => Number(l.monto) === 0 && (l.incluido || l.compartido || l.grupo === "modulo"));
+  const mt = r.mantenimiento as O | null;
+  return [
+    `COTIZACIÓN (calculada por el sistema de ARK, versión ${v.version}; no cambies precios ni alcance):`,
+    `Industria del tarifario: ${t((r.industria as O)?.nombre)}`,
+    `Estado: ${est[t(r.estatus)] ?? t(r.estatus)}`,
+    "Conceptos cotizados:",
+    ...cobrados.map((l) => "- " + desc(l)),
+    ...(incluidos.length ? ["Incluidos sin costo extra (ya forman parte de otro concepto):", ...incluidos.map((l) => "- " + t(l.nombre))] : []),
+    `Precio que se presenta al cliente ({{precio}}): ${dinero(r.negociado)} MXN más IVA${Number((r.descuento as O)?.pct) > 0 ? ` (incluye un descuento de ${(r.descuento as O).pct}% sobre ${dinero(r.oferta)})` : ""}`,
+    mt ? `Mantenimiento ({{mantenimiento}}): plan ${t(mt.nombre)}, ${dinero(mt.precio)} al mes${mt.desde ? " (desde)" : ""}` : "",
+    `Servicios externos que se cobran aparte: ${((r.externos ?? []) as O[]).map((e) => t(e.nombre)).join(", ") || "ninguno"}`,
+    `Solo para la nota del vendedor: precio de referencia ({{precio_referencia}}) ${dinero(r.pr)}; mínimo permitido ({{precio_minimo}}) ${dinero(r.piso)}${r.piso_definitivo ? "" : " (provisional, sujeto a aprobación)"}.`,
+    ...(((r.avisos ?? []) as string[]).length ? ["Hipótesis y advertencias de la cotización:", ...((r.avisos ?? []) as string[]).map((a) => "- " + a)] : []),
+  ].filter(Boolean).join("\n");
+}
+
 // Manda la conversación como batch. `mensajes` se guarda para poder continuar si hay pause_turn.
 async function mandarBatch(id: string, mensajes: Anthropic.Messages.MessageParam[]) {
   return await claude().messages.batches.create({
@@ -87,7 +150,7 @@ async function mandarBatch(id: string, mensajes: Anthropic.Messages.MessageParam
   });
 }
 
-async function solicitar(sb: SupabaseClient, id: string) {
+async function solicitar(sb: SupabaseClient, id: string, version?: number) {
   const { data: fila, error } = await sb.from("clientes").select("data").eq("id", id).single();
   if (error || !fila) throw new Error("Cliente no encontrado");
   // El guion lo lee el vendedor del cliente (o Ricardo si no tiene), así que va con su nombre.
@@ -98,8 +161,9 @@ async function solicitar(sb: SupabaseClient, id: string) {
     const nombre = String((e?.data as Record<string, unknown> | undefined)?.nombre ?? "").trim();
     if (nombre) vendedor = nombre;
   }
+  const cot = await cotizacionDe(sb, id, version);
   const mensajes: Anthropic.Messages.MessageParam[] = [
-    { role: "user", content: `VENDEDOR QUE PRESENTA: ${vendedor}\n\nRESPUESTAS:\n\n` + respuestasDe(cd) },
+    { role: "user", content: `VENDEDOR QUE PRESENTA: ${vendedor}\n\nRESPUESTAS:\n\n` + respuestasDe(cd) + "\n\n" + textoCotizacion(cot) },
   ];
   const { data: prev } = await sb.from("propuestas").select("data").eq("id", id).maybeSingle();
   let batch;
@@ -116,13 +180,14 @@ async function solicitar(sb: SupabaseClient, id: string) {
       ...pd, estado: "error", error, mensajes: null,
       reintentar: true, ultimoIntento: Date.now(), intentos: (Number(pd.intentos) || 0) + 1,
     } });
-    throw e;
+    console.error("No se pudo crear el batch", m);
+    throw new Error(error);
   }
   const { error: e2 } = await sb.from("propuestas").upsert({
     id,
     data: {
       ...(prev?.data ?? {}), estado: "pendiente", batchId: batch.id, solicitada: Date.now(), error: "",
-      mensajes, continuaciones: 0, reintentar: false,
+      mensajes, continuaciones: 0, reintentar: false, cotizacion_pendiente: paraPropuesta(cot),
     },
   });
   if (e2) throw e2;
@@ -187,15 +252,19 @@ async function revisar(sb: SupabaseClient) {
         ];
         const texto = bloques.flatMap((b) => (b.type === "text" ? [b.text] : [])).join("").trim();
         const { legible, datos } = separar(texto);
+        // la misma versión de la cotización queda en la propuesta (presentación, guion y cotización coinciden)
+        const snap = (d.cotizacion_pendiente ?? d.cotizacion ?? null) as ReturnType<typeof paraPropuesta> | null;
+        if (datos && snap) datos.pricing = preciosDeCotizacion(datos.pricing as O | undefined, snap);
         await guardar({
           estado: "lista", texto: legible, datos, generada: Date.now(), modelo: m.model, mensajes: null, continuaciones: null,
+          cotizacion: snap, cotizacion_pendiente: null,
           error: datos ? "" : "No se pudo leer el JSON; la presentación queda vacía.",
           incompleta: m.stop_reason === "max_tokens",
         });
         listas++;
-        // Si el cliente no tiene valor estimado, se toma el precio objetivo (al que se espera cerrar).
+        // Si el cliente no tiene valor estimado, se toma el precio que se presenta (negociado) de la cotización.
         const pr = (datos?.pricing ?? {}) as Record<string, unknown>;
-        const precio = Number(pr.target_price_mxn ?? pr.development_price_mxn) || Number(pr.offer_price_mxn) || 0;
+        const precio = Number(pr.negotiated_price_mxn) || Number(pr.target_price_mxn ?? pr.development_price_mxn) || Number(pr.offer_price_mxn) || 0;
         if (precio > 0) {
           const { data: cli } = await sb.from("clientes").select("data").eq("id", f.id).single();
           const cd = (cli?.data ?? {}) as Record<string, unknown>;
@@ -256,7 +325,7 @@ Deno.serve(async (req) => {
           if (!suyo || (est && est !== "error")) return json({ error: "Solo el administrador puede volver a generar esta propuesta" }, 403);
         }
       }
-      await solicitar(sb, String(body.id));
+      await solicitar(sb, String(body.id), Number(body.version) || undefined);
       return json({ ok: true });
     }
     return json(await revisar(sb));

@@ -93,11 +93,23 @@ const ICONOS = {
 };
 const svgIcono = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONOS[n] || '<circle cx="12" cy="12" r="9"/>'}</svg>`;
 
+// Montos de la cotización en los textos de Claude ({{precio}}, {{mantenimiento}}, {{pago_1}}…). Igual que conPrecios de index.html.
+function conPrecios(txt, snap) {
+  if (!snap || !snap.precios || txt == null) return txt;
+  const P = snap.precios, tot = Number(P.negociado) || 0, m = snap.mantenimiento || {};
+  const v = {precio: tot, precio_inicial: P.oferta, descuento: P.descuento, mantenimiento: m.precio, precio_referencia: P.referencia, precio_minimo: P.piso};
+  CONDICIONES.pagos.forEach(([pct], i) => { v['pago_' + (i + 1)] = tot * pct / 100; });
+  return String(txt).replace(/\{\{\s*(\w+)\s*\}\}/g, (x, k) => k in v ? dinero(v[k]) : x);
+}
+
 function variables(p, cliente, vendedor) {
-  const d = p.datos || {}, pr = d.pricing || {};
-  // La presentación muestra el precio de oferta, el más alto de los tres (en propuestas anteriores el más alto era el objetivo).
-  const precio = Math.max(Number(pr.target_price_mxn ?? pr.development_price_mxn) || 0, Number(pr.offer_price_mxn) || 0), mensual = Number(pr.monthly_maintenance_mxn) || 0;
+  const d = p.datos || {}, pr = d.pricing || {}, snap = p.cotizacion;
+  // Con cotización (motor de precios): el precio para el cliente de esa versión y su mantenimiento.
+  // Propuestas anteriores: el precio de oferta, el más alto de los tres (antes el más alto era el objetivo).
+  const precio = snap && snap.precios ? Number(snap.precios.negociado) || 0 : Math.max(Number(pr.target_price_mxn ?? pr.development_price_mxn) || 0, Number(pr.offer_price_mxn) || 0);
+  const mensual = snap && snap.mantenimiento ? Number(snap.mantenimiento.precio) || 0 : Number(pr.monthly_maintenance_mxn) || 0;
   const v = {...(d.presentation || {})};
+  for (const k in v) v[k] = conPrecios(v[k], snap);
   if (!limpio(v.cliente_nombre)) v.cliente_nombre = cliente.empresa;
   if (!limpio(v.cliente_contacto)) v.cliente_contacto = cliente.contacto;
   Object.assign(v, {
@@ -148,14 +160,14 @@ function construir(v, guion = {}) {
     // Notas del presentador: el guion de Claude para esta diapositiva; si no hay, la indicación de la plantilla.
     // La "nota" del guion (trae el precio de oferta y el mínimo) no se muestra aquí: se vería al compartir pantalla.
     const aside = s.querySelector('aside'), g = guion[id];
-    notas.push(g ? g.guion.trim() : aside ? aside.textContent.replace(/\s*Variables:[\s\S]*$/, '').trim() : '');
+    notas.push(g ? conPrecios(g.guion.trim(), cotizacionActual) : aside ? aside.textContent.replace(/\s*Variables:[\s\S]*$/, '').trim() : '');
     s.classList.add('slide');
     frame.appendChild(s);
   }
   return {frame, notas};
 }
 
-let actual = 0, slides = [], notas = [];
+let actual = 0, slides = [], notas = [], cotizacionActual = null;
 function mostrar(i) {
   actual = Math.max(0, Math.min(slides.length - 1, i));
   slides.forEach((s, k) => s.classList.toggle('on', k === actual));
@@ -200,6 +212,7 @@ async function iniciar() {
   }
   const guion = Object.fromEntries((Array.isArray(prop.datos.script) ? prop.datos.script : [])
     .filter(x => x && x.slide && String(x.guion || '').trim()).map(x => [x.slide, x]));
+  cotizacionActual = prop.cotizacion || null;
   const r = construir(variables(prop, cliente, vendedor), guion);
   $('stage').innerHTML = '';
   $('stage').appendChild(r.frame);

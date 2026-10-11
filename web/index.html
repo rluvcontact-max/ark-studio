@@ -519,6 +519,72 @@ a.btn.primary{color:var(--on-ink)}
 .aviso b{display:block}
 .aviso span{font-size:14px;color:var(--muted)}
 .aviso-acts{display:flex;gap:8px;justify-content:flex-end}
+/* cotización (panel de negociación) */
+.sheet.wide:has(#cot-panel){width:min(1200px,100%)}
+.cz-top{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:13px;color:var(--muted);margin:-4px 0 14px}
+.cz-top b{color:var(--fg)}
+.cz-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start}
+.cz-tot{position:sticky;top:0;display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:18px;background:var(--hair)}
+.cz-big span{display:block;font-size:12px;color:var(--muted)}
+.cz-big b{display:block;font-size:30px;letter-spacing:-.02em;line-height:1.15}
+.cz-big small{font-size:12px;color:var(--muted)}
+.cz-dl{margin:0;display:grid;gap:8px}
+.cz-dl>div{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:13.5px}
+.cz-dl dt{color:var(--muted)}
+.cz-dl dd{margin:0;text-align:right;font-weight:600;display:flex;flex-direction:column;align-items:flex-end}
+.cz-dl dd small{font-weight:400;font-size:11.5px;color:var(--muted)}
+.cz-dl .cz-col{flex-direction:column;align-items:stretch}
+.cz-dl .cz-col dd{align-items:stretch}
+.cz-desc{flex-direction:row!important;align-items:center!important;gap:6px}
+.cz-desc span{font-weight:400;color:var(--muted)}
+.cz-tot input,.cz-lv input,.cz-lv select,.cz-add input,.cz-aj-in input,.cz-buscar,label.cz-col input{padding:8px 10px;border-radius:10px;border:1px solid var(--hair);background:var(--glass);color:var(--fg);font-size:14px;min-width:0;width:100%}
+.cz-desc input{width:76px}
+label.cz-col{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted)}
+.cz-msg{margin:0;font-size:12.5px;color:var(--muted);line-height:1.45}
+.cz-msg.warn{color:var(--fg);font-weight:600}
+.cz-acts{display:flex;flex-direction:column;gap:8px}
+.cz-acts .btn{justify-content:center}
+.cz-ctl{margin-bottom:14px}
+.cz-chk{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);letter-spacing:0}
+.cz-chk input{width:auto!important}
+.cz-filtros{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0 2px}
+.cz-buscar{flex:1 1 220px;width:auto!important}
+.cz-list{display:flex;flex-direction:column;gap:6px}
+.cz-row{display:grid;grid-template-columns:minmax(0,1fr) 170px 110px 104px;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;border:1px solid var(--hair)}
+.cz-row.on{background:var(--hair);border-color:transparent}
+.cz-n{min-width:0;display:flex;flex-direction:column;gap:3px}
+.cz-n>b{font-size:14px;font-weight:600}
+.cz-n small,.cz-lv small{font-size:12px;color:var(--muted)}
+.cz-tags{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.cz-warn{border-color:var(--fg);color:var(--fg)}
+.cz-alc{line-height:1.35}
+.cz-p{text-align:right;font-weight:600;font-size:14px}
+.cz-row .btn{justify-content:center}
+.cz-full{grid-column:1/-1}
+.cz-aj summary{cursor:pointer;font-size:12px;color:var(--muted)}
+.cz-aj-in{display:grid;grid-template-columns:150px minmax(0,1fr);gap:8px;margin-top:8px;align-items:end}
+.cz-aj-in label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.cz-aj-in .cz-chk{grid-column:1/-1}
+.cz-add{display:flex;gap:8px}
+.cz-tab{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+.cz-tab td{padding:7px 4px;border-top:1px solid var(--hair);vertical-align:top}
+.cz-tab td:last-child{text-align:right;white-space:nowrap;font-weight:600}
+.cz-tab small{color:var(--muted);font-weight:400}
+.cz-tab tr.sub td{font-weight:700}
+.cz-hist{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.cz-h{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid var(--hair);font-size:13.5px}
+.cz-h.on{background:var(--hair)}
+.cz-h small{color:var(--muted)}
+.cz-h-acts{display:flex;gap:6px;flex-wrap:wrap}
+.te-tab{display:flex;flex-direction:column;gap:6px}
+.te-row{display:grid;grid-template-columns:150px minmax(0,1fr) 110px auto auto auto auto;gap:8px;align-items:center;font-size:13px}
+.te-row code{font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
+.te-row input:not([type=checkbox]),.te-json{padding:7px 10px;border-radius:10px;border:1px solid var(--hair);background:var(--glass);color:var(--fg);font-size:13.5px;min-width:0;width:100%}
+.te-mini{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.te-json{min-height:50vh;font:12px/1.4 ui-monospace,Menlo,monospace}
+@media (max-width:900px){.cz-grid{grid-template-columns:1fr}.cz-tot{position:static;order:-1}}
+@media (max-width:640px){.cz-row{grid-template-columns:minmax(0,1fr) auto}.cz-lv{grid-column:1/-1;order:3}.cz-p{order:2}.cz-row .btn{grid-column:1/-1;order:4}
+  .te-row{grid-template-columns:1fr 1fr}.te-row code{grid-column:1/-1}.cz-aj-in{grid-template-columns:1fr}}
 @media (max-width:700px){.enc-r,.res-grid{grid-template-columns:1fr}}
 @media (max-width:900px){.premios{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:700px){.cr{grid-template-columns:22px auto 1fr 30px;row-gap:6px}.cr .pista{grid-column:3/-1;grid-row:2;margin:0 10px 0 0}.cr-sig{display:none}.prem-fila{grid-template-columns:70px 1fr 60px}.prem-fila .btn{grid-column:1/-1;justify-self:start}.premio{padding:14px}.premio h3{font-size:15.5px}.pr-emoji{width:44px;height:44px;font-size:24px}}
@@ -609,6 +675,7 @@ a.btn.primary{color:var(--on-ink)}
 </style>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="cotizador.js"></script>
 </head>
 <body>
 
@@ -1162,12 +1229,13 @@ function vInicio(){
   const clienteDeCita=e=>cli(e.clienteId)||mine.find(c=>c.empresa&&String(e.titulo||'').toLowerCase().includes(c.empresa.toLowerCase()));
   const prep=myEv.filter(e=>e.fecha<=manana).map(e=>({e,c:clienteDeCita(e)})).find(x=>x.c&&propDe(x.c.id)&&propDe(x.c.id).datos);
   let prepHtml='';
-  if(prep){const p=propDe(prep.c.id),P=preciosDe(p.datos&&p.datos.pricing);
+  if(prep){const p=propDe(prep.c.id),P=preciosDe(p.datos&&p.datos.pricing),S=p.cotizacion&&p.cotizacion.precios;
     const cuando=prep.e.fecha===today?'Hoy':'Mañana';
     prepHtml=`<section class="glass panel prepara"><h2>Prepara tu llamada <span class="tag">${cuando}${prep.e.hora?' · '+esc(prep.e.hora):''}</span></h2>
       <div class="prepara-in"><div><b>${esc(prep.c.empresa)}</b><span>${esc(prep.e.titulo||prep.e.tipo||'Cita')}</span></div>
-        <div class="prop-sum">${P.oferta?`<div><span>Oferta (se presenta)</span><b>${money(P.oferta)}</b></div>`:''}${P.objetivo?`<div><span>Objetivo</span><b>${money(P.objetivo)}</b></div>`:''}${P.minimo?`<div><span>Mínimo</span><b>${money(P.minimo)}</b></div>`:''}</div>
-        <div class="pf-acts"><button class="btn btn-sm primary" data-prepara="${prep.c.id}" data-paso="3">Ver guion</button><button class="btn btn-sm" data-prepara="${prep.c.id}" data-paso="2">Presentación</button><button class="btn btn-sm" data-prepara="${prep.c.id}" data-paso="4">Preguntas</button><button class="btn btn-sm ghost" data-edit-client="${prep.c.id}">Notas</button></div></div></section>`}
+        <div class="prop-sum">${S?`<div><span>Precio (se presenta)</span><b>${money(S.negociado)}</b></div><div><span>Mínimo permitido</span><b>${money(S.piso)}</b></div>`
+          :`${P.oferta?`<div><span>Oferta (se presenta)</span><b>${money(P.oferta)}</b></div>`:''}${P.objetivo?`<div><span>Objetivo</span><b>${money(P.objetivo)}</b></div>`:''}${P.minimo?`<div><span>Mínimo</span><b>${money(P.minimo)}</b></div>`:''}`}</div>
+        <div class="pf-acts"><button class="btn btn-sm primary" data-prepara="${prep.c.id}" data-paso="4">Ver guion</button><button class="btn btn-sm" data-prepara="${prep.c.id}" data-paso="3">Presentación</button><button class="btn btn-sm" data-prepara="${prep.c.id}" data-paso="2">Cotización</button><button class="btn btn-sm" data-prepara="${prep.c.id}" data-paso="5">Preguntas</button><button class="btn btn-sm ghost" data-edit-client="${prep.c.id}">Notas</button></div></div></section>`}
   // recordatorios de notas que ya vencen
   const recs=data.notas.filter(n=>n.recordatorio&&!n.hecho&&n.recordatorio<=today&&mine.some(c=>c.id===n.clienteId)).sort((a,b)=>a.recordatorio.localeCompare(b.recordatorio));
   const recHtml=recs.length?`<section class="glass panel"><h2>Recordatorios <span class="tag">${recs.length}</span></h2><div class="list">${recs.map(n=>{const c=cli(n.clienteId);return `<div class="ev cli-fila"><button class="cli-main" data-edit-client="${c.id}"><div class="t">${esc(c.empresa)}</div><div class="s">${esc(n.texto)}</div></button><div class="cli-acts"><span class="s">${n.recordatorio<today?'Vencido':'Hoy'}</span><button class="btn btn-sm" data-nota-hecha="${n.id}">Hecho</button></div></div>`}).join('')}</div></section>`:'';
@@ -1312,7 +1380,7 @@ function vEquipo(){
         <button class="btn btn-sm ghost" data-edit-emp="${e.id}">Editar</button>
       </div></article>`}).join('');
   return header(`${data.empleados.length} personas`,'Equipo','Crea un usuario y contraseña para cada empleado en “Editar”. Con eso entra a su app, sin ver finanzas.',
-      `<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="bonos">Bonos y material</button><button class="btn primary" data-act="new-emp">${plus}Agregar empleado</button></div>`)+
+      `<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="bonos">Bonos y material</button><button class="btn" data-act="tarifario">Tarifario</button><button class="btn primary" data-act="new-emp">${plus}Agregar empleado</button></div>`)+
     (cards?`<div class="team">${cards}</div>`:`<section class="glass panel"><div class="empty"><strong>Todavía no hay empleados</strong>Agrega a tu equipo para asignarle clientes y citas.</div></section>`);
 }
 
@@ -1659,6 +1727,7 @@ main.addEventListener('click',async e=>{
   if(d.act==='new-ev') return evForm(null,ui.dia);
   if(d.act==='new-emp') return empForm();
   if(d.act==='bonos') return bonosForm();
+  if(d.act==='tarifario') return tarifarioEditor();
   if(d.act==='premios') return premiosForm();
   if(d.finalizar){const c=cli(d.finalizar);if(c)finalizarForm(c);return}
   if(d.act==='push') return activarPush();
@@ -1817,7 +1886,7 @@ function mdBasico(t){
 }
 const GIRO_EMOJI={'Restaurante o cafetería':'🍽️','Tienda o comercio':'🛍️','Salud o clínica':'🩺','Belleza o spa':'💇','Gimnasio o deporte':'🏋️',
   'Servicios profesionales':'💼','Educación o cursos':'🎓','Inmobiliaria o construcción':'🏠','Logística o distribución':'🚚','Otro':'✨'};
-const PASOS_PROP=['Encuesta','Resumen','Presentación','Guion','Preguntas'];
+const PASOS_PROP=['Encuesta','Resumen','Cotización','Presentación','Guion','Preguntas'];
 // Diapositivas de la presentación en orden (ids de web/propuesta/plantilla.js y DIAPOSITIVAS de propuesta-claude/prompt.ts).
 const DIAPOS=[['cover','Portada'],['agenda','Agenda'],['entendimos','Lo que entendimos'],['necesidad','La necesidad'],['oportunidad','La oportunidad'],
   ['solucion','La propuesta'],['funciones','Funciones'],['flujo','Cómo funciona'],['concepto','Así se vería'],['plan','Plan de trabajo'],
@@ -1826,16 +1895,19 @@ const DIAPOS=[['cover','Portada'],['agenda','Agenda'],['entendimos','Lo que ente
 const guionDe=d=>(Array.isArray(d&&d.script)?d.script:[]).filter(x=>x&&String(x.guion||'').trim())
   .map(x=>{const i=DIAPOS.findIndex(([id])=>id===x.slide);return {i,nombre:i>=0?DIAPOS[i][1]:String(x.slide||''),guion:String(x.guion).trim(),nota:String(x.nota||'').trim()}});
 const parrafos=t=>String(t||'').split(/\n+/).map(x=>x.trim()).filter(Boolean).map(x=>`<p>${esc(x)}</p>`).join('');
-// Recorrido del prospecto: 1) encuesta (negocio, respuestas, Google), 2) resumen de la propuesta, 3) presentación,
-// 4) guion para leer en orden de la presentación, 5) preguntas probables. Abajo, el botón "Contrato firmado".
+// Recorrido del prospecto: 1) encuesta (negocio, respuestas, Google), 2) resumen de la propuesta, 3) cotización (panel de
+// negociación, montarCotizacion), 4) presentación, 5) guion para leer en orden de la presentación, 6) preguntas probables.
+// Abajo, el botón "Contrato firmado". Los montos de los textos de Claude son marcadores ({{precio}}…) que se llenan con la
+// versión de la cotización que usan los materiales (propuestas.data.cotizacion), con conPrecios().
 function abrirPropuesta(c,paso,diapo){
   const p=propDe(c.id)||{},d=p.datos||{},pr=d.pricing||{},g=d.google_profile||{},enc=c.encuesta||{},pp=d.proposal||{};
+  const SN=p.cotizacion||null,cp=x=>conPrecios(x,SN);
   const google=c.google||enc.google||'',giro=c.giro||enc.giro||'';
   const caja=(l,v)=>v?`<div><span>${l}</span><b>${esc(v)}</b></div>`:'';
   const wa=String(c.telefono||'').replace(/\D/g,'');
   const sinProp=`<p class="prop-err">${p.estado==='pendiente'?'Claude está preparando la propuesta; suele tardar unos minutos y esta ventana se puede volver a abrir.':p.estado==='error'?esc(p.error||'No se pudo generar la propuesta.'):'Aún no hay propuesta para este cliente.'}</p>`;
-  const analisis=(abierto)=>p.texto?`<details class="prop-det"${abierto?' open':''}><summary>Análisis interno y precio</summary><div class="prop-txt" id="prop-txt">${mdBasico(p.texto)}</div></details>`:'';
-  const G=guionDe(d),Q=(Array.isArray(d.questions)?d.questions:[]).filter(x=>x&&x.question);
+  const analisis=(abierto)=>p.texto?`<details class="prop-det"${abierto?' open':''}><summary>Análisis interno y precio</summary><div class="prop-txt" id="prop-txt">${mdBasico(cp(p.texto))}</div></details>`:'';
+  const G=guionDe(d).map(x=>({...x,guion:cp(x.guion),nota:cp(x.nota)})),Q=(Array.isArray(d.questions)?d.questions:[]).filter(x=>x&&x.question).map(x=>({question:cp(x.question),answer:cp(x.answer)}));
   let cuerpo='';
   if(paso===0){
     const datosG=g.found?`<div class="negocio-g"><div class="prop-sum">${caja('Calificación',g.rating?'★ '+g.rating:'')+caja('Reseñas',g.reviews)+caja('Categoría en Google',g.category)}</div>
@@ -1857,22 +1929,26 @@ function abrirPropuesta(c,paso,diapo){
       <div class="negocio-acts">${/^https?:\/\//i.test(google)?`<a class="btn btn-sm" href="${esc(google)}" target="_blank" rel="noopener">Ver en Google ↗</a>`:'<span class="access"><i></i>Sin link de Google</span>'}
         ${wa?`<a class="btn btn-sm ghost" href="https://wa.me/${wa.length===10?'52'+wa:wa}" target="_blank" rel="noopener">WhatsApp</a>`:''}</div></div>${resp}${datosG}`;
   }else if(paso===1){
-    const P=preciosDe(pr);
-    const sum=caja('Oferta (se presenta)',P.oferta?money(P.oferta):'')+caja('Precio objetivo',P.objetivo?money(P.objetivo):'')+caja('Mínimo aceptable',P.minimo?money(P.minimo):'')+
+    const P=preciosDe(pr),SP=SN&&SN.precios;
+    const sum=SP?caja('Precio (se presenta)',money(SP.negociado))+(SP.descuento?caja('Oferta inicial',money(SP.oferta)):'')+caja('Precio de referencia',money(SP.referencia))+
+        caja('Mínimo permitido',money(SP.piso)+(SP.piso_definitivo?'':' (provisional)'))+caja('Mantenimiento',SN.mantenimiento?money(SN.mantenimiento.precio)+'/mes':'')
+      :caja('Oferta (se presenta)',P.oferta?money(P.oferta):'')+caja('Precio objetivo',P.objetivo?money(P.objetivo):'')+caja('Mínimo aceptable',P.minimo?money(P.minimo):'')+
       caja('Mantenimiento',pr.monthly_maintenance_mxn?money(pr.monthly_maintenance_mxn)+'/mes':'')+caja('Nivel',pr.project_level);
     const txt=x=>typeof x==='string'?x:(x&&(x.name||x.nombre||x.feature||x.title))||'';
     const lista=(t,a)=>Array.isArray(a)&&a.filter(txt).length?`<div><h4 class="sub-h">${t}</h4><ul class="res-l">${a.filter(txt).map(x=>`<li>${esc(txt(x))}</li>`).join('')}</ul></div>`:'';
     const listas=lista('Primera versión',pp.essential_features)+lista('Recomendadas',pp.recommended_features)+lista('Para después',pp.future_features);
     cuerpo=!p.datos&&!p.texto?sinProp:`${p.incompleta?'<p class="prop-err" style="margin-bottom:8px">La respuesta de Claude quedó cortada; conviene volver a generarla.</p>':''}
-      ${pp.summary||pp.solution?`<div class="res-txt">${parrafos(pp.summary||pp.solution)}</div>`:''}
-      ${sum?`<h4 class="sub-h">Precios (solo para ti)</h4><div class="prop-sum">${sum}</div>`:''}
+      ${pp.summary||pp.solution?`<div class="res-txt">${parrafos(cp(pp.summary||pp.solution))}</div>`:''}
+      ${sum?`<h4 class="sub-h">Precios (solo para ti)${SN?` · cotización versión ${esc(SN.version)}`:''}</h4>${SN?`<p class="ayuda" style="margin:0 0 8px">${estatusCot(SN.estatus)}</p>`:''}<div class="prop-sum">${sum}</div>`:''}
       ${listas?`<div class="res-grid">${listas}</div>`:''}
       ${analisis(!(pp.summary||pp.solution))}`;
   }else if(paso===2){
+    cuerpo='<div id="cot-panel" class="cz-wrap"><p class="prop-err">Calculando la cotización…</p></div>';
+  }else if(paso===3){
     const url=`propuesta.html?id=${encodeURIComponent(c.id)}`;
     cuerpo=p.datos?`<iframe class="prop-frame" src="${url}&embed=1${diapo>0?'&diapo='+(diapo+1):''}" title="Presentación de la propuesta" allow="fullscreen"></iframe>
       <div style="margin-top:10px"><a class="btn btn-sm" href="${url}" target="_blank" rel="noopener">Abrir en pantalla completa ↗</a></div>`:sinProp;
-  }else if(paso===3){
+  }else if(paso===4){
     cuerpo=G.length?`<p class="ayuda" style="margin:0 0 12px">Léelo mientras compartes la presentación: cada parte va con su diapositiva. Las notas en gris son solo para ti.</p>
         <div class="guion">${G.map(x=>`<article class="guion-d"><header><span class="guion-n">${x.i>=0?String(x.i+1).padStart(2,'0'):'·'}</span><b>${esc(x.nombre)}</b>
           ${x.i>=0&&p.datos?`<button type="button" class="btn btn-sm ghost" data-diapo="${x.i}">Ver diapositiva</button>`:''}</header>
@@ -1897,11 +1973,369 @@ function abrirPropuesta(c,paso,diapo){
   document.getElementById('paso-cerrar').onclick=close;
   root.querySelectorAll('[data-paso]').forEach(b=>b.onclick=()=>abrirPropuesta(c,+b.dataset.paso));
   root.querySelectorAll('[data-ir]').forEach(b=>b.onclick=()=>abrirPropuesta(c,paso+(+b.dataset.ir)));
-  root.querySelectorAll('[data-diapo]').forEach(b=>b.onclick=()=>abrirPropuesta(c,2,+b.dataset.diapo));
+  root.querySelectorAll('[data-diapo]').forEach(b=>b.onclick=()=>abrirPropuesta(c,3,+b.dataset.diapo));
+  if(paso===2)montarCotizacion(c);
   const pc=document.getElementById('paso-cierre');if(pc)pc.onclick=()=>cierreForm(c);
-  const cp=document.getElementById('prop-copy');
+  const cpBtn=document.getElementById('prop-copy');
   const copia=G.map(x=>`${x.i>=0?x.i+1+'. ':''}${x.nombre.toUpperCase()}\n\n${x.guion}${x.nota?`\n\n(Nota: ${x.nota})`:''}`).join('\n\n');
-  if(cp)cp.onclick=()=>navigator.clipboard.writeText(copia).then(()=>toast('Copiado')).catch(()=>toast('Selecciona y copia el texto'));
+  if(cpBtn)cpBtn.onclick=()=>navigator.clipboard.writeText(copia).then(()=>toast('Copiado')).catch(()=>toast('Selecciona y copia el texto'));
+}
+
+/* ----- COTIZACIÓN: motor de precios (cotizador.js), tablas tarifarios/cotizaciones y Edge Function cotizacion ----- */
+// El precio lo calcula el código con el tarifario (nunca Claude). En el panel se suman o quitan funciones, se cambian niveles,
+// diseño, plataforma, sucursales y descuentos, y todo se recalcula al instante sin guardar. "Guardar versión" crea una versión
+// inmutable (el servidor la recalcula y revisa permisos); "Actualizar cotización, guion y presentación" la usa en los materiales.
+const COT=window.ArkCotizador;
+const CZ_PAGOS=[50,30,20]; // igual que CONDICIONES.pagos de propuesta.html y CONDICIONES_PROPUESTA de prompt.ts
+const tarifas={};
+async function tarifa(v){
+  if(v&&tarifas[v])return {version:v,t:tarifas[v]};
+  let q=sb.from('tarifarios').select('version,data');
+  q=v?q.eq('version',v):q.order('version',{ascending:false}).limit(1);
+  const {data:r,error}=await q;if(error)throw error;
+  if(!r||!r.length)throw {message:'Aún no hay tarifario.'};
+  tarifas[r[0].version]=r[0].data;return {version:r[0].version,t:r[0].data};
+}
+async function errFn(e){try{const j=await e.context.json();return {message:j.error||e.message}}catch(_){return {message:(e&&e.message)||'Error'}}}
+// Montos de la cotización en los textos de Claude ({{precio}}, {{mantenimiento}}, {{pago_1}}…).
+function conPrecios(txt,snap){
+  if(!snap||!snap.precios||txt==null)return txt;
+  const P=snap.precios,tot=Number(P.negociado)||0,m=snap.mantenimiento||{};
+  const v={precio:tot,precio_inicial:P.oferta,descuento:P.descuento,mantenimiento:m.precio,precio_referencia:P.referencia,precio_minimo:P.piso,
+    pago_1:tot*CZ_PAGOS[0]/100,pago_2:tot*CZ_PAGOS[1]/100,pago_3:tot*CZ_PAGOS[2]/100};
+  return String(txt).replace(/\{\{\s*(\w+)\s*\}\}/g,(x,k)=>k in v?money(v[k]):x);
+}
+const estatusCot=e=>{const m={validado:['ok','Precio validado'],desde:['','Estimado "desde": hay conceptos por confirmar'],revision:['','Requiere revisión técnica']}[e]||['',e||''];
+  return `<span class="access ${m[0]}" style="display:inline-flex"><i></i>${esc(m[1])}</span>`};
+const czNorm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const czCanon=o=>JSON.stringify(o,(k,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.keys(v).sort().reduce((a,x)=>(a[x]=v[x],a),{}):v);
+const czClon=o=>JSON.parse(JSON.stringify(o||{}));
+let CZ=null;
+
+async function montarCotizacion(c){
+  const box=document.getElementById('cot-panel');if(!box)return;
+  try{
+    const {data:vs,error}=await sb.from('cotizaciones').select('data').eq('cliente_id',c.id).order('version',{ascending:false});
+    if(error)throw error;
+    let versiones=(vs||[]).map(r=>r.data);
+    if(!versiones.length){
+      const r=await sb.functions.invoke('cotizacion',{body:{accion:'inicial',clienteId:c.id}});
+      if(r.error)throw await errFn(r.error);
+      versiones=[r.data];
+    }
+    const base=versiones[0],[tv,ult]=await Promise.all([tarifa(base.tarifa_version),tarifa()]);
+    let costos=[];
+    if(!isEmp()){const {data:cs}=await sb.from('cotizacion_costos').select('data,creado').eq('cliente_id',c.id).order('creado',{ascending:false});costos=(cs||[]).map(x=>x.data)}
+    CZ={c,versiones,base,tv:tv.version,t:tv.t,ultima:ult.version,costos,sel:czClon(base.seleccion),filtro:'todos',q:'',cd:'',nota:'',extra:false,abiertos:{},ocupado:false};
+    box.onclick=czClick;box.onchange=czChange;box.oninput=czInput;
+    box.addEventListener('toggle',e=>{const d=e.target.closest&&e.target.closest('[data-aj]');if(d&&CZ)CZ.abiertos[d.dataset.aj]=d.open},true);
+    pintarCot();
+  }catch(e){box.innerHTML=`<p class="prop-err">No se pudo cargar la cotización. ${esc((e&&e.message)||'')}</p>`}
+}
+// Cálculo en vivo. El admin usa el costo directo validado (piso técnico y margen); el vendedor, el piso de la versión guardada si el alcance no cambió.
+function calcCot(){
+  let r=COT.calcular(CZ.t,CZ.sel);
+  if(!isEmp()){const cd=Number(CZ.cd)||Number((CZ.costos.find(x=>x.alcance===r.alcance)||{}).cd)||0;if(cd)r=COT.calcular(CZ.t,CZ.sel,{cd});r.cdUsado=cd}
+  else if(CZ.base.alcance===r.alcance&&CZ.base.resultado&&CZ.base.resultado.piso_definitivo)r=COT.calcular(CZ.t,CZ.sel,{pisoTecnico:CZ.base.resultado.piso});
+  return r;
+}
+const czSucio=()=>czCanon(COT.normalizar(CZ.t,CZ.sel))!==czCanon(COT.normalizar(CZ.t,CZ.base.seleccion||{}))||CZ.tv!==CZ.base.tarifa_version||(!isEmp()&&Number(CZ.cd)>0);
+const czFecha=ms=>new Date(Number(ms)||Date.now()).toLocaleString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'America/Mexico_City'});
+
+function pintarCot(){
+  const box=document.getElementById('cot-panel');if(!box||!CZ)return;
+  const A=!isEmp(),t=CZ.t,sel=CZ.sel,base=CZ.base,cat=COT.catalogo(t),r=calcCot();CZ.r=r;
+  const prop=propDe(CZ.c.id)||{},mat=prop.cotizacion,ind=COT.industriaDe(t,sel.industria),L=Object.fromEntries(r.lineas.map(l=>[l.id,l]));
+  const niv=t.niveles||{},sucio=czSucio(),cerrado=CZ.c.estado==='cerrado';
+  const etiqueta=x=>x.nombre+(Number(x.precio)?` (+${money(x.precio)}${x.desde?' desde':''})`:x.pct?` (+${x.pct}%)`:x.revision?' (revisión)':'');
+  const campo=(k,arr,val,lab)=>`<label>${lab}<select data-cz="${k}">${arr.map(x=>opt(x.id,etiqueta(x),x.id===val)).join('')}</select></label>`;
+  const us=(t.usuarios||[]).find(x=>x.id===sel.usuarios);
+  const controles=`<div class="form cz-ctl">
+    <label>Industria<select data-cz="industria">${(t.industrias||[]).map(i=>opt(i.id,`${i.nombre} (base ${money(i.base)}, mínimo ${money(i.minimo)})`,i.id===ind.id)).join('')}</select></label>
+    ${campo('diseno',t.diseno||[],sel.diseno,'Diseño')}${campo('plataforma',t.plataformas||[],sel.plataforma,'Plataforma')}
+    ${campo('sucursales',t.sucursales||[],sel.sucursales,'Sucursales')}
+    <label>Usuarios al mes<select data-cz="usuarios">${(t.usuarios||[]).map(x=>opt(x.id,x.nombre+(x.revision?' (revisión)':''),x.id===sel.usuarios)).join('')}</select>
+      ${us&&us.opcional?`<span class="cz-chk"><input type="checkbox" data-cz-carga ${sel.carga?'checked':''}> Pruebas de carga (+${money(us.precio)} desde)</span>`:''}</label>
+    ${campo('plazo',t.plazos||[],sel.plazo,'Plazo de entrega')}
+    <label>Mantenimiento<select data-cz="mantenimiento">${opt('','Automático según el proyecto',!sel.mantenimiento)}${(t.mantenimiento||[]).map(x=>opt(x.id,`${x.nombre} · ${money(x.precio)}/mes${x.desde?' desde':''}`,x.id===sel.mantenimiento)).join('')}</select></label>
+  </div>`;
+  const ajuste=id=>{const a=(sel.ajustes_admin||{})[id]||{};return `<details class="cz-aj" data-aj="${esc(id)}"${CZ.abiertos[id]?' open':''}><summary>Definir precio o alcance (admin)</summary>
+    <div class="cz-aj-in"><label>Precio definido<input type="number" min="0" step="100" inputmode="numeric" data-ajm="${esc(id)}" value="${esc(a.monto??'')}" placeholder="Tarifa"></label>
+    <label>Nota<input data-ajn="${esc(id)}" value="${esc(a.nota||'')}" placeholder="Alcance acordado"></label>
+    <span class="cz-chk"><input type="checkbox" data-ajc="${esc(id)}" ${a.confirmado?'checked':''}> Alcance confirmado (quita "desde" y revisión)</span></div></details>`};
+  const fila=it=>{
+    const s=sel.items[it.id],l=L[it.id],inc=!!s,nv=inc&&it.niveles?(s.nivel||'intermedio'):null,alc=it.niveles?((t.alcances||{})[it.alcance]||{}):{};
+    const precio=inc?(l?l.monto:0):Math.round(Number(it.precio)||0);
+    const req=(it.requiere||[]).map(x=>cat[x]?cat[x].nombre:x);
+    const tags=[(inc?l&&l.desde:it.desde)&&precio?'<span class="tag">Desde</span>':'',(inc?l&&l.revision:it.revision)?'<span class="tag cz-warn">Requiere revisión</span>':'',
+      l&&l.incluido?`<span class="tag">Incluido en ${esc((L[l.incluido]||{}).nombre||'otro')}</span>`:'',l&&l.compartido?`<span class="tag">Se comparte con ${esc((L[l.compartido]||{}).nombre||'otro')}</span>`:'',
+      inc&&s.origen==='auto'?`<span class="tag" title="${esc(s.motivo||'')}">Agregado: ${esc(s.motivo||'dependencia')}</span>`:'',
+      l&&l.provisional?'<span class="tag cz-warn">Nivel por definir</span>':'',l&&l.ajustado?'<span class="tag">Precio definido</span>':'',
+      it.grupo==='modulo'&&it.industria!==ind.id?`<span class="tag">${esc(it.industriaNombre||'')}</span>`:''].join('');
+    return `<div class="cz-row${inc?' on':''}">
+      <div class="cz-n"><b>${esc((inc&&s.nombre)||it.nombre)}</b>${inc&&s.nombre&&s.nombre!==it.nombre?`<small>${esc(it.nombre)}</small>`:''}
+        ${tags||req.length?`<div class="cz-tags">${tags}${req.length?`<small>Necesita: ${esc(req.join(', '))}</small>`:''}</div>`:''}
+        ${nv&&alc[nv]?`<small class="cz-alc">${esc(alc[nv])}</small>`:''}${l&&l.nota&&!l.incluido&&!l.compartido?`<small class="cz-alc">${esc(l.nota)}</small>`:''}</div>
+      <div class="cz-lv">${it.niveles?(inc?`<select data-nivel="${esc(it.id)}" aria-label="Nivel de ${esc(it.nombre)}">${COT.NIVELES.map(n=>`<option value="${n}" ${n===nv?'selected':''} title="${esc(alc[n]||'')}">${esc(((niv[n]||{}).nombre||n)+' ×'+((niv[n]||{}).factor||1))}</option>`).join('')}</select>`:'<small>Con niveles</small>'):'<small>Estándar</small>'}</div>
+      <div class="cz-p">${inc?(precio?money(precio):'Incluido'):(precio?'+'+money(precio):'Cotización aparte')}</div>
+      <button type="button" class="btn btn-sm${inc?' ghost':''}" data-${inc?'quitar':'agregar'}="${esc(it.id)}">${inc?'− Quitar':'+ Agregar'}</button>
+      ${A&&inc?`<div class="cz-full">${ajuste(it.id)}</div>`:''}</div>`;
+  };
+  const q=czNorm(CZ.q),F=CZ.filtro;
+  const pasa=it=>{const inc=!!sel.items[it.id];
+    if(F==='incluidos'&&!inc)return false;if(F==='no'&&inc)return false;
+    if(F==='personalizados'&&!(it.grupo==='especial'||(sel.ajustes_admin||{})[it.id]||(inc&&sel.items[it.id].nombre)))return false;
+    return !q||czNorm(it.nombre+' '+((inc&&sel.items[it.id].nombre)||'')).includes(q)};
+  const secciones=[[`Sistemas de ${ind.nombre}`,(ind.modulos||[]).map(m=>cat[m.id])],
+    ...COT.GRUPOS.map(([g,k,tit])=>[tit,(t[k]||[]).map(x=>cat[x.id])]),
+    ['De otros giros',Object.values(cat).filter(x=>x.grupo==='modulo'&&x.industria!==ind.id&&(sel.items[x.id]||q))]];
+  const lista=secciones.map(([tit,its])=>{const v=its.filter(Boolean).filter(pasa);return v.length?`<h4 class="sub-h">${esc(tit)}</h4><div class="cz-list">${v.map(fila).join('')}</div>`:''}).join('')
+    ||'<p class="prop-err">Nada coincide con el filtro.</p>';
+  const pers=sel.personalizados||[];
+  const persHtml=(F==='todos'||F==='personalizados'||F==='incluidos')?`<h4 class="sub-h">Funciones fuera del catálogo</h4>
+    <div class="cz-list">${pers.map((p,i)=>{const l=L['per.'+p.id]||{};return `<div class="cz-row on"><div class="cz-n"><b>${esc(p.nombre)}</b><div class="cz-tags">${l.revision?'<span class="tag cz-warn">Requiere revisión y cotización personalizada</span>':'<span class="tag">Precio confirmado</span>'}</div>${p.nota?`<small class="cz-alc">${esc(p.nota)}</small>`:''}</div>
+      <div class="cz-lv">${A?`<input type="number" min="0" step="100" data-perm="${i}" value="${esc(p.monto||'')}" placeholder="Precio" aria-label="Precio">`:''}</div>
+      <div class="cz-p">${l.monto?money(l.monto):'Por cotizar'}</div><button type="button" class="btn btn-sm ghost" data-per-quitar="${i}">− Quitar</button>
+      ${A?`<div class="cz-full"><span class="cz-chk"><input type="checkbox" data-perc="${i}" ${p.confirmado?'checked':''}> Alcance y precio confirmados</span></div>`:''}</div>`}).join('')}
+      <div class="cz-add"><input data-per-nombre data-foco="pern" placeholder="Agregar una función que no está en el catálogo"><button type="button" class="btn btn-sm" data-per-add>+ Agregar</button></div></div>`:'';
+  const d=r.descuento,P=COT.ETIQUETAS.permiso,mt=r.mantenimiento,ref=(base.resultado||{}).negociado;
+  const permiso=!d.requiere?'':d.requiere==='vendedor'?'<p class="cz-msg">Descuento dentro de lo que puede dar el vendedor.</p>'
+    :A?`<p class="cz-msg">Necesita autorización de ${esc(P[d.requiere])}: al guardar queda autorizado por ti.</p>${d.requiere==='extraordinaria'?`<span class="cz-chk"><input type="checkbox" data-cz-extra ${CZ.extra?'checked':''}> Autorizo un precio debajo del mínimo permitido</span>`:''}`
+    :`<p class="cz-msg warn">Necesita autorización de ${esc(P[d.requiere])}${d.requiere==='extraordinaria'?' (queda debajo del mínimo permitido)':''}: al guardar quedará pendiente para el administrador.</p>`;
+  const totales=`<aside class="cz-tot">
+    <div class="cz-big"><span>Precio para el cliente</span><b>${money(r.negociado)}</b><small>más IVA</small></div>
+    <div>${estatusCot(r.estatus)}</div>
+    <dl class="cz-dl">
+      <div><dt>Oferta inicial</dt><dd>${money(r.oferta)}</dd></div>
+      <div><dt>Descuento</dt><dd class="cz-desc"><input type="number" min="0" max="100" step="0.5" inputmode="decimal" data-cz-desc data-foco="desc" value="${esc(sel.descuento&&sel.descuento.pct||'')}" placeholder="0" aria-label="Descuento en porcentaje">%${d.monto?` <span>−${money(d.monto)}</span>`:''}</dd></div>
+      ${d.pct?`<div class="cz-col"><dt>Motivo del descuento</dt><dd><input data-cz-motivo data-foco="motivo" value="${esc(sel.descuento.motivo||'')}" placeholder="Ej. cierre esta semana"></dd></div>`:''}
+      <div><dt>Precio de referencia</dt><dd>${money(r.pr)}</dd></div>
+      <div><dt>Mínimo permitido</dt><dd>${money(r.piso)}<small>${r.piso_definitivo?'definitivo':'provisional, sujeto a aprobación'}</small></dd></div>
+      ${A?`<div class="cz-col"><dt>Costo directo validado (solo admin)</dt><dd><input type="number" min="0" step="500" data-cz-cd data-foco="cd" value="${esc(CZ.cd)}" placeholder="${r.cdUsado?money(r.cdUsado):'Sin validar'}"></dd></div>
+        <div><dt>Margen</dt><dd>${r.margen!=null?Math.round(r.margen*100)+'%':'—'}<small>meta ${Math.round((r.margen_meta||0)*100)}%</small></dd></div>`:''}
+      <div><dt>Mantenimiento</dt><dd>${mt?money(mt.precio)+'/mes':'—'}<small>${mt?esc(mt.nombre)+(mt.desde?' · desde':''):''}</small></dd></div>
+    </dl>
+    ${permiso}
+    ${sucio&&ref!=null?`<p class="cz-msg">Frente a la versión ${esc(base.version)}: ${r.negociado-ref>=0?'+':'−'}${money(Math.abs(r.negociado-ref))}</p>`:''}
+    ${sucio?`<label class="cz-col">Nota de esta versión<input data-cz-nota data-foco="nota" value="${esc(CZ.nota)}" placeholder="Qué cambió y por qué"></label>`:''}
+    <div class="cz-acts">
+      <button type="button" class="btn primary" data-cz-actualizar ${CZ.ocupado?'disabled':''}>Actualizar cotización, guion y presentación</button>
+      <button type="button" class="btn" data-cz-guardar ${!sucio||CZ.ocupado?'disabled':''}>Guardar versión</button>
+      <button type="button" class="btn ghost" data-cz-cliente>Ver cotización para el cliente ↗</button>
+      ${A?'<button type="button" class="btn ghost" data-cz-tarifario>Editar tarifario</button>':''}
+    </div></aside>`;
+  const matTxt=mat?`Presentación y guion: versión ${esc(mat.version)}${mat.version!==base.version?' (otra versión)':''}`:prop.cotizacion_pendiente&&prop.estado==='pendiente'?'Claude está preparando la presentación con la cotización':'La presentación aún no usa una cotización';
+  const top=`<div class="cz-top"><span><b>Versión ${esc(base.version)}</b> · ${esc(czFecha(base.creado))} · ${esc((base.autor||{}).nombre||'Sistema')}</span>
+    ${base.estado==='pendiente'?'<span class="tag cz-warn">Descuento pendiente de autorización</span>':''}
+    <span>${matTxt}</span><span>Tarifario v${esc(CZ.tv)}</span>
+    ${CZ.ultima>CZ.tv?`<button type="button" class="chip-btn" data-cz-tarifa>Usar tarifario vigente (v${esc(CZ.ultima)})</button>`:''}
+    ${cerrado?'<span class="tag">Proyecto firmado: quitar funciones va como gestión de cambios</span>':''}</div>`;
+  const avisos=[...r.avisos];
+  const rev=r.lineas.filter(l=>l.revision).map(l=>l.nombre);
+  if(rev.length)avisos.unshift(`Sujeto a revisión técnica antes de confirmar precio: ${rev.join(', ')}.`);
+  const avisosHtml=avisos.length?`<details class="prop-det" open><summary>Hipótesis y advertencias (${avisos.length})</summary><ul class="res-l">${avisos.map(a=>`<li>${esc(a)}</li>`).join('')}</ul></details>`:'';
+  const desglose=`<details class="prop-det"><summary>Desglose completo</summary><table class="cz-tab"><tbody>
+    ${r.lineas.map(l=>`<tr><td>${esc(l.nombre)}${l.nivel?` <small>(${esc((niv[l.nivel]||{}).nombre||l.nivel)})</small>`:''}${l.nota?`<br><small>${esc(l.nota)}</small>`:''}</td><td>${l.monto?money(l.monto):'Incluido'}${l.desde&&l.monto?' <small>desde</small>':''}</td></tr>`).join('')}
+    <tr class="sub"><td>Subtotal</td><td>${money(r.suma)}</td></tr>
+    ${r.ajuste_minimo?`<tr><td>Ajuste al mínimo de la industria</td><td>${money(r.ajuste_minimo)}</td></tr>`:''}
+    <tr class="sub"><td>Precio de referencia</td><td>${money(r.pr)}</td></tr>
+    <tr><td>Oferta inicial (×${(t.politica||{}).factor_oferta})</td><td>${money(r.oferta)}</td></tr>
+    ${d.monto?`<tr><td>Descuento ${d.pct}%</td><td>−${money(d.monto)}</td></tr>`:''}
+    <tr class="sub"><td>Precio para el cliente</td><td>${money(r.negociado)}</td></tr></tbody></table>
+    ${r.externos.length?`<p class="ayuda">Aparte, según tarifas del proveedor: ${esc(r.externos.map(e=>e.nombre).join(', '))}.</p>`:''}</details>`;
+  const hist=`<details class="prop-det"><summary>Historial de versiones (${CZ.versiones.length})</summary><div class="cz-hist">${CZ.versiones.map(v=>{const R=v.resultado||{},D=R.descuento||{},au=v.autorizacion;
+    return `<div class="cz-h${v.version===base.version?' on':''}"><div><b>v${esc(v.version)}</b> · ${esc(czFecha(v.creado))} · ${esc((v.autor||{}).nombre||'Sistema')}${v.origen==='encuesta'?' · desde la encuesta':v.origen==='autorizacion'?' · autorización':''}
+      <br><small>${money(R.negociado)}${v.anterior&&v.anterior.negociado!=null?` (antes ${money(v.anterior.negociado)})`:''}${D.pct?` · descuento ${D.pct}%${D.motivo?': '+esc(D.motivo):''}`:''}${au&&D.pct?` · autorizó ${esc(au.nombre||'')}`:''}${v.estado==='pendiente'?' · pendiente de autorización':''}${v.nota?' · '+esc(v.nota):''}</small></div>
+      <div class="cz-h-acts">${v.version!==base.version?`<button type="button" class="btn btn-sm ghost" data-cz-ver="${esc(v.version)}">Ver</button>`:''}${A&&v.estado==='pendiente'?`<button type="button" class="btn btn-sm" data-cz-autorizar="${esc(v.version)}">Autorizar</button>`:''}</div></div>`}).join('')}</div></details>`;
+  const filtros=[['todos','Todos'],['incluidos','Incluidos'],['no','No incluidos'],['personalizados','Personalizados']];
+  const foco=document.activeElement,fk=foco&&foco.dataset&&foco.dataset.foco,pos=foco&&foco.selectionStart;
+  box.innerHTML=`${top}<div class="cz-grid"><div class="cz-main">${controles}
+    <div class="cz-filtros">${filtros.map(([k,l])=>`<button type="button" class="chip-btn" data-filtro="${k}" aria-pressed="${F===k}">${l}</button>`).join('')}
+      <input class="cz-buscar" type="search" data-cz-q data-foco="q" value="${esc(CZ.q)}" placeholder="Buscar función (también de otros giros)"></div>
+    ${lista}${persHtml}${avisosHtml}${desglose}${hist}</div>${totales}</div>`;
+  if(fk){const n=box.querySelector(`[data-foco="${fk}"]`);if(n){n.focus();try{if(pos!=null)n.setSelectionRange(pos,pos)}catch(_){}}}
+}
+function czAgregar(id){
+  const cat=COT.catalogo(CZ.t),it=cat[id];if(!it)return;
+  const falt=COT.faltantes(CZ.t,CZ.sel.items,id,CZ.sel.industria);
+  if(falt.length&&!confirm(`Para agregar ${it.nombre} también se agregará: ${falt.map(x=>cat[x]?cat[x].nombre:x).join(', ')}.`))return;
+  CZ.sel.items[id]={nivel:it.niveles?'intermedio':null,origen:'panel'};
+  falt.forEach(x=>{CZ.sel.items[x]={nivel:cat[x]&&cat[x].niveles?'intermedio':null,origen:'auto',motivo:`Lo necesita ${it.nombre}`}});
+  pintarCot();
+}
+function czQuitar(id){
+  const cat=COT.catalogo(CZ.t),dep=COT.dependientes(CZ.t,CZ.sel.items,id),todos=[id,...dep],enBase=(CZ.base.seleccion||{}).items||{};
+  if(CZ.c.estado==='cerrado'&&isEmp()&&todos.some(x=>enBase[x]))return toast('El proyecto ya está firmado: para quitar funciones pide al administrador una gestión de cambios.');
+  if(dep.length&&!confirm(`${dep.map(x=>cat[x]?cat[x].nombre:x).join(', ')} depende de ${cat[id]?cat[id].nombre:id} y también se quitará. ¿Continuar?`))return;
+  todos.forEach(x=>delete CZ.sel.items[x]);
+  pintarCot();
+}
+function czClick(e){
+  const b=e.target.closest('button');if(!b||!CZ)return;const ds=b.dataset;
+  if(ds.agregar)return czAgregar(ds.agregar);
+  if(ds.quitar)return czQuitar(ds.quitar);
+  if(ds.filtro){CZ.filtro=ds.filtro;return pintarCot()}
+  if('perAdd' in ds){const i=document.querySelector('#cot-panel [data-per-nombre]'),n=i&&i.value.trim();if(!n)return toast('Escribe el nombre de la función.');
+    (CZ.sel.personalizados=CZ.sel.personalizados||[]).push({id:'p'+Date.now().toString(36),nombre:n,monto:0,nota:''});return pintarCot()}
+  if(ds.perQuitar!==undefined){CZ.sel.personalizados.splice(+ds.perQuitar,1);return pintarCot()}
+  if('czTarifa' in ds){CZ.tv=CZ.ultima;CZ.t=tarifas[CZ.ultima];return pintarCot()}
+  if(ds.czVer)return czVer(+ds.czVer);
+  if(ds.czAutorizar)return czAutorizar(+ds.czAutorizar);
+  if('czGuardar' in ds)return czGuardar(false);
+  if('czActualizar' in ds)return czGuardar(true);
+  if('czTarifario' in ds)return tarifarioEditor();
+  if('czCliente' in ds){if(czSucio())return toast('Guarda la versión para ver la cotización del cliente.');
+    window.open(`cotizacion.html?id=${encodeURIComponent(CZ.c.id)}&v=${CZ.base.version}`,'_blank','noopener')}
+}
+function czChange(e){
+  const x=e.target,ds=x.dataset;if(!CZ)return;
+  if(ds.cz){CZ.sel[ds.cz]=x.value;if(ds.cz==='usuarios')CZ.sel.carga=false;return pintarCot()}
+  if('czCarga' in ds){CZ.sel.carga=x.checked;return pintarCot()}
+  if('czExtra' in ds){CZ.extra=x.checked;return}
+  if(ds.nivel){const s=CZ.sel.items[ds.nivel];if(s){s.nivel=x.value;s.provisional=false}return pintarCot()}
+  const aj=k=>{CZ.sel.ajustes_admin=CZ.sel.ajustes_admin||{};return CZ.sel.ajustes_admin[k]=CZ.sel.ajustes_admin[k]||{}};
+  const limpia=k=>{const a=CZ.sel.ajustes_admin[k];if(a&&(a.monto===''||a.monto==null)&&!a.confirmado&&!a.nota)delete CZ.sel.ajustes_admin[k]};
+  if(ds.ajm){aj(ds.ajm).monto=x.value===''?'':Number(x.value);limpia(ds.ajm);return pintarCot()}
+  if(ds.ajn){aj(ds.ajn).nota=x.value;limpia(ds.ajn);return pintarCot()}
+  if(ds.ajc){aj(ds.ajc).confirmado=x.checked;limpia(ds.ajc);return pintarCot()}
+  if(ds.perm!==undefined){CZ.sel.personalizados[+ds.perm].monto=Number(x.value)||0;return pintarCot()}
+  if(ds.perc!==undefined){CZ.sel.personalizados[+ds.perc].confirmado=x.checked;return pintarCot()}
+}
+function czInput(e){
+  const x=e.target,ds=x.dataset;if(!CZ)return;
+  if('czQ' in ds){CZ.q=x.value;return pintarCot()}
+  if('czDesc' in ds){CZ.sel.descuento={...(CZ.sel.descuento||{}),pct:Math.min(100,Math.max(0,Number(x.value)||0))};return pintarCot()}
+  if('czMotivo' in ds){CZ.sel.descuento={...(CZ.sel.descuento||{}),motivo:x.value};return}
+  if('czCd' in ds){CZ.cd=x.value;return pintarCot()}
+  if('czNota' in ds){CZ.nota=x.value}
+}
+async function czVer(v){
+  const x=CZ.versiones.find(y=>y.version===v);if(!x)return;
+  try{const tv=await tarifa(x.tarifa_version);Object.assign(CZ,{base:x,sel:czClon(x.seleccion),tv:tv.version,t:tv.t,cd:'',nota:'',extra:false});pintarCot()}catch(e){writeError(e)}
+}
+async function czAutorizar(v){
+  const x=CZ.versiones.find(y=>y.version===v);if(!x)return;
+  const ext=(x.resultado||{}).descuento&&x.resultado.descuento.requiere==='extraordinaria';
+  if(ext&&!confirm('Este descuento deja el precio debajo del mínimo permitido. ¿Lo autorizas de forma extraordinaria?'))return;
+  const r=await sb.functions.invoke('cotizacion',{body:{accion:'autorizar',clienteId:CZ.c.id,version:v,extraordinaria:ext}});
+  if(r.error)return toast((await errFn(r.error)).message);
+  CZ.versiones.unshift(r.data);Object.assign(CZ,{base:r.data,sel:czClon(r.data.seleccion)});
+  toast(`Descuento autorizado: versión ${r.data.version}.`);pintarCot();
+}
+async function czGuardar(confirmar){
+  const A=!isEmp(),d=CZ.r.descuento;
+  if(d.pct>0&&!String((CZ.sel.descuento||{}).motivo||'').trim())return toast('Escribe el motivo del descuento.');
+  if(d.requiere==='extraordinaria'&&A&&!CZ.extra)return toast('Ese precio queda debajo del mínimo permitido: marca la autorización extraordinaria.');
+  CZ.ocupado=true;pintarCot();
+  try{
+    let v=CZ.base;
+    if(czSucio()){
+      const body={accion:'guardar',clienteId:CZ.c.id,seleccion:CZ.sel,base:CZ.base.version,tarifa:CZ.tv,nota:CZ.nota,extraordinaria:CZ.extra};
+      if(A&&Number(CZ.cd)>0)body.cd=Number(CZ.cd);
+      const r=await sb.functions.invoke('cotizacion',{body});
+      if(r.error)throw await errFn(r.error);
+      v=r.data;CZ.versiones.unshift(v);
+      if(v.costo)CZ.costos.unshift({cd:v.costo.cd,alcance:v.alcance});
+      Object.assign(CZ,{base:v,sel:czClon(v.seleccion),cd:'',nota:'',extra:false});
+      toast(v.estado==='pendiente'?`Versión ${v.version} guardada: el descuento quedó pendiente de autorización.`:`Versión ${v.version} guardada.`);
+    }
+    if(confirmar){
+      if(v.estado==='pendiente')throw {message:'Esta versión necesita que el administrador autorice el descuento antes de usarla en la presentación.'};
+      const r=await sb.functions.invoke('cotizacion',{body:{accion:'confirmar',clienteId:CZ.c.id,version:v.version}});
+      if(r.error)throw await errFn(r.error);
+      try{await load('propuestas');await load('clientes')}catch(_){}
+      toast(r.data.modo==='inmediato'?`Listo: cotización, guion y presentación usan la versión ${v.version}.`
+        :`Claude está preparando la presentación y el guion con la versión ${v.version}. Tarda unos minutos.`);
+    }
+  }catch(e){toast((e&&e.message)||'No se pudo guardar.')}
+  CZ.ocupado=false;pintarCot();
+}
+
+/* ----- TARIFARIO (solo admin): precios y reglas editables; cada guardado es una versión nueva (RPC guardar_tarifario) ----- */
+let TE=null;
+async function tarifarioEditor(){
+  try{const tv=await tarifa();TE={t:czClon(tv.t),version:tv.version,tab:'industrias',ind:0,err:''}}catch(e){return writeError(e)}
+  root.innerHTML=`<div class="scrim"><div class="glass sheet wide" role="dialog" aria-modal="true" aria-label="Tarifario"><div id="te"></div></div></div>`;
+  root.querySelector('.scrim').addEventListener('click',e=>{if(e.target.classList.contains('scrim'))close()});
+  document.addEventListener('keydown',escKey);
+  const box=document.getElementById('te');
+  box.oninput=e=>{const x=e.target;if(x.dataset.k)teSet(x.dataset.k,x.type==='checkbox'?x.checked:x.type==='number'?(x.value===''?'':Number(x.value)):x.value)};
+  box.onchange=e=>{const x=e.target;if(x.dataset.teInd!==undefined){TE.ind=+x.value;pintarTE()}};
+  box.onclick=teClick;
+  pintarTE();
+}
+function teSet(path,val){const ks=path.split('.');let o=TE.t;ks.slice(0,-1).forEach(k=>{o=o[k]});const last=ks[ks.length-1];if(val===''||val===false)delete o[last];else o[last]=val}
+function teCheck(t){
+  const err=[];let cat;try{cat=COT.catalogo(t)}catch(e){return ['El tarifario no tiene la forma esperada.']}
+  if(!Array.isArray(t.industrias)||!t.industrias.length)err.push('Debe haber al menos una industria.');
+  const ids=new Set();
+  const todos=[...(t.industrias||[]).flatMap(i=>i.modulos||[]),...COT.GRUPOS.flatMap(([,k])=>t[k]||[])];
+  todos.forEach(x=>{if(!x.id)err.push('Hay un concepto sin id.');else if(ids.has(x.id))err.push(`El id ${x.id} está repetido.`);ids.add(x.id);
+    if(!(Number(x.precio)>=0))err.push(`${x.nombre||x.id}: precio inválido.`);
+    [...(x.requiere||[]),...(x.incluye||[])].forEach(r=>{if(!cat[r])err.push(`${x.id} hace referencia a ${r}, que no existe.`)})});
+  (t.industrias||[]).forEach(i=>{if(i.admin&&!cat[i.admin])err.push(`${i.nombre}: el panel ${i.admin} no existe.`)});
+  const enc=t.encuesta||{};Object.entries(enc.sistemas||{}).forEach(([g,m])=>Object.entries(m).forEach(([n,es])=>(es||[]).forEach(e=>{const id=typeof e==='string'?e:e&&e.id;if(!cat[id])err.push(`Encuesta "${n}" (${g}) apunta a ${id}, que no existe.`)})));
+  Object.values(enc.integraciones||{}).forEach(id=>{if(!cat[id])err.push(`Integración de la encuesta apunta a ${id}, que no existe.`)});
+  const p=t.politica||{};if(!(Number(p.factor_oferta)>=1))err.push('El factor de oferta debe ser 1 o más.');if(!(Number(p.factor_piso)>0&&Number(p.factor_piso)<=1))err.push('El factor del piso debe estar entre 0 y 1.');
+  if(!(Number(p.margen)>=0&&Number(p.margen)<1))err.push('El margen debe estar entre 0 y 0.99.');
+  return err.slice(0,12);
+}
+function pintarTE(){
+  const box=document.getElementById('te');if(!box||!TE)return;const t=TE.t;
+  const num=(k,v,ph='')=>`<input type="number" step="any" min="0" data-k="${k}" value="${esc(v??'')}" placeholder="${esc(ph)}">`;
+  const txt=(k,v)=>`<input data-k="${k}" value="${esc(v??'')}">`;
+  const chk=(k,v,l)=>`<label class="cz-chk"><input type="checkbox" data-k="${k}" ${v?'checked':''}> ${l}</label>`;
+  const tabla=(pref,arr,conPct)=>`<div class="te-tab">${arr.map((x,i)=>`<div class="te-row"><code>${esc(x.id)}</code>${txt(`${pref}.${i}.nombre`,x.nombre)}
+    ${conPct?num(`${pref}.${i}.pct`,x.pct):num(`${pref}.${i}.precio`,x.precio)}${'desde' in x||pref.includes('modulos')||COT.GRUPOS.some(([,k])=>pref===k)||['diseno','plataformas','sucursales','usuarios','mantenimiento'].includes(pref)?chk(`${pref}.${i}.desde`,x.desde,'Desde'):''}
+    ${pref.includes('modulos')||COT.GRUPOS.some(([,k])=>pref===k)?chk(`${pref}.${i}.revision`,x.revision,'Revisión')+chk(`${pref}.${i}.niveles`,x.niveles,'Niveles'):''}
+    ${pref==='mantenimiento'?`<span class="te-mini">Hasta PR ${num(`${pref}.${i}.hasta`,x.hasta,'sin tope')}</span>`:''}
+    ${pref.includes('modulos')||COT.GRUPOS.some(([,k])=>pref===k)?`<button type="button" class="btn btn-sm ghost" data-te-borrar="${pref}.${i}">Quitar</button>`:''}</div>`).join('')}
+    ${pref.includes('modulos')||COT.GRUPOS.some(([,k])=>pref===k)?`<button type="button" class="btn btn-sm" data-te-nuevo="${pref}">+ Agregar concepto</button>`:''}</div>`;
+  const tabs=[['industrias','Industrias'],['generales','Funciones generales'],['ajustes','Diseño, plataforma y más'],['politica','Política y niveles'],['avanzado','Avanzado (JSON)']];
+  let cuerpo='';
+  if(TE.tab==='industrias'){const i=TE.ind,ind=t.industrias[i]||{};
+    cuerpo=`<div class="form"><label>Industria<select data-te-ind>${t.industrias.map((x,k)=>opt(k,x.nombre,k===i)).join('')}</select></label>
+      <label>Nombre${txt(`industrias.${i}.nombre`,ind.nombre)}</label><label>Precio base${num(`industrias.${i}.base`,ind.base)}</label><label>Mínimo final del proyecto${num(`industrias.${i}.minimo`,ind.minimo)}</label></div>
+      <h4 class="sub-h">Módulos (precio intermedio/estándar)</h4>${tabla(`industrias.${i}.modulos`,ind.modulos||[])}`}
+  else if(TE.tab==='generales')cuerpo=COT.GRUPOS.map(([,k,tit])=>`<h4 class="sub-h">${tit}</h4>${tabla(k,t[k]||[])}`).join('');
+  else if(TE.tab==='ajustes')cuerpo=`<h4 class="sub-h">Diseño</h4>${tabla('diseno',t.diseno||[])}<h4 class="sub-h">Plataformas</h4>${tabla('plataformas',t.plataformas||[])}
+    <h4 class="sub-h">Sucursales</h4>${tabla('sucursales',t.sucursales||[])}<h4 class="sub-h">Usuarios al mes</h4>${tabla('usuarios',t.usuarios||[])}
+    <h4 class="sub-h">Plazos (recargo %)</h4>${tabla('plazos',t.plazos||[],true)}<h4 class="sub-h">Mantenimiento mensual</h4>${tabla('mantenimiento',t.mantenimiento||[])}`;
+  else if(TE.tab==='politica'){const p=t.politica||{};
+    cuerpo=`<div class="form"><label>Factor de oferta (1.18 = +18%)${num('politica.factor_oferta',p.factor_oferta)}</label><label>Factor del piso provisional (0.90 = −10%)${num('politica.factor_piso',p.factor_piso)}</label>
+      <label>Meta de margen bruto (0.60 = 60%)${num('politica.margen',p.margen)}</label><label>Redondeo (pesos)${num('redondeo',t.redondeo)}</label>
+      <label>Descuento máximo del vendedor (%)${num('politica.desc_vendedor',p.desc_vendedor)}</label><label>Descuento máximo con supervisor (%)${num('politica.desc_supervisor',p.desc_supervisor)}</label>
+      ${COT.NIVELES.map(n=>`<label>Factor ${esc((t.niveles[n]||{}).nombre||n)}${num(`niveles.${n}.factor`,(t.niveles[n]||{}).factor)}</label>`).join('')}</div>
+      <p class="ayuda">Más de ${esc(p.desc_supervisor)}% de descuento lo autoriza dirección (el administrador). Ningún precio baja del mínimo permitido sin autorización extraordinaria.</p>`}
+  else cuerpo=`<p class="ayuda" style="margin:0 0 8px">Todo el tarifario, incluido cómo se traduce cada respuesta de la encuesta a conceptos (encuesta.sistemas). Edita con cuidado: se valida antes de guardar.</p>
+    <textarea class="te-json" data-te-json spellcheck="false">${esc(JSON.stringify(t,null,1))}</textarea><div style="margin-top:8px"><button type="button" class="btn btn-sm" data-te-aplicar>Aplicar JSON</button></div>`;
+  box.innerHTML=`<h3>Tarifario · versión ${esc(TE.version)} vigente</h3>
+    <p class="ayuda" style="margin:-6px 0 12px">Al guardar se crea la versión ${esc(TE.version+1)}. Las cotizaciones ya guardadas conservan la versión con la que se hicieron.</p>
+    <div class="pasos">${tabs.map(([k,l])=>`<button type="button" class="chip-btn" data-te-tab="${k}" aria-pressed="${TE.tab===k}">${l}</button>`).join('')}</div>
+    ${cuerpo}
+    ${TE.err?`<p class="err">${esc(TE.err)}</p>`:''}
+    <div class="form" style="margin-top:14px"><label class="full">Nota del cambio<input id="te-nota" placeholder="Ej. subimos el panel administrativo de salud"></label></div>
+    <div class="paso-nav"><button type="button" class="btn ghost" data-te-cerrar>Cancelar</button><button type="button" class="btn primary" data-te-guardar>Guardar versión ${esc(TE.version+1)}</button></div>`;
+}
+async function teClick(e){
+  const b=e.target.closest('button');if(!b||!TE)return;const ds=b.dataset;
+  if(ds.teTab){TE.tab=ds.teTab;TE.err='';return pintarTE()}
+  if('teCerrar' in ds)return close();
+  if(ds.teBorrar){const ks=ds.teBorrar.split('.'),i=+ks.pop();let o=TE.t;ks.forEach(k=>{o=o[k]});const x=o[i];
+    if(!confirm(`¿Quitar ${x.nombre||x.id} del tarifario? Las cotizaciones guardadas no cambian.`))return;o.splice(i,1);return pintarTE()}
+  if(ds.teNuevo){const ks=ds.teNuevo.split('.');let o=TE.t;ks.forEach(k=>{o=o[k]});const n=prompt('Nombre del concepto');if(!n)return;
+    const pref=ds.teNuevo.startsWith('industrias')?((o[0]&&o[0].id.split('.')[0])||'mod'):({transversales:'tr',integraciones:'int',automatizaciones:'aut',especiales:'esp'}[ds.teNuevo]||'x');
+    let id=pref+'.'+czNorm(n).replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,30),k=2;while(COT.catalogo(TE.t)[id])id=id.replace(/_\d+$/,'')+'_'+(k++);
+    o.push({id,nombre:n,precio:0});return pintarTE()}
+  if('teAplicar' in ds){try{TE.t=JSON.parse(document.querySelector('[data-te-json]').value);TE.err='JSON aplicado: revisa y guarda.'}catch(err){TE.err='El JSON no es válido: '+err.message}return pintarTE()}
+  if('teGuardar' in ds){
+    if(TE.tab==='avanzado'){try{TE.t=JSON.parse(document.querySelector('[data-te-json]').value)}catch(err){TE.err='El JSON no es válido: '+err.message;return pintarTE()}}
+    const err=teCheck(TE.t);if(err.length){TE.err=err.join(' ');return pintarTE()}
+    b.disabled=true;
+    const {data:v,error}=await sb.rpc('guardar_tarifario',{p_data:TE.t,p_nota:(document.getElementById('te-nota')||{}).value||''});
+    if(error){b.disabled=false;return writeError(error)}
+    tarifas[v]=TE.t;close();toast(`Tarifario guardado: versión ${v}. Las cotizaciones nuevas lo usan.`);
+  }
 }
 
 /* ----- CIERRE: contrato firmado → creación de la app → venta completada (RPC cerrar_trato / completar_venta) ----- */

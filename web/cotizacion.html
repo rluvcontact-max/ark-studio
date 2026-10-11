@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cotización · ARK Studio</title>
+<link rel="icon" href="favicon-64.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Manrope:wght@300..800&display=swap" rel="stylesheet">
+<style>
+  /* Cotización para el cliente: solo lo que el cliente puede ver (sin precio de referencia, mínimo, costos ni autorizaciones). */
+  :root{--bg:#e9ebef;--paper:#ffffff;--fg:#0b0c0e;--muted:#5b616c;--hair:rgba(12,14,18,.1)}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--fg);font-family:Inter,-apple-system,system-ui,sans-serif}
+  .bar{position:sticky;top:0;display:flex;gap:8px;align-items:center;padding:12px 16px;background:rgba(233,235,239,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--hair);z-index:2}
+  .bar .t{flex:1;min-width:0;font-size:14px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bar a,.bar button{font:inherit;font-size:14px;color:var(--fg);background:#fff;border:1px solid var(--hair);border-radius:999px;padding:7px 14px;cursor:pointer;text-decoration:none;white-space:nowrap}
+  .hoja{width:min(860px,calc(100% - 32px));margin:24px auto 48px;background:var(--paper);border-radius:20px;padding:48px;box-shadow:0 24px 60px -30px rgba(0,0,0,.35)}
+  header{display:flex;justify-content:space-between;gap:24px;align-items:flex-start;border-bottom:1px solid var(--hair);padding-bottom:24px}
+  header img{width:64px;height:auto}
+  h1{font-family:Manrope,Inter,sans-serif;font-weight:300;font-size:36px;letter-spacing:-.02em;margin:0}
+  .meta{text-align:right;font-size:13px;color:var(--muted);line-height:1.6}
+  .para{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0}
+  .para span{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+  .para b{font-size:16px}
+  .aviso{padding:12px 16px;border-radius:12px;background:#f3f4f6;font-size:13.5px;line-height:1.5;margin:0 0 20px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{text-align:left;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:0 0 10px}
+  td{padding:11px 0;border-top:1px solid var(--hair);vertical-align:top}
+  td small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+  td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+  th.n{text-align:right}
+  .tot td{font-weight:600}
+  .total td{font-size:20px;font-weight:700;border-top:2px solid var(--fg)}
+  h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:32px 0 10px;font-weight:600}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  ul{margin:0;padding-left:18px;font-size:14px;line-height:1.6}
+  p{font-size:14px;line-height:1.55;margin:0}
+  .pie{margin-top:32px;padding-top:16px;border-top:1px solid var(--hair);font-size:12px;color:var(--muted)}
+  .msg{max-width:520px;margin:20vh auto 0;padding:0 16px;text-align:center;line-height:1.5;color:var(--muted)}
+  .msg b{display:block;color:var(--fg);font-size:20px;margin-bottom:8px}
+  @media (max-width:640px){.hoja{padding:24px;border-radius:16px}.para,.cols{grid-template-columns:1fr}header{flex-direction:column}.meta{text-align:left}h1{font-size:28px}}
+  @media print{html,body{background:#fff}.bar{display:none}.hoja{box-shadow:none;margin:0;width:100%;padding:0;border-radius:0}}
+</style>
+</head>
+<body>
+<div class="bar"><a href="./" id="volver">← ARK Studio</a><span class="t" id="titulo">Cotización</span><button id="pdf">Imprimir o guardar PDF</button></div>
+<div id="doc"><div class="msg">Cargando cotización…</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+/* Condiciones comerciales: iguales a CONDICIONES de propuesta.html y CONDICIONES_PROPUESTA de prompt.ts. */
+const CONDICIONES = {
+  impuestos: 'Más IVA', vigencia: '15 días', garantia: '30 días para corrección de errores',
+  pagos: [[50, 'Al firmar'], [30, 'Al aprobar el diseño'], [20, 'A la entrega']],
+  sinVendedor: {nombre: 'Ricardo Lua', telefono: '', email: ''},
+};
+const SB_URL = 'https://tuaxfleudqxmvoicssqw.supabase.co', SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1YXhmbGV1ZHF4bXZvaWNzc3F3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyOTUxMjEsImV4cCI6MjEwNjg3MTEyMX0.GBXnLj1xiPn7GsaXdysfoODsbfGuL-q6FFG78BZLGPQ';
+const sb = window.supabase.createClient(SB_URL, SB_KEY, {auth: {persistSession: true, autoRefreshToken: true}});
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+const dinero = n => '$' + Math.round(Number(n) || 0).toLocaleString('es-MX');
+const $ = id => document.getElementById(id);
+const aviso = (t, x) => { $('doc').innerHTML = `<div class="msg"><b>${esc(t)}</b>${x}</div>`; };
+
+async function iniciar() {
+  const qs = new URLSearchParams(location.search), id = qs.get('id');
+  if (!id) return aviso('Falta el cliente', 'Abre la cotización desde la ficha del cliente en <a href="./">ARK Studio</a>.');
+  const {data: {session}} = await sb.auth.getSession();
+  if (!session) return aviso('Inicia sesión', 'Entra a <a href="./">ARK Studio</a> y vuelve a abrir la cotización.');
+  const [{data: c}, {data: p}] = await Promise.all([
+    sb.from('clientes').select('data').eq('id', id).maybeSingle(),
+    sb.from('propuestas').select('data').eq('id', id).maybeSingle(),
+  ]);
+  if (!c) return aviso('No encontramos este cliente', 'Puede que no tengas acceso a él.');
+  // la versión pedida, la que usan la presentación y el guion, o la última
+  const v = Number(qs.get('v')) || (p && p.data && p.data.cotizacion && p.data.cotizacion.version) || null;
+  let q = sb.from('cotizaciones').select('data').eq('cliente_id', id);
+  q = v ? q.eq('version', v) : q.order('version', {ascending: false}).limit(1);
+  const {data: filas} = await q;
+  const cot = filas && filas[0] && filas[0].data;
+  if (!cot) return aviso('Aún no hay cotización', 'Ábrela desde el paso "Cotización" de la propuesta.');
+  const cli = c.data || {};
+  let vendedor = CONDICIONES.sinVendedor;
+  if (cli.empleadoId) {
+    const {data: e} = await sb.from('empleados').select('data').eq('id', cli.empleadoId).maybeSingle();
+    if (e && e.data) vendedor = {nombre: e.data.nombre || '', telefono: e.data.telefono || '', email: e.data.email || ''};
+  }
+  pintar(cot, cli, vendedor, id);
+}
+
+function pintar(cot, cli, vendedor, id) {
+  const k = cot.cliente || {}, lineas = k.lineas || [], mt = k.mantenimiento;
+  const fecha = new Date(cot.creado || Date.now()).toLocaleDateString('es-MX', {day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Mexico_City'});
+  document.title = `Cotización · ${cli.empresa || 'ARK'}`;
+  $('titulo').textContent = `Cotización para ${cli.empresa || 'cliente'} · versión ${cot.version}`;
+  const nota = k.estatus === 'revision' ? 'Algunos conceptos requieren una revisión técnica antes de confirmar su precio. El precio final se confirma por escrito antes de firmar.'
+    : k.estatus === 'desde' ? 'Algunos conceptos son un precio "desde": su monto se confirma al definir juntos el alcance, antes de firmar.' : '';
+  const filas = lineas.map(l => `<tr><td>${esc(l.nombre)}${l.nivel ? ` <small>Nivel ${esc(l.nivel)}</small>` : ''}${l.nota ? `<small>${esc(l.nota)}</small>` : ''}</td>
+    <td class="n">${l.incluido ? 'Incluido' : (l.desde ? 'desde ' : '') + dinero(l.monto)}</td></tr>`).join('');
+  const total = Number(k.total) || 0;
+  $('doc').innerHTML = `<article class="hoja">
+    <header><div><img src="propuesta/logo-negro.png" alt="ARK"><h1>Cotización</h1></div>
+      <div class="meta">Folio ${esc(String(id).slice(0, 8).toUpperCase())}-${esc(cot.version)}<br>${esc(fecha)}<br>Vigencia: ${esc(CONDICIONES.vigencia)}</div></header>
+    <div class="para"><div><span>Para</span><b>${esc(cli.empresa || '')}</b>${cli.contacto ? `<p>${esc(cli.contacto)}</p>` : ''}</div>
+      <div><span>Te atiende</span><b>${esc(vendedor.nombre)}</b>${vendedor.telefono || vendedor.email ? `<p>${esc([vendedor.telefono, vendedor.email].filter(Boolean).join(' · '))}</p>` : ''}</div></div>
+    ${nota ? `<p class="aviso">${esc(nota)}</p>` : ''}
+    <table><thead><tr><th>Concepto</th><th class="n">Importe</th></tr></thead><tbody>${filas}
+      <tr class="tot"><td>Precio del proyecto</td><td class="n">${dinero(k.precio_inicial)}</td></tr>
+      ${Number(k.descuento) ? `<tr><td>Descuento</td><td class="n">−${dinero(k.descuento)}</td></tr>` : ''}
+      <tr class="total"><td>Total</td><td class="n">${dinero(total)}</td></tr></tbody></table>
+    <p style="margin-top:8px;color:var(--muted);font-size:12.5px">Precios en ${esc(k.moneda || 'MXN')}. ${esc(CONDICIONES.impuestos)}.</p>
+    <div class="cols">
+      <div><h2>Esquema de pagos</h2><table><tbody>${CONDICIONES.pagos.map(([pct, m]) => `<tr><td>${pct}% · ${esc(m)}</td><td class="n">${dinero(total * pct / 100)}</td></tr>`).join('')}</tbody></table></div>
+      <div><h2>Mantenimiento mensual</h2>${mt ? `<p><b>Plan ${esc(mt.nombre)}: ${mt.desde ? 'desde ' : ''}${dinero(mt.precio)} al mes</b></p><p style="color:var(--muted);margin-top:6px">${esc(mt.nota || '')}</p>` : '<p>Se define al confirmar el proyecto.</p>'}</div>
+    </div>
+    ${(k.externos || []).length ? `<h2>No incluido: servicios de terceros</h2><p style="margin-bottom:6px">Se pagan aparte, según la tarifa vigente de cada proveedor:</p><ul>${k.externos.map(e => `<li>${esc(e.nombre)}</li>`).join('')}</ul>` : ''}
+    <h2>Condiciones</h2><ul><li>Vigencia de esta cotización: ${esc(CONDICIONES.vigencia)}.</li><li>Garantía: ${esc(CONDICIONES.garantia)}.</li>
+      <li>Cambios de alcance después de firmar se cotizan por separado.</li><li>El mantenimiento no incluye desarrollos nuevos ni consumos de servicios externos.</li></ul>
+    <p class="pie">ARK · Aplicaciones a la medida · Guadalajara, México</p></article>`;
+}
+if (new URLSearchParams(location.search).has('embed')) $('volver').hidden = true;
+$('pdf').onclick = () => window.print();
+iniciar().catch(e => { console.error(e); aviso('No se pudo cargar la cotización', 'Revisa tu conexión e inténtalo de nuevo.'); });
+</script>
+</body>
+</html>
