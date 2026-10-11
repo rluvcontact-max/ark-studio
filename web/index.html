@@ -1074,7 +1074,7 @@ function vPanel(){
       <section class="glass panel"><h2>Próximas citas <button class="btn btn-sm ghost" data-go="calendario">Ver calendario</button></h2><div class="list">${list}</div></section>
     </div>`;
 }
-const ENCUESTA='https://arkencuesta.netlify.app/';
+const ENCUESTA='https://arkencuesta-mx.netlify.app/';
 /* clave del link de la encuesta (?v=) por empleado; debe coincidir con EQUIPO en encuesta/index.html y VENDEDORES en lead-encuesta */
 const CLAVES_ENCUESTA={'andres-mayo':'andres','patricio-schnabel':'patricio','guillermo-munoz':'guillermo','juan-pablo-suro':'juanpablo','jorge-torres':'jorge','bruno-rodriguez':'bruno'};
 const linkEncuesta=id=>ENCUESTA+'?v='+encodeURIComponent(CLAVES_ENCUESTA[id]||id);

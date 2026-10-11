@@ -1,6 +1,6 @@
-# Encuesta (arkencuesta.netlify.app)
+# Encuesta (arkencuesta-mx.netlify.app)
 
-`index.html` es la encuesta publicada: un solo archivo con los logos y las fotos del equipo incrustados. Para publicar, arrastra esta carpeta (o el ZIP) a Netlify → arkencuesta → Deploys.
+`index.html` es la encuesta publicada: un solo archivo con los logos y las fotos del equipo incrustados. Para publicar, arrastra esta carpeta (o el ZIP) a Netlify → arkencuesta-mx (cuenta nueva de Netlify; con la detección de formularios activada) → Deploys.
 
 Puntos clave del archivo:
 - `EQUIPO`: clave `?v=` → nombre, foto y página de reservas de Google Calendar de cada vendedor.

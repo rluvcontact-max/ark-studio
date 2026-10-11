@@ -17,7 +17,7 @@ supabase link --project-ref tuaxfleudqxmvoicssqw
 ## Publicar
 
 - **App**: carpeta `web/` → proyecto de Netlify **arkdashboardmx**.
-- **Encuesta**: carpeta `encuesta/` → proyecto de Netlify **arkencuesta**.
+- **Encuesta**: carpeta `encuesta/` → proyecto de Netlify **arkencuesta-mx** (cuenta nueva).
 
 Recomendado: subir este repo a GitHub y conectarlo a Netlify para que cada cambio se publique solo.
 

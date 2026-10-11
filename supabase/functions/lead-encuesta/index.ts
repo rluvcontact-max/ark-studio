@@ -1,4 +1,4 @@
-// Recibe las respuestas de la encuesta pública (arkencuesta.netlify.app)
+// Recibe las respuestas de la encuesta pública (arkencuesta-mx.netlify.app)
 // y las registra como cliente 'prospecto' asignado al vendedor del link (?v=...).
 // Desplegada con verify_jwt = false (es pública; valida honeypot y datos).
 // Después de responder pide a propuesta-claude que Claude prepare la propuesta comercial y a
