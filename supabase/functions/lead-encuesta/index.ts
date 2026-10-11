@@ -3,6 +3,9 @@
 // Desplegada con verify_jwt = false (es pública; valida origen, honeypot y datos).
 // Después de responder pide a propuesta-claude que Claude prepare la propuesta comercial y a
 // notificar que avise por push al vendedor (si algo falla, el prospecto queda registrado igual).
+// Desde oct 2026 la encuesta también manda tamaño, sucursales, usuarios al mes, diseño, integraciones, objetivos,
+// presupuesto (opcional), el nivel de complejidad de cada sistema (texto `complejidad`) y `cotizacion`: un JSON
+// estructurado para el cotizador automático futuro. Todo se guarda en data.encuesta.
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 declare const EdgeRuntime: { waitUntil(p: Promise<unknown>): void };
@@ -68,6 +71,16 @@ Deno.serve(async (req) => {
   // Link del perfil de Google del negocio (opcional): solo se acepta http(s).
   const google = /^https?:\/\/\S+$/i.test(txt(b.google, 500)) ? txt(b.google, 500) : "";
 
+  // cotizacion: JSON de la encuesta con los datos estructurados (se guarda tal cual si es válido y no es enorme)
+  let cotizacion: unknown = null;
+  try { const c = txt(b.cotizacion, 40000); cotizacion = c ? JSON.parse(c) : null; } catch { cotizacion = null; }
+  const extra = {
+    tamano: txt(b.tamano), sucursales: txt(b.sucursales), usuarios_mes: txt(b.usuarios_mes), diseno: txt(b.diseno),
+    integraciones: txt(b.integraciones, 400), integraciones_cual: txt(b.integraciones_cual, 300),
+    objetivos: txt(b.objetivos, 400), objetivo_otro: txt(b.objetivo_otro, 300), presupuesto: txt(b.presupuesto),
+    complejidad: txt(b.complejidad, 4000), fecha: txt(b.fecha, 40),
+  };
+
   const notas = [
     "Llegó por la encuesta" + (empleadoId ? "" : " (link general)") + ".",
     `Giro: ${txt(b.giro)}`,
@@ -75,6 +88,9 @@ Deno.serve(async (req) => {
     `Para quién: ${txt(b.usuarios)}`,
     `Plataforma: ${txt(b.plataforma)}`,
     `Lo quiere: ${txt(b.tiempo)}`,
+    extra.tamano ? `Tamaño: ${extra.tamano} · ${extra.sucursales} · ${extra.usuarios_mes} usuarios al mes` : "",
+    extra.diseno ? `Diseño: ${extra.diseno}` : "",
+    extra.presupuesto ? `Presupuesto: ${extra.presupuesto}` : "",
     google ? `Google: ${google}` : "",
     txt(b.comentarios, 1500) ? `Comentarios: ${txt(b.comentarios, 1500)}` : "",
   ].filter(Boolean).join("\n");
@@ -93,6 +109,8 @@ Deno.serve(async (req) => {
       encuesta: {
         negocio, nombre, google, giro: txt(b.giro), sistemas: txt(b.sistemas, 1500), usuarios: txt(b.usuarios),
         plataforma, tiempo: txt(b.tiempo), comentarios: txt(b.comentarios, 1500),
+        ...Object.fromEntries(Object.entries(extra).filter(([, v]) => v)),
+        ...(cotizacion ? { cotizacion } : {}),
       },
     },
   }).select("id").single();

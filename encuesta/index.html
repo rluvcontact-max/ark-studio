@@ -128,6 +128,14 @@ h2{font-size:clamp(21px,4.4vw,26px);line-height:1.18;font-weight:650;letter-spac
 .opt input:checked + label .tick{background:var(--accent);border-color:var(--accent)}
 .opt input:checked + label .tick svg{opacity:1;transform:none}
 .opt input:focus-visible + label{box-shadow:0 0 0 4px var(--sel)}
+.opt.sin-ic .ic{display:none}
+.hint{color:var(--ink-3);font-size:12.5px;margin:-4px 0 10px}
+.chips-opts .opt label{padding-top:12px;padding-bottom:12px}
+.q{margin-top:24px}
+.q:first-child{margin-top:0}
+.q h3{font-size:16px;font-weight:600;margin:0 0 4px;letter-spacing:-.01em}
+.q .para{color:var(--ink-3);font-size:12.5px;margin:0 0 10px}
+.q .nota{color:var(--ink-3);font-size:12.5px;margin:8px 0 0}
 
 /* botones */
 .nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:26px}
@@ -204,6 +212,8 @@ h2{font-size:clamp(21px,4.4vw,26px);line-height:1.18;font-weight:650;letter-spac
 <form hidden method='post' name='encuesta-app'><input type='hidden' name='form-name' value='encuesta-app' />
   <input name="bot-field"><input name="nombre"><input name="negocio"><input name="google"><input name="whatsapp"><input name="correo">
   <input name="giro"><input name="sistemas"><input name="usuarios"><input name="plataforma"><input name="tiempo"><input name="comentarios"><input name="vendedor">
+  <input name="tamano"><input name="sucursales"><input name="usuarios_mes"><input name="diseno"><input name="integraciones"><input name="integraciones_cual">
+  <input name="objetivos"><input name="objetivo_otro"><input name="presupuesto"><input name="complejidad"><input name="cotizacion"><input name="fecha">
 </form>
 
 <main class="wrap">
@@ -218,11 +228,14 @@ h2{font-size:clamp(21px,4.4vw,26px);line-height:1.18;font-weight:650;letter-spac
     <form id="f" novalidate>
       <input type="hidden" name="form-name" value="encuesta-app">
       <input type="hidden" name="vendedor" id="vendedor">
+      <input type="hidden" name="complejidad" id="complejidad">
+      <input type="hidden" name="cotizacion" id="cotizacion">
+      <input type="hidden" name="fecha" id="fecha">
       <p class="hidden"><label>No llenar: <input name="bot-field"></label></p>
 
       <!-- 0 · Bienvenida -->
       <div class="step on" data-step="0">
-        <p class="eyebrow">Encuesta · 1 minuto</p>
+        <p class="eyebrow">Encuesta · 3 minutos</p>
         <h1>Diseñemos la app de tu negocio</h1>
         <p class="sub">Elige lo que te gustaría que tuviera tu aplicación. Con tus respuestas preparamos una idea a tu medida y, al final, puedes agendar una llamada rápida de 10 minutos para presentártela.</p>
         <div class="field"><label for="nombre">Tu nombre</label><input class="input" id="nombre" name="nombre" autocomplete="name" placeholder="Ej. Ana López" required></div>
@@ -243,16 +256,40 @@ h2{font-size:clamp(21px,4.4vw,26px);line-height:1.18;font-weight:650;letter-spac
           ["🚚","Logística o distribución"],["✨","Otro"]]'></div>
       </div>
 
-      <!-- 2 · Sistemas -->
-      <div class="step" data-step="2" data-required="sistemas">
+      <!-- 2 · Tu negocio -->
+      <div class="step" data-step="2" data-required="tamano,sucursales,usuarios_mes">
+        <h2>Cuéntanos de tu negocio</h2>
+        <p class="sub">Así pensamos una app del tamaño correcto para ti.</p>
+        <p class="group-title">¿Qué tamaño tiene actualmente tu negocio?</p>
+        <div class="opts" data-name="tamano" data-type="radio" data-items='[
+          ["🌱","Emprendimiento o negocio pequeño"],["🏪","Negocio establecido"],
+          ["🏢","Empresa mediana"],["🏙️","Empresa grande o corporativo"]]'></div>
+        <p class="group-title" style="margin-top:22px">¿Cuántas sucursales tiene?</p>
+        <div class="opts chips-opts" data-name="sucursales" data-type="radio" data-items='[
+          ["","1 sucursal"],["","2 a 5 sucursales"],["","6 a 15 sucursales"],["","16 a 50 sucursales"],["","Más de 50 sucursales"]]'></div>
+        <p class="group-title" style="margin-top:22px">¿Cuántas personas crees que usarán tu app cada mes?</p>
+        <p class="hint">No necesitas saberlo exactamente. Solo selecciona una estimación.</p>
+        <div class="opts chips-opts" data-name="usuarios_mes" data-type="radio" data-items='[
+          ["","Menos de 100"],["","Entre 100 y 500"],["","Entre 501 y 2,000"],["","Entre 2,001 y 10,000"],["","Más de 10,000"],["","No estoy seguro"]]'></div>
+      </div>
+
+      <!-- 3 · Sistemas -->
+      <div class="step" data-step="3" data-required="sistemas">
         <p class="eyebrow" id="sis-eyebrow"></p>
         <h2>¿Qué sistemas te gustaría incluir?</h2>
         <p class="sub">Selecciona todos los que te interesen. No te preocupes por el costo todavía.</p>
         <div id="sistemas-box"></div>
       </div>
 
-      <!-- 3 · Usuarios y plataforma -->
-      <div class="step" data-step="3" data-required="usuarios,plataforma">
+      <!-- 4 · Detalles de los sistemas elegidos (solo aparece si alguno lo necesita) -->
+      <div class="step" data-step="4" id="paso-detalles">
+        <h2>Unos detalles de lo que elegiste</h2>
+        <p class="sub">Así sabemos qué tan completo debe ser cada sistema. Si no estás seguro, elige esa opción.</p>
+        <div id="detalle-box"></div>
+      </div>
+
+      <!-- 5 · Usuarios y plataforma -->
+      <div class="step" data-step="5" data-required="usuarios,plataforma">
         <h2>¿Para quién sería la app?</h2>
         <p class="sub">Puede ser para tus clientes, para tu equipo, o las dos.</p>
         <div class="opts one" data-name="usuarios" data-type="radio" data-items='[
@@ -265,8 +302,46 @@ h2{font-size:clamp(21px,4.4vw,26px);line-height:1.18;font-weight:650;letter-spac
           ["📱","iPhone y Android"],["💻","Web (navegador)"],["🔗","Las dos"],["🤔","Aún no sé"]]'></div>
       </div>
 
-      <!-- 4 · Tiempo -->
-      <div class="step" data-step="4" data-required="tiempo">
+      <!-- 6 · Diseño e integraciones -->
+      <div class="step" data-step="6" data-required="diseno,integraciones">
+        <h2>¿Cómo te gustaría que se viera tu aplicación?</h2>
+        <p class="sub">Elige el estilo que más se parezca a lo que imaginas.</p>
+        <div class="opts one" data-name="diseno" data-type="radio" data-items='[
+          ["✨","Esencial","Moderna, sencilla y profesional. Un diseño atractivo, fácil de usar y adaptado a la identidad de tu negocio."],
+          ["💎","Personalizada","Un diseño exclusivo para tu marca: identidad visual propia, pantallas personalizadas y una experiencia más distintiva."],
+          ["👑","Premium","Una experiencia de alto nivel: diseño completamente a la medida, animaciones elegantes, transiciones fluidas y elementos interactivos."]]'></div>
+        <p class="group-title" style="margin-top:24px">¿Usas algún sistema que te gustaría conectar con la app?</p>
+        <p class="hint">Por ejemplo, un sistema de caja, inventario, facturación o reservaciones.</p>
+        <div class="opts" data-name="integraciones" data-type="checkbox" id="integraciones" data-items='[
+          ["🆕","No, comenzaríamos desde cero"],["🖥️","Punto de venta o caja"],["📦","Sistema de inventario"],["📅","Sistema de reservaciones"],
+          ["🧾","Sistema de facturación"],["📇","Administración de clientes (CRM)"],["🔌","Otro"],["🤔","No estoy seguro"]]'></div>
+        <div class="field hidden" id="integ-cual-box" style="margin-top:14px">
+          <label for="integraciones_cual">¿Qué sistema o plataforma usas? <span style="color:var(--ink-3)">(opcional)</span></label>
+          <input class="input" id="integraciones_cual" name="integraciones_cual" placeholder="Ej. Shopify, Square, Odoo, SAP…">
+        </div>
+      </div>
+
+      <!-- 7 · Objetivos y presupuesto -->
+      <div class="step" data-step="7" data-required="objetivos">
+        <h2>¿Qué te gustaría lograr con tu aplicación?</h2>
+        <p class="sub">Elige hasta tres.</p>
+        <div class="opts" data-name="objetivos" data-type="checkbox" id="objetivos" data-items='[
+          ["💰","Aumentar mis ventas"],["⏱️","Ahorrar tiempo y automatizar procesos"],["❤️","Mejorar la experiencia de mis clientes"],
+          ["📱","Modernizar mi negocio"],["📊","Tener mejor control de mi empresa"],["🚀","Expandir mi negocio"],["✨","Otro"]]'></div>
+        <p class="hint" id="obj-max" style="margin-top:8px"></p>
+        <div class="field hidden" id="obj-otro-box" style="margin-top:10px">
+          <label for="objetivo_otro">¿Cuál? <span style="color:var(--ink-3)">(opcional)</span></label>
+          <input class="input" id="objetivo_otro" name="objetivo_otro" placeholder="Cuéntanos qué te gustaría lograr">
+        </div>
+        <p class="group-title" style="margin-top:24px">¿Qué presupuesto aproximado tienes contemplado? <span style="text-transform:none;letter-spacing:0;font-weight:400">(opcional)</span></p>
+        <p class="hint">Nos ayuda a proponerte una solución a tu medida. No es un compromiso de compra.</p>
+        <div class="opts chips-opts" data-name="presupuesto" data-type="radio" data-items='[
+          ["","$10,000 – $20,000 MXN"],["","$20,001 – $40,000 MXN"],["","$40,001 – $70,000 MXN"],
+          ["","$70,001 – $120,000 MXN"],["","Más de $120,000 MXN"],["","Todavía no tengo un presupuesto definido"]]'></div>
+      </div>
+
+      <!-- 8 · Tiempo -->
+      <div class="step" data-step="8" data-required="tiempo">
         <h2>¿Para cuándo te gustaría tenerla?</h2>
         <p class="sub">Nos ayuda a organizar los tiempos de diseño y desarrollo.</p>
         <div class="opts one" data-name="tiempo" data-type="radio" data-items='[
@@ -277,8 +352,8 @@ h2{font-size:clamp(21px,4.4vw,26px);line-height:1.18;font-weight:650;letter-spac
         </div>
       </div>
 
-      <!-- 5 · Agendar -->
-      <div class="step" data-step="5">
+      <!-- 9 · Agendar -->
+      <div class="step" data-step="9">
         <span class="pill"><b></b>Respuestas enviadas</span>
         <h2>Agenda una llamada de 10 minutos con <span class="host-name"></span></h2>
         <p class="sub">Es una llamada cortita: te presentamos la idea de tu app con base en lo que elegiste y resolvemos dudas. Sin compromiso.</p>
@@ -305,8 +380,8 @@ h2{font-size:clamp(21px,4.4vw,26px);line-height:1.18;font-weight:650;letter-spac
         <a class="alt" id="wa" target="_blank" rel="noopener">Prefiero que me escriban por WhatsApp →</a>
       </div>
 
-      <!-- 6 · Gracias -->
-      <div class="step thanks" data-step="6">
+      <!-- 10 · Gracias -->
+      <div class="step thanks" data-step="10">
         <div class="ok-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
         <h1>¡Listo, <span id="thx-name"></span>!</h1>
         <p class="sub">Gracias por tu tiempo. Ya tenemos tus respuestas y con ellas vamos a preparar una idea de app pensada para <strong id="thx-biz"></strong>.</p>
@@ -363,11 +438,13 @@ const GENERAL = { nombre: "el equipo de ARK", foto: "", agenda: "https://calenda
   CONFIG.agenda = p.agenda;
   CONFIG.foto = p.foto;
   CONFIG.general = !EQUIPO[clave];
+  CONFIG.clave = EQUIPO[clave] ? clave : "";
   document.getElementById("vendedor").value = EQUIPO[clave] ? p.nombre : "General";
 }
 /* ==================================================== */
 
 const $ = s => document.querySelector(s);
+const form = document.getElementById("f");
 const $$ = s => [...document.querySelectorAll(s)];
 const check = '<svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg>';
 
@@ -603,11 +680,137 @@ const SISTEMAS = {
   }
 };
 
+/* ============ COMPLEJIDAD POR SISTEMA ============
+   Algunos sistemas cambian mucho de tamaño (y de precio) según lo que se necesite. Si el cliente elige uno,
+   en el paso "Detalles" se le pregunta qué nivel necesita; una sola pregunta por tipo de sistema aunque haya
+   elegido varios parecidos. Los nombres en `sistemas` deben ser iguales a los de SISTEMAS (arriba).
+   Opción: {v: código, t: texto, d: descripción, n: nivel (basico|intermedio|avanzado|empresarial|no_se), suc: solo con varias sucursales}.
+   revision: necesita revisión técnica, legal y de seguridad antes de cotizar. multi: se pueden elegir varias. */
+const NO_SE = {v:"no_se", t:"No estoy seguro", n:"no_se"};
+const MODULOS = {
+  reservas: {pregunta:"¿Qué tipo de reservaciones o citas necesitas?",
+    sistemas:["Reservar clases y horarios","Citas con entrenador personal","Reservar mesa","Agendar citas","Agenda por doctor y consultorio",
+      "Agendar cita con su estilista","Agenda por estilista","Agendar asesorías","Agendar visitas","Reservas y citas"],
+    opciones:[{v:"basico",t:"Básicas",d:"Tus clientes eligen fecha y hora"},
+      {v:"intermedio",t:"Intermedias",d:"También eligen al empleado o especialista"},
+      {v:"avanzado",t:"Avanzadas",d:"Administras horarios, empleados y disponibilidad"},
+      {v:"empresarial",t:"Empresariales",d:"Varias sucursales, cada una con su personal",suc:true}, NO_SE]},
+  pedidos: {pregunta:"¿Qué tipo de sistema de pedidos necesitas?",
+    sistemas:["Pedidos para llevar o domicilio","Pedir desde la mesa con QR","Compra en línea","Apartar y recoger en tienda",
+      "Tienda en la app","Venta de productos","Pedidos en línea","Cotizar y solicitar envíos"],
+    opciones:[{v:"basico",t:"Básico",d:"Recibir solicitudes de pedido"},
+      {v:"intermedio",t:"Intermedio",d:"Pedidos con pago en línea"},
+      {v:"avanzado",t:"Avanzado",d:"Estados del pedido, notificaciones y seguimiento"},
+      {v:"empresarial",t:"Empresarial",d:"Conectado con inventario, sucursales o tus sistemas actuales"}, NO_SE]},
+  pagos: {pregunta:"¿Cómo te gustaría recibir los pagos?", multi:true, ayuda:"Puedes elegir varias.",
+    sistemas:["Pagos en la app","Pagos y meses sin intereses","Pagos y anticipos","Anticipo al agendar","Pagos en línea",
+      "Apartado en línea","Estado de cuenta","Paquetes de clases","Paquetes de tratamiento"],
+    opciones:[{v:"unico",t:"Pagos únicos",d:"El cliente paga cada compra o servicio",n:"basico"},
+      {v:"anticipo",t:"Anticipos o depósitos",d:"Apartan con una parte y pagan el resto después",n:"intermedio"},
+      {v:"recurrente",t:"Pagos recurrentes o a plazos",d:"Cobros automáticos cada mes o mensualidades",n:"avanzado"},
+      {v:"varios",t:"Diferentes métodos y tipos de pago",d:"Tarjeta, transferencia, OXXO, meses sin intereses…",n:"avanzado"}, NO_SE]},
+  membresias: {pregunta:"¿Cómo quieres administrar las membresías o cobros recurrentes?",
+    sistemas:["Membresías con cobro automático","Membresías y paquetes","Colegiaturas automáticas","Igualas mensuales","Membresías"],
+    opciones:[{v:"basico",t:"Básicas",d:"Consultar qué membresías están activas"},
+      {v:"intermedio",t:"Intermedias",d:"Pagos y renovaciones desde la app"},
+      {v:"avanzado",t:"Avanzadas",d:"Cobro automático, recordatorios y diferentes planes"},
+      {v:"empresarial",t:"Empresariales",d:"Membresías, accesos y administración de varias sucursales",suc:true}, NO_SE]},
+  acceso: {pregunta:"¿Cómo sería la entrada de tus miembros?",
+    sistemas:["Control de acceso y asistencia","Check-in con QR"],
+    opciones:[{v:"basico",t:"Con QR en recepción",d:"El miembro muestra su QR y se registra su entrada"},
+      {v:"avanzado",t:"Con torniquete o lector",d:"Un equipo en la entrada abre automáticamente"}, NO_SE]},
+  inventario: {pregunta:"¿Qué nivel de control de inventario necesitas?",
+    sistemas:["Inventario de insumos","Inventario por sucursal","Inventario de medicamentos","Inventario de productos","Inventario de almacén","Inventario"],
+    opciones:[{v:"basico",t:"Básico",d:"Agregar y editar productos"},
+      {v:"intermedio",t:"Intermedio",d:"Las existencias se descuentan solas"},
+      {v:"avanzado",t:"Avanzado",d:"Alertas, reportes y movimientos de inventario"},
+      {v:"empresarial",t:"Empresarial",d:"Inventario sincronizado entre varias sucursales",suc:true}, NO_SE]},
+  entregas: {pregunta:"¿Cómo te gustaría manejar las entregas?",
+    sistemas:["Rastreo de repartidor","Envíos y rastreo","Rastreo en tiempo real","Avisos de estatus","Prueba de entrega",
+      "App para choferes","Optimización de rutas","Control de flotilla","Entregas a domicilio"],
+    opciones:[{v:"basico",t:"Avisos de estatus",d:"Preparando, en camino, entregado"},
+      {v:"intermedio",t:"App para repartidores",d:"Tus repartidores o choferes actualizan cada entrega"},
+      {v:"avanzado",t:"Ubicación en tiempo real",d:"El cliente ve el pedido en el mapa"},
+      {v:"empresarial",t:"Operación completa",d:"Rutas optimizadas, flotilla y varios almacenes"}, NO_SE]},
+  expediente: {pregunta:"¿Qué necesitas para administrar los expedientes de tus pacientes?", revision:true,
+    nota:"Como son datos de salud, los revisamos con especial cuidado de seguridad y privacidad antes de cotizar.",
+    sistemas:["Expediente clínico digital","Resultados de estudios","Recetas digitales"],
+    opciones:[{v:"basico",t:"Consulta básica",d:"Ver la información de cada paciente"},
+      {v:"intermedio",t:"Historial clínico",d:"Registrar y actualizar el historial"},
+      {v:"avanzado",t:"Seguimiento completo",d:"Documentos, resultados y seguimiento de pacientes"},
+      {v:"empresarial",t:"Varios especialistas",d:"Permisos por especialista y varias sucursales"}, NO_SE]},
+  videollamada: {pregunta:"¿Cómo serían las teleconsultas?",
+    sistemas:["Teleconsulta"],
+    opciones:[{v:"basico",t:"Con un link de Google Meet o Zoom",d:"Se manda el link al agendar"},
+      {v:"avanzado",t:"Videollamada dentro de la app",d:"Sin salir de tu aplicación"}, NO_SE]},
+  cursos: {pregunta:"¿Qué tan completos serían tus cursos en línea?",
+    sistemas:["Cursos en línea","Tareas y exámenes","Certificados"],
+    opciones:[{v:"basico",t:"Básicos",d:"Videos y materiales para consultar"},
+      {v:"intermedio",t:"Intermedios",d:"Lecciones con avance, tareas y exámenes"},
+      {v:"avanzado",t:"Avanzados",d:"Venta de cursos, certificados y comunidad de alumnos"}, NO_SE]},
+  chat: {pregunta:"¿Qué tipo de chat necesitas?",
+    sistemas:["Chat con tu equipo","Chat con clientes","Chat con asesor","Comunicación con padres"],
+    opciones:[{v:"basico",t:"Mensajes sencillos",d:"Avisos y mensajes de texto"},
+      {v:"intermedio",t:"Chat en tiempo real",d:"Con fotos y archivos"},
+      {v:"avanzado",t:"Atención con varios agentes",d:"Asignar conversaciones y respuestas automáticas"}, NO_SE]},
+  lealtad: {pregunta:"¿Cómo te gustaría premiar a tus clientes?",
+    sistemas:["Puntos y lealtad","Retos y logros"],
+    opciones:[{v:"basico",t:"Sellos o puntos",d:"Acumulan por cada compra o visita"},
+      {v:"intermedio",t:"Recompensas y cupones",d:"Premios, cupones y promociones de cumpleaños"},
+      {v:"avanzado",t:"Niveles y campañas",d:"Niveles de cliente, retos y promociones personalizadas"}, NO_SE]},
+  facturacion: {pregunta:"¿Cómo te gustaría facturar?",
+    sistemas:["Facturación","Facturación y Carta Porte"],
+    opciones:[{v:"basico",t:"Cuando el cliente la pida",d:"Tú la emites desde el panel"},
+      {v:"intermedio",t:"Autofactura",d:"El cliente genera su factura desde la app"},
+      {v:"avanzado",t:"Automática y conectada",d:"Se factura sola y se conecta con tu contador o sistema"}, NO_SE]},
+  firma: {pregunta:"¿Qué tipo de firma necesitas?",
+    sistemas:["Firma digital","Contratos digitales"],
+    opciones:[{v:"basico",t:"Firma en pantalla",d:"El cliente firma con el dedo en su celular"},
+      {v:"avanzado",t:"Firma con validez legal avanzada",d:"Como la e.firma del SAT"}, NO_SE]},
+};
+const NIVELES = ["basico","intermedio","avanzado","empresarial"];
+const unaSucursal = () => form.querySelector('[name="sucursales"]:checked')?.value === "1 sucursal";
+// Módulos que aplican según los sistemas elegidos (en el orden de MODULOS).
+function modulosActivos(){
+  const sel = [...form.querySelectorAll('[name="sistemas"]:checked')].map(i=>i.value);
+  return Object.entries(MODULOS).map(([id,m])=>({id, m, sistemas: m.sistemas.filter(x=>sel.includes(x))})).filter(x=>x.sistemas.length);
+}
+const opcionesDe = m => m.opciones.filter(o => !(o.suc && unaSucursal()));
+// Pinta el paso "Detalles": conserva lo ya contestado y descarta lo que ya no aplica.
+function renderDetalles(){
+  const previo = {};
+  form.querySelectorAll('[name^="det_"]:checked').forEach(i => (previo[i.name] ||= []).push(i.value));
+  const box = $("#detalle-box"); box.innerHTML = "";
+  modulosActivos().forEach(({id,m,sistemas})=>{
+    const q = document.createElement("div"); q.className = "q"; q.dataset.modulo = id;
+    q.innerHTML = `<h3></h3><p class="para"></p>`;
+    q.querySelector("h3").textContent = m.pregunta;
+    q.querySelector(".para").textContent = (m.ayuda ? m.ayuda + " · " : "") + "Para: " + sistemas.join(", ");
+    const g = document.createElement("div"); g.className = "opts one";
+    opcionesDe(m).forEach(o=>{
+      const el = optHTML("det_"+id, m.multi ? "checkbox" : "radio", ["", o.t, o.d]);
+      const inp = el.querySelector("input"); inp.value = o.v;
+      if((previo["det_"+id]||[]).includes(o.v)) inp.checked = true;
+      g.appendChild(el);
+    });
+    q.appendChild(g);
+    if(m.nota){ const n = document.createElement("p"); n.className = "nota"; n.textContent = m.nota; q.appendChild(n); }
+    box.appendChild(q);
+  });
+}
+// "No estoy seguro" es excluyente en las preguntas de varias opciones.
+form.addEventListener("change", e=>{
+  const t = e.target;
+  if(t.type==="checkbox" && t.name.startsWith("det_") && t.checked){
+    form.querySelectorAll(`[name="${t.name}"]`).forEach(i=>{ if(i!==t && (t.value==="no_se" || i.value==="no_se")) i.checked = false; });
+  }
+});
+
 /* construir opciones */
 let uid = 0;
 function optHTML(name,type,[ic,label,small]){
   const id = "o"+(uid++);
-  const d = document.createElement("div"); d.className="opt";
+  const d = document.createElement("div"); d.className = ic ? "opt" : "opt sin-ic";
   d.innerHTML = `<input type="${type}" id="${id}" name="${name}">
     <label for="${id}"><span class="ic">${ic}</span><span class="tx">${label}${small?`<small>${small}</small>`:""}</span><span class="tick">${check}</span></label>`;
   d.querySelector("input").value = label;
@@ -633,10 +836,10 @@ function renderSistemas(){
   });
 }
 
-/* navegación */
-const steps = $$(".step"), LAST_Q = 4, BOOK = 5, THANKS = 6;
+/* navegación: el paso de detalles solo aparece si algún sistema elegido lo necesita */
+const steps = $$(".step"), DETALLES = 4, LAST_Q = 8, BOOK = 9, THANKS = 10;
 let cur = 0;
-const form = $("#f");
+const flujo = () => [0,1,2,3,4,5,6,7,8].filter(i => i!==DETALLES || modulosActivos().length);
 
 function valid(i){
   const s = steps[i];
@@ -645,13 +848,15 @@ function valid(i){
     const tel = form.whatsapp.value.replace(/\D/g,"").length>=10;
     return ok && tel;
   }
+  if(i===DETALLES) return [...s.querySelectorAll(".q")].every(q=>q.querySelector("input:checked"));
   const req = (s.dataset.required||"").split(",").filter(Boolean);
   return req.every(n=>form.querySelector(`[name="${n}"]:checked`));
 }
 function refresh(){
   steps.forEach((s,i)=>s.classList.toggle("on",i===cur));
-  $("#bar").style.width = Math.min(cur/BOOK,1)*100+"%";
-  $("#counter").textContent = cur>0 && cur<=LAST_Q ? `${cur} de ${LAST_Q}` : "";
+  const f = flujo(), pos = f.indexOf(cur), total = f.length-1;
+  $("#bar").style.width = cur>=BOOK ? "100%" : Math.max(0,pos)/(total+1)*100+"%";
+  $("#counter").textContent = cur>0 && cur<=LAST_Q ? `${pos} de ${total}` : "";
   $("#back").style.visibility = cur>0 && cur<BOOK ? "visible":"hidden";
   $("#nav").classList.toggle("hidden",cur>=BOOK);
   $("#next").textContent = cur===0 ? "Comenzar →" : cur===LAST_Q ? "Enviar y agendar →" : "Siguiente →";
@@ -660,12 +865,35 @@ function refresh(){
 }
 form.addEventListener("input",()=>{$("#next").disabled=!valid(cur)});
 form.addEventListener("change",()=>{$("#next").disabled=!valid(cur)});
-$("#back").onclick = ()=>{ if(cur>0){cur--;refresh();window.scrollTo({top:0,behavior:"smooth"})} };
+$("#back").onclick = ()=>{ const f = flujo(), i = f.indexOf(cur); if(i>0){ cur = f[i-1]; refresh(); window.scrollTo({top:0,behavior:"smooth"}) } };
 $("#next").onclick = async ()=>{
   if(!valid(cur)) return;
-  if(cur<LAST_Q){ cur++; if(cur===2) renderSistemas(); refresh(); window.scrollTo({top:0,behavior:"smooth"}); return; }
+  if(cur<LAST_Q){
+    if(cur===3 || cur===2) renderDetalles();      // los detalles dependen de los sistemas y de las sucursales
+    const f = flujo(); cur = f[f.indexOf(cur)+1];
+    if(cur===3) renderSistemas();
+    refresh(); window.scrollTo({top:0,behavior:"smooth"}); return;
+  }
   await submit();
 };
+
+/* integraciones: "desde cero" y "no estoy seguro" son excluyentes; si elige un sistema, se pregunta cuál (opcional) */
+const INTEG_EXCL = ["No, comenzaríamos desde cero","No estoy seguro"];
+form.addEventListener("change", e=>{
+  const t = e.target;
+  if(t.name==="integraciones"){
+    if(t.checked) form.querySelectorAll('[name="integraciones"]').forEach(i=>{ if(i!==t && (INTEG_EXCL.includes(t.value) || INTEG_EXCL.includes(i.value))) i.checked = false; });
+    const real = [...form.querySelectorAll('[name="integraciones"]:checked')].some(i=>!INTEG_EXCL.includes(i.value));
+    $("#integ-cual-box").classList.toggle("hidden", !real);
+  }
+  if(t.name==="objetivos"){
+    const sel = form.querySelectorAll('[name="objetivos"]:checked');
+    if(sel.length>3){ t.checked = false; $("#obj-max").textContent = "Puedes elegir hasta tres."; }
+    else $("#obj-max").textContent = "";
+    $("#obj-otro-box").classList.toggle("hidden", !form.querySelector('[name="objetivos"][value="Otro"]:checked'));
+  }
+  $("#next").disabled = !valid(cur);
+});
 form.addEventListener("keydown",e=>{
   if(e.key==="Enter" && e.target.tagName!=="TEXTAREA"){ e.preventDefault(); $("#next").click(); }
 });
@@ -682,10 +910,52 @@ function enviarLead(data){
     fetch(LEAD_URL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body), keepalive:true}).catch(()=>{});
   }catch(e){}
 }
+/* Datos estructurados para ARK (y para el cotizador automático que se hará después).
+   No calcula precios: solo deja cada dato identificado (industria, tamaño, sistemas con su nivel, etc.).
+   El presupuesto declarado es solo referencia: nunca se usa para subir el precio. */
+const DISENO = {"Esencial":"esencial","Personalizada":"personalizada","Premium":"premium"};
+function nivelDe(m, codigos){
+  const ops = m.opciones.filter(o=>codigos.includes(o.v)).map(o=>o.n||o.v).filter(n=>NIVELES.includes(n));
+  return ops.length ? ops.reduce((a,b)=>NIVELES.indexOf(b)>NIVELES.indexOf(a)?b:a) : (codigos.length ? "por_definir" : "");
+}
+function armarCotizacion(){
+  const val = n => form.querySelector(`[name="${n}"]:checked`)?.value || "";
+  const vals = n => [...form.querySelectorAll(`[name="${n}"]:checked`)].map(i=>i.value);
+  const giro = val("giro"), cat = SISTEMAS[giro] || SISTEMAS._general, grupoDe = {};
+  cat.grupos.forEach(([g,items])=>items.forEach(it=>grupoDe[it[1]] = g));
+  const activos = modulosActivos(), modulos = {}, lineas = [];
+  activos.forEach(({id,m,sistemas})=>{
+    const codigos = vals("det_"+id), ops = m.opciones.filter(o=>codigos.includes(o.v));
+    modulos[id] = {pregunta:m.pregunta, respuestas:ops.map(o=>o.t), codigos, nivel:nivelDe(m,codigos), sistemas, revision:!!m.revision};
+    lineas.push(`${m.pregunta} ${ops.map(o=>o.d?`${o.t} (${o.d})`:o.t).join("; ")||"Sin respuesta"} [${sistemas.join(", ")}]`);
+  });
+  const integ = vals("integraciones"), integReal = integ.filter(x=>!INTEG_EXCL.includes(x));
+  const cot = {
+    version:1, fecha:new Date().toISOString(), vendedor:CONFIG.clave || "general",
+    industria:giro, tamano:val("tamano"), sucursales:val("sucursales"), usuarios_mes:val("usuarios_mes"),
+    para_quien:val("usuarios"), plataforma:val("plataforma"), tiempo:val("tiempo"),
+    diseno:{nivel:DISENO[val("diseno")]||"", texto:val("diseno")},
+    integraciones:{categorias:integ, plataformas:integReal.length ? form.integraciones_cual.value.trim() : ""},
+    objetivos:vals("objetivos"), objetivo_otro:vals("objetivos").includes("Otro") ? form.objetivo_otro.value.trim() : "",
+    presupuesto:val("presupuesto") || null,
+    sistemas:vals("sistemas").map(n=>{const a = activos.find(x=>x.sistemas.includes(n));
+      return {nombre:n, grupo:grupoDe[n]||"", modulo:a?a.id:null, nivel:a?modulos[a.id].nivel:"estandar", revision:a?!!a.m.revision:false}}),
+    modulos,
+    revision_especial:activos.filter(a=>a.m.revision).map(a=>a.id),
+  };
+  return {cot, complejidad: lineas.join("\n")};
+}
 function collect(){
+  const {cot, complejidad} = armarCotizacion();
+  form.cotizacion.value = JSON.stringify(cot);
+  form.complejidad.value = complejidad;
+  form.fecha.value = cot.fecha;
   const fd = new FormData(form), out = new URLSearchParams();
   const multi = {};
-  for(const [k,v] of fd){ (multi[k] ||= []).push(v); }
+  for(const [k,v] of fd){ if(!k.startsWith("det_")) (multi[k] ||= []).push(v); }
+  // los campos opcionales que quedaron ocultos no se mandan
+  if(!cot.integraciones.plataformas) delete multi.integraciones_cual;
+  if(!cot.objetivo_otro) delete multi.objetivo_otro;
   for(const k in multi) out.set(k, multi[k].join(", "));
   return {params:out, data:multi};
 }

@@ -328,6 +328,7 @@ a.btn.primary{color:var(--on-ink)}
 .enc-r div{padding:10px 14px;border-radius:12px;background:var(--hair);min-width:0}
 .enc-r dt{font-size:12px;color:var(--muted)}
 .enc-r dd{margin:2px 0 0;font-size:14.5px;line-height:1.45;overflow-wrap:anywhere}
+.enc-r div.full{grid-column:1/-1}.enc-r div.full dd{white-space:pre-line}
 .res-txt{padding:16px 18px;border-radius:14px;background:var(--hair)}
 .res-txt p{margin:0 0 8px;font-size:16px;line-height:1.6}
 .res-txt p:last-child{margin:0}
@@ -1843,9 +1844,13 @@ function abrirPropuesta(c,paso,diapo){
         ${g.website?`<p><b>Sitio:</b> ${esc(g.website)}</p>`:''}${g.summary?`<p>${esc(g.summary)}</p>`:''}</div>`
       :google&&p.datos?'<p class="prop-err" style="margin-top:12px">Claude no pudo consultar el perfil de Google; la propuesta se hizo solo con la encuesta.</p>':'';
     const R=[['Negocio',enc.negocio||c.empresa],['Contacto',enc.nombre||c.contacto],['WhatsApp',c.telefono],['Correo',c.email],['Giro',giro],
-      ['Qué necesita',enc.sistemas||c.sistemas],['Para quién es la app',enc.usuarios],['Plataforma',enc.plataforma],['Para cuándo',enc.tiempo||c.tiempo],['Comentarios',enc.comentarios]]
+      ['Qué necesita',enc.sistemas||c.sistemas],['Para quién es la app',enc.usuarios],['Plataforma',enc.plataforma],['Para cuándo',enc.tiempo||c.tiempo],
+      ['Tamaño del negocio',enc.tamano],['Sucursales',enc.sucursales],['Usuarios al mes',enc.usuarios_mes],['Diseño',enc.diseno],
+      ['Sistemas a conectar',[enc.integraciones,enc.integraciones_cual].filter(Boolean).join(' · ')],
+      ['Objetivos',[enc.objetivos,enc.objetivo_otro].filter(Boolean).join(' · ')],['Presupuesto (referencia)',enc.presupuesto],
+      ['Comentarios',enc.comentarios],['Nivel en cada sistema',enc.complejidad,1]]
       .filter(x=>String(x[1]||'').trim());
-    const resp=Object.keys(enc).length?`<h4 class="sub-h">Respuestas de la encuesta</h4><dl class="enc-r">${R.map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>`
+    const resp=Object.keys(enc).length?`<h4 class="sub-h">Respuestas de la encuesta</h4><dl class="enc-r">${R.map(([k,v,ancho])=>`<div${ancho?' class="full"':''}><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>`
       :`<p class="prop-err" style="margin-top:12px">Este cliente no llegó por la encuesta.${c.notas?' Notas: '+esc(c.notas):''}</p>`;
     cuerpo=`<div class="negocio-card"><div class="negocio-emoji" aria-hidden="true">${GIRO_EMOJI[giro]||'✨'}</div>
       <div><h4>${esc(c.empresa||'Sin nombre')}</h4><p>${esc(giro||'Giro sin definir')}${c.contacto?' · '+esc(c.contacto):''}</p></div>

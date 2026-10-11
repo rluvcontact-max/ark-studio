@@ -58,6 +58,13 @@ function respuestasDe(c: Record<string, unknown>) {
       `Sistemas que le interesan: ${t(e.sistemas)}`, `Para quién es la app: ${t(e.usuarios)}`,
       `Plataforma: ${t(e.plataforma)}`, `Para cuándo lo quiere: ${t(e.tiempo)}`, `Comentarios: ${t(e.comentarios)}`,
       `Link del perfil de Google del negocio: ${t(e.google)}`,
+      // datos agregados a la encuesta en oct 2026 (las anteriores no los traen)
+      `Tamaño del negocio: ${t(e.tamano)}`, `Sucursales: ${t(e.sucursales)}`, `Usuarios estimados al mes: ${t(e.usuarios_mes)}`,
+      `Estilo de diseño que quiere: ${t(e.diseno)}`,
+      `Sistemas actuales que quiere conectar: ${t(e.integraciones)}${t(e.integraciones_cual) ? ` (${t(e.integraciones_cual)})` : ""}`,
+      `Objetivos principales: ${t(e.objetivos)}${t(e.objetivo_otro) ? ` (${t(e.objetivo_otro)})` : ""}`,
+      `Presupuesto aproximado (opcional, solo referencia): ${t(e.presupuesto)}`,
+      `Nivel que necesita en cada sistema:${t(e.complejidad) ? "\n" + t(e.complejidad) : ""}`,
     ]
     : [`Negocio: ${t(c.empresa)}`, `Nombre de quien respondió: ${t(c.contacto)}`, t(c.notas)];
   return lineas.filter((l) => !/:\s*$/.test(l)).join("\n");
