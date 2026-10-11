@@ -209,7 +209,7 @@ h2{font-size:clamp(21px,4.4vw,26px);line-height:1.18;font-weight:650;letter-spac
 <div class="bg" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 
 <!-- Formulario estático para que Netlify detecte los campos -->
-<form hidden method='post' name='encuesta-app'><input type='hidden' name='form-name' value='encuesta-app' />
+<form hidden method="post" name="encuesta-app" data-netlify="true" netlify-honeypot="bot-field"><input type="hidden" name="form-name" value="encuesta-app">
   <input name="bot-field"><input name="nombre"><input name="negocio"><input name="google"><input name="whatsapp"><input name="correo">
   <input name="giro"><input name="sistemas"><input name="usuarios"><input name="plataforma"><input name="tiempo"><input name="comentarios"><input name="vendedor">
   <input name="tamano"><input name="sucursales"><input name="usuarios_mes"><input name="diseno"><input name="integraciones"><input name="integraciones_cual">
@@ -900,15 +900,19 @@ form.addEventListener("keydown",e=>{
 
 /* envío */
 /* Además de Netlify Forms, registra al prospecto en ARK Studio (Clientes), asignado al vendedor del link (?v=).
-   Si falla, la encuesta sigue igual: no bloquea ni muestra error. */
+   Regresa true si ARK Studio lo recibió. Se manda una sola vez aunque el prospecto toque "Reintentar". */
 const LEAD_URL = "https://tuaxfleudqxmvoicssqw.supabase.co/functions/v1/lead-encuesta";
-function enviarLead(data){
+let leadEnviado = false;
+async function enviarLead(data){
+  if(leadEnviado) return true;
   try{
     const body = {};
     for(const k in data) body[k] = data[k].join(", ");
     body.v = new URLSearchParams(location.search).get("v") || "";
-    fetch(LEAD_URL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body), keepalive:true}).catch(()=>{});
-  }catch(e){}
+    const r = await fetch(LEAD_URL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body), keepalive:true});
+    if(r.ok) leadEnviado = true;
+    return r.ok;
+  }catch(e){ return false; }
 }
 /* Datos estructurados para ARK (y para el cotizador automático que se hará después).
    No calcula precios: solo deja cada dato identificado (industria, tamaño, sistemas con su nivel, etc.).
@@ -962,15 +966,15 @@ function collect(){
 async function submit(){
   const btn = $("#next"); btn.disabled = true; btn.textContent = "Enviando…";
   const {params,data} = collect();
-  try{
-    const r = await fetch("/", {method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:params.toString()});
-    if(!r.ok) throw new Error(r.status);
-  }catch(e){
+  // Netlify Forms y ARK Studio en paralelo: basta con que uno de los dos reciba las respuestas para seguir a la agenda.
+  const netlify = fetch("/", {method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:params.toString()})
+    .then(r=>r.ok).catch(()=>false);
+  const [okNetlify, okArk] = await Promise.all([netlify, enviarLead(data)]);
+  if(!okNetlify && !okArk){
     btn.disabled=false; btn.textContent="Reintentar →";
     $("#err").textContent = "No pudimos enviar tus respuestas. Revisa tu conexión e intenta de nuevo.";
     return;
   }
-  enviarLead(data);
   showBooking(data);
 }
 function showBooking(data){
