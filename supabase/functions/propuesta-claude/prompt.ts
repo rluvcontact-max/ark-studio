@@ -5,6 +5,7 @@
 // Agregado: tres precios (objetivo, oferta y mínimo aceptable) en lugar de recomendado + mínimo.
 // Agregado: análisis del perfil de Google del negocio (web_search / web_fetch) para afinar la propuesta y el presupuesto.
 // Agregado: guion listo para leer, una parte por diapositiva (JSON `script`), y preguntas probables (JSON `questions`).
+// Agregado: resumen de la propuesta para el vendedor (JSON `proposal.summary`).
 
 export const VARIABLES_PRESENTACION: Record<string, string> = {
   cliente_nombre: "Nombre del negocio o empresa.",
@@ -569,6 +570,7 @@ Utiliza esta estructura:
 "main_need": ""
 },
 "proposal": {
+"summary": "",
 "solution": "",
 "essential_features": [],
 "recommended_features": [],
@@ -609,6 +611,8 @@ No agregues Markdown dentro de los valores.
 No uses símbolos de moneda dentro de los campos numéricos de pricing.
 
 En google_profile: found es true solo si consultaste el perfil y es el mismo negocio; rating y reviews como texto tal como aparecen en Google (ej. "4.6", "312"); summary es una o dos frases de lo más relevante para la propuesta. Si no hay datos, deja found en false y los textos vacíos.
+
+En proposal.summary: resumen de la propuesta para el vendedor en 3 a 5 frases, sin Markdown: qué app se propone y para quién, qué resuelve, qué incluye la primera versión, el precio objetivo con su mantenimiento y el tiempo de entrega. Debe coincidir con la presentación.
 
 En script: exactamente una entrada por diapositiva, en el mismo orden y con el mismo id en "slide"; "guion" es el texto que el vendedor lee en voz alta (párrafos separados con \\n) y "nota" una indicación breve solo para el vendedor, o vacía.
 

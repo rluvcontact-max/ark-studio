@@ -176,6 +176,10 @@ select.pill,.field-in{padding:9px 14px;border-radius:999px;border:1px solid var(
 .st.propuesta::before{background:currentColor}
 .st.cerrado{background:var(--ink);color:var(--on-ink);border-color:transparent}
 .st.cerrado::before{background:currentColor}
+.st.creacion{background:var(--hair);border-color:var(--ink)}
+.st.creacion::before{background:linear-gradient(90deg,currentColor 50%,transparent 0)}
+.st.completado{background:var(--ink);color:var(--on-ink);border-color:transparent}
+.st.completado::before{background:currentColor;border-radius:2px}
 .st.perdido{color:var(--faint);border-color:var(--hair);text-decoration:line-through}
 
 /* calendario */
@@ -319,6 +323,24 @@ a.btn.primary{color:var(--on-ink)}
 .prop-txt td,.prop-txt th{border-bottom:1px solid var(--stroke);padding:6px 8px;text-align:left;vertical-align:top}
 .sheet.wide{width:min(980px,100%)}
 .guion{display:flex;flex-direction:column;gap:10px}
+.sub-h{margin:18px 0 8px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.enc-r{margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.enc-r div{padding:10px 14px;border-radius:12px;background:var(--hair);min-width:0}
+.enc-r dt{font-size:12px;color:var(--muted)}
+.enc-r dd{margin:2px 0 0;font-size:14.5px;line-height:1.45;overflow-wrap:anywhere}
+.res-txt{padding:16px 18px;border-radius:14px;background:var(--hair)}
+.res-txt p{margin:0 0 8px;font-size:16px;line-height:1.6}
+.res-txt p:last-child{margin:0}
+.res-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.res-l{margin:0;padding-left:18px;font-size:14px;line-height:1.5}
+.res-l li{margin-bottom:4px}
+.form label.archivo span{font-size:12.5px;letter-spacing:0;color:var(--faint)}
+.form label.archivo input{padding:10px;background:var(--hair);border-style:dashed}
+.festejo{grid-column:1/-1;text-align:center;padding:10px 6px 4px}
+.festejo .fx{font-size:56px;line-height:1;margin-bottom:10px}
+.festejo h4{margin:0 0 8px;font-size:24px}
+.festejo p{margin:0 0 6px;font-size:16px;line-height:1.5;color:var(--muted)}
+.festejo b{color:var(--fg)}
 .guion-d{padding:16px 18px;border-radius:14px;background:var(--hair)}
 .guion-d header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .guion-d header b{font-size:15px}
@@ -496,6 +518,7 @@ a.btn.primary{color:var(--on-ink)}
 .aviso b{display:block}
 .aviso span{font-size:14px;color:var(--muted)}
 .aviso-acts{display:flex;gap:8px;justify-content:flex-end}
+@media (max-width:700px){.enc-r,.res-grid{grid-template-columns:1fr}}
 @media (max-width:900px){.premios{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:700px){.cr{grid-template-columns:22px auto 1fr 30px;row-gap:6px}.cr .pista{grid-column:3/-1;grid-row:2;margin:0 10px 0 0}.cr-sig{display:none}.prem-fila{grid-template-columns:70px 1fr 60px}.prem-fila .btn{grid-column:1/-1;justify-self:start}.premio{padding:14px}.premio h3{font-size:15.5px}.pr-emoji{width:44px;height:44px;font-size:24px}}
 @media (max-width:700px){.bono-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.esc-fila,.mat-fila{grid-template-columns:1fr}}
@@ -685,6 +708,14 @@ const initials=n=>String(n||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).joi
 const emp=id=>data.empleados.find(e=>e.id===id);
 const cli=id=>data.clientes.find(c=>c.id===id);
 const estado=k=>ESTADOS.find(e=>e.k===k)||ESTADOS[0];
+// Etapa que se muestra: 'cerrado' se divide en creación de la app (para el admin) y venta completada (data.completado).
+function etapa(c){
+  if(c&&c.estado==='cerrado'){
+    if(c.completado)return {k:'completado',l:'Venta completada'};
+    return isEmp()?{k:'cerrado',l:'Cerrado'}:{k:'creacion',l:'Creación de app'};
+  }
+  return estado(c&&c.estado);
+}
 const fmtDay=s=>parse(s).toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
 const fmtShort=s=>{const d=parse(s);return {d:d.getDate(),m:d.toLocaleDateString('es-MX',{month:'short'}).replace('.','')}};
 const sortedEmps=()=>[...data.empleados].sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''));
@@ -758,9 +789,10 @@ function suscribir(cols){
   if(canal)sb.removeChannel(canal);
   canal=sb.channel('ark');
   cols.forEach(c=>canal.on('postgres_changes',{event:'*',schema:'public',table:c==='accesos'?'perfiles':c},()=>{
-    clearTimeout(pendientes[c]);pendientes[c]=setTimeout(async()=>{try{const antes=c==='clientes'?new Set(data.clientes.map(x=>x.id)):null;
+    clearTimeout(pendientes[c]);pendientes[c]=setTimeout(async()=>{try{const antes=c==='clientes'?new Map(data.clientes.map(x=>[x.id,x.estado])):null;
       await load(c);
-      if(antes){data.clientes.filter(x=>!antes.has(x.id)&&x.origen==='Encuesta'&&(!isEmp()||x.empleadoId===me().id)).forEach(avisoProspecto)}
+      if(antes){data.clientes.filter(x=>!antes.has(x.id)&&x.origen==='Encuesta'&&(!isEmp()||x.empleadoId===me().id)).forEach(avisoProspecto);
+        if(!isEmp())data.clientes.filter(x=>antes.has(x.id)&&antes.get(x.id)!=='cerrado'&&x.estado==='cerrado'&&x.cierre&&x.cierre.por!=='admin').forEach(avisoCierre)}
       if(c==='clientes'||c==='finanzas')await cargarExtras();
       refresh();
       if(c==='notas'){const b=document.getElementById('notas-box'),cl=b&&cli(b.dataset.cliente);if(cl)pintarNotas(cl)}
@@ -952,6 +984,11 @@ function vPanel(){
       <div class="n">${r.t} cli · ${r.c} ✓<br>${moneyShort(r.v)}</div></div>`).join('')
     :`<div class="empty"><strong>Sin equipo todavía</strong>Agrega a tus empleados en la sección Equipo.</div>`;
   const list=prox.slice(0,6).map(evRow).join('')||`<div class="empty"><strong>No hay citas próximas</strong>Agenda llamadas y reuniones desde el Calendario.</div>`;
+  // tratos cerrados cuya app está en creación (siguiente paso del admin: finalizar la venta)
+  const enCreacion=cerrados.filter(c=>!c.completado).sort((a,b)=>((b.cierre||{}).registrado||0)-((a.cierre||{}).registrado||0));
+  const creacionHtml=enCreacion.length?`<section class="glass panel"><h2>Apps en creación <span class="tag">${enCreacion.length}</span></h2><div class="list">${enCreacion.map(c=>{const e=emp(c.empleadoId);
+      return `<div class="ev cli-fila"><button class="cli-main" data-edit-client="${c.id}"><div class="t">${esc(c.empresa)}</div><div class="s">${c.cierre&&c.cierre.fecha?'Contrato firmado el '+esc(fechaLarga(c.cierre.fecha)):'Cerrado'}${e?' · '+esc(e.nombre):''}</div></button>
+        <div class="cli-acts"><button class="btn btn-sm primary" data-finalizar="${c.id}">Finalizar venta</button></div></div>`}).join('')}</div></section>`:'';
   const nsg=sinGrabar(data.eventos).length;
   const bannerG=nsg?`<div class="banner"><span>${nsg===1?'1 junta virtual':nsg+' juntas virtuales'} sin grabación en Grain.</span><button type="button" data-go="juntas">Revisar</button></div>`:'';
   return bannerG+header('Hoy es '+hoy,'Panel de ARK','Clientes, dinero y agenda de la empresa en una vista.',
@@ -963,6 +1000,7 @@ function vPanel(){
       <div class="stat"><b>${moneyShort(pipeline)}</b><span>En proceso · ${activos.length} clientes</span></div>
     </section>
     <section class="glass panel"><h2>Embudo de prospección <span class="tag">${cerrados.length} cerrados · ${semana} citas en 7 días</span></h2><div class="funnel">${funnel}</div></section>
+    ${creacionHtml}
     <div class="grid-2">
       <section class="glass panel"><h2>Clientes por empleado <span class="tag">sólido = cerrados</span></h2><div class="rank">${rank}</div></section>
       <section class="glass panel"><h2>Próximas citas <button class="btn btn-sm ghost" data-go="calendario">Ver calendario</button></h2><div class="list">${list}</div></section>
@@ -1117,7 +1155,7 @@ function vInicio(){
   const frios=seg.filter(c=>mov(c)&&ahora-mov(c)>5*DIA);
   const nuevos=mine.filter(c=>c.origen==='Encuesta'&&c.estado==='prospecto'&&ahora-(c.creado||0)<2*DIA).sort((a,b)=>(b.creado||0)-(a.creado||0));
   const filaCli=(c,sub)=>{const wa=linkWA(c);return `<div class="ev cli-fila"><button class="cli-main" data-edit-client="${c.id}"><div class="t">${esc(c.empresa)}</div><div class="s">${sub}</div></button>
-      <div class="cli-acts">${wa?`<a class="btn btn-sm" href="${esc(wa)}" target="_blank" rel="noopener" aria-label="WhatsApp a ${esc(c.empresa)}">WhatsApp</a>`:''}<span class="st ${c.estado}">${estado(c.estado).l}</span></div></div>`};
+      <div class="cli-acts">${wa?`<a class="btn btn-sm" href="${esc(wa)}" target="_blank" rel="noopener" aria-label="WhatsApp a ${esc(c.empresa)}">WhatsApp</a>`:''}<span class="st ${etapa(c).k}">${etapa(c).l}</span></div></div>`};
   // prepara tu llamada: próxima cita (hoy o mañana) ligada a un cliente con propuesta lista
   const manana=iso(new Date(ahora+DIA));
   const clienteDeCita=e=>cli(e.clienteId)||mine.find(c=>c.empresa&&String(e.titulo||'').toLowerCase().includes(c.empresa.toLowerCase()));
@@ -1128,7 +1166,7 @@ function vInicio(){
     prepHtml=`<section class="glass panel prepara"><h2>Prepara tu llamada <span class="tag">${cuando}${prep.e.hora?' · '+esc(prep.e.hora):''}</span></h2>
       <div class="prepara-in"><div><b>${esc(prep.c.empresa)}</b><span>${esc(prep.e.titulo||prep.e.tipo||'Cita')}</span></div>
         <div class="prop-sum">${obj?`<div><span>Objetivo</span><b>${money(obj)}</b></div>`:''}${pr.offer_price_mxn?`<div><span>Oferta</span><b>${money(pr.offer_price_mxn)}</b></div>`:''}${min?`<div><span>Mínimo</span><b>${money(min)}</b></div>`:''}</div>
-        <div class="pf-acts"><button class="btn btn-sm primary" data-prepara="${prep.c.id}" data-paso="1">Ver guion y preguntas</button><button class="btn btn-sm" data-prepara="${prep.c.id}" data-paso="2">Presentación</button><button class="btn btn-sm ghost" data-edit-client="${prep.c.id}">Notas</button></div></div></section>`}
+        <div class="pf-acts"><button class="btn btn-sm primary" data-prepara="${prep.c.id}" data-paso="3">Ver guion</button><button class="btn btn-sm" data-prepara="${prep.c.id}" data-paso="2">Presentación</button><button class="btn btn-sm" data-prepara="${prep.c.id}" data-paso="4">Preguntas</button><button class="btn btn-sm ghost" data-edit-client="${prep.c.id}">Notas</button></div></div></section>`}
   // recordatorios de notas que ya vencen
   const recs=data.notas.filter(n=>n.recordatorio&&!n.hecho&&n.recordatorio<=today&&mine.some(c=>c.id===n.clienteId)).sort((a,b)=>a.recordatorio.localeCompare(b.recordatorio));
   const recHtml=recs.length?`<section class="glass panel"><h2>Recordatorios <span class="tag">${recs.length}</span></h2><div class="list">${recs.map(n=>{const c=cli(n.clienteId);return `<div class="ev cli-fila"><button class="cli-main" data-edit-client="${c.id}"><div class="t">${esc(c.empresa)}</div><div class="s">${esc(n.texto)}</div></button><div class="cli-acts"><span class="s">${n.recordatorio<today?'Vencido':'Hoy'}</span><button class="btn btn-sm" data-nota-hecha="${n.id}">Hecho</button></div></div>`}).join('')}</div></section>`:'';
@@ -1176,14 +1214,18 @@ function vInicio(){
 }
 
 /* ----- CLIENTES ----- */
+// Filtro de etapa en Clientes: 'creacion' y 'completado' son las dos partes de 'cerrado'.
+const pasaEtapa=(c,f)=>f==='todos'||(f==='creacion'?c.estado==='cerrado'&&!c.completado:f==='completado'?c.estado==='cerrado'&&!!c.completado:c.estado===f);
 function vClientes(){
   const q=ui.q.trim().toLowerCase(),E=isEmp();
-  let C=data.clientes.filter(c=>(ui.fEmp==='todos'||c.empleadoId===ui.fEmp)&&(ui.fEst==='todos'||c.estado===ui.fEst));
+  let C=data.clientes.filter(c=>(ui.fEmp==='todos'||c.empleadoId===ui.fEmp)&&pasaEtapa(c,ui.fEst));
   if(q) C=C.filter(c=>[c.empresa,c.contacto,c.telefono,c.email,c.tipoApp,c.notas].join(' ').toLowerCase().includes(q));
   C.sort((a,b)=>(b.creado||0)-(a.creado||0));
   const empOpts=`<option value="todos">Todo el equipo</option>`+sortedEmps().map(e=>`<option value="${e.id}" ${ui.fEmp===e.id?'selected':''}>${esc(e.nombre)}</option>`).join('');
-  const chips=[{k:'todos',l:'Todos'},...ESTADOS].map(s=>`<button class="chip-btn" data-fest="${s.k}" aria-pressed="${ui.fEst===s.k}">${s.l}</button>`).join('');
-  const rows=C.map(c=>{const e=emp(c.empleadoId),s=estado(c.estado);return `<button class="trow" data-edit-client="${c.id}">
+  const FILTROS=E?[{k:'todos',l:'Todos'},...ESTADOS]
+    :[{k:'todos',l:'Todos'},...ESTADOS.filter(s=>!['cerrado','perdido'].includes(s.k)),{k:'creacion',l:'Creación de app'},{k:'completado',l:'Negocios con app'},estado('perdido')];
+  const chips=FILTROS.map(s=>`<button class="chip-btn" data-fest="${s.k}" aria-pressed="${ui.fEst===s.k}">${s.l}</button>`).join('');
+  const rows=C.map(c=>{const e=emp(c.empleadoId),s=etapa(c);return `<button class="trow" data-edit-client="${c.id}">
       <div class="cell-main"><b>${esc(c.empresa)}</b><span>${esc(c.contacto||'Sin contacto')}${c.telefono?' · '+esc(c.telefono):''}</span></div>
       <div class="who">${E?`<span style="color:var(--muted)">${esc(c.tipoApp||'Proyecto por definir')}</span>`:e?`${av(e,'sm')}<span>${esc(e.nombre)}</span>`:'<span style="color:var(--faint)">Sin asignar</span>'}</div>
       <span class="st ${s.k}">${s.l}</span>
@@ -1577,7 +1619,7 @@ function perfilEmp(e){
           ${mine.length?`<div class="embudo">${embudo.map(x=>`<div class="fila"><span>${x.s.l}</span><div class="barra"><i style="width:${x.n?x.n/maxE*100:0}%"></i></div><span class="n">${x.n}</span></div>`).join('')}</div>`:'<p class="pf-vacio">Todavía no tiene clientes asignados.</p>'}
         </div>
         <div class="glass pf-sec"><h3>Clientes recientes ${mine.length>6?`<em>${mine.length-6} más</em>`:''}</h3>
-          ${recientes.length?`<div class="pf-lista">${recientes.map(c=>{const st=estado(c.estado);return `<div class="it"><div style="min-width:0"><b>${esc(c.empresa||'Sin nombre')}</b><small>${esc(c.tipoApp||c.giro||'Proyecto por definir')}</small></div><span class="st ${st.k}">${st.l}</span><span class="v">${c.valor?moneyShort(c.valor):'—'}</span></div>`}).join('')}</div>`:'<p class="pf-vacio">Sin clientes.</p>'}
+          ${recientes.length?`<div class="pf-lista">${recientes.map(c=>{const st=etapa(c);return `<div class="it"><div style="min-width:0"><b>${esc(c.empresa||'Sin nombre')}</b><small>${esc(c.tipoApp||c.giro||'Proyecto por definir')}</small></div><span class="st ${st.k}">${st.l}</span><span class="v">${c.valor?moneyShort(c.valor):'—'}</span></div>`}).join('')}</div>`:'<p class="pf-vacio">Sin clientes.</p>'}
         </div>
         <div class="glass pf-sec"><h3>Próximas citas</h3>
           ${prox.length?`<div class="pf-lista">${prox.slice(0,4).map(v=>{const f=fmtShort(v.fecha);return `<div class="it"><div style="min-width:0"><b>${esc(v.titulo||v.tipo||'Cita')}</b><small>${esc(v.tipo||'')}${v.origen==='google'?' · Google Calendar':''}</small></div><span>${f.d} ${f.m}</span><span class="v">${esc(v.hora||'')}</span></div>`}).join('')}</div>`:'<p class="pf-vacio">Sin citas próximas.</p>'}
@@ -1617,6 +1659,7 @@ main.addEventListener('click',async e=>{
   if(d.act==='new-emp') return empForm();
   if(d.act==='bonos') return bonosForm();
   if(d.act==='premios') return premiosForm();
+  if(d.finalizar){const c=cli(d.finalizar);if(c)finalizarForm(c);return}
   if(d.act==='push') return activarPush();
   if(d.act==='mi-perfil') return perfilEmp(me());
   if(d.notaHecha) return marcarNotaHecha(d.notaHecha);
@@ -1691,23 +1734,29 @@ const cliSelect=(val)=>{const list=(isEmp()?data.clientes.filter(c=>c.empleadoId
 function clientForm(c){
   const v=c||{estado:'prospecto',empleadoId:ui.fEmp!=='todos'?ui.fEmp:''};
   const sigE=c&&SIG_ETAPA[c.estado],wa=c&&linkWA(c),tel=c&&telDigitos(c.telefono);
-  const rapidas=c&&(wa||tel||sigE)?`<div class="rapidas">${wa?`<a class="btn btn-sm primary" href="${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>`:''}${tel?`<a class="btn btn-sm" href="tel:+${esc(tel)}">Llamar</a>`:''}${sigE?`<button type="button" class="btn btn-sm" id="f-avanza">Pasar a ${esc(estado(sigE).l)} →</button>`:''}</div>`:'';
+  const rapidas=c&&(wa||tel||sigE)?`<div class="rapidas">${wa?`<a class="btn btn-sm primary" href="${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>`:''}${tel?`<a class="btn btn-sm" href="tel:+${esc(tel)}">Llamar</a>`:''}${sigE==='cerrado'?'<button type="button" class="btn btn-sm" id="f-cierre">Contrato firmado →</button>':sigE?`<button type="button" class="btn btn-sm" id="f-avanza">Pasar a ${esc(estado(sigE).l)} →</button>`:''}</div>`:'';
+  // 'cerrado' no se elige a mano: solo con "Contrato firmado" (comprobante + contrato). El admin puede reabrir.
+  const cerradoYa=v.estado==='cerrado',abiertas=ESTADOS.filter(s=>s.k!=='cerrado');
+  const etapaCampo=cerradoYa&&isEmp()?`<label>Etapa<input value="${esc(etapa(v).l)}" disabled><input type="hidden" name="estado" value="cerrado"></label>`
+    :`<label>Etapa<select name="estado" id="f-estado">${(cerradoYa?[{k:'cerrado',l:etapa(v).l},...abiertas]:abiertas).map(s=>opt(s.k,s.l,s.k===v.estado)).join('')}</select></label>`;
   const fields=`${rapidas}
     <label class="full">Empresa<input name="empresa" id="f-empresa" required value="${esc(v.empresa)}" placeholder="Nombre de la empresa"></label>
     <label>Contacto<input name="contacto" id="f-contacto" value="${esc(v.contacto)}" placeholder="Persona con quien hablas"></label>
     <label>Teléfono / WhatsApp<input name="telefono" id="f-telefono" type="tel" value="${esc(v.telefono)}" placeholder="33 1234 5678"></label>
     <label>Correo<input name="email" id="f-email" type="email" value="${esc(v.email)}"></label>
     ${empSelect('empleadoId',v.empleadoId,'Lo trajo')}
-    <label>Etapa<select name="estado" id="f-estado">${ESTADOS.map(s=>opt(s.k,s.l,s.k===v.estado)).join('')}</select></label>
+    ${etapaCampo}
     <label>Tipo de proyecto<select name="tipoApp" id="f-tipoApp">${opt('','Por definir',!v.tipoApp)}${APPS.map(a=>opt(a,a,a===v.tipoApp)).join('')}</select></label>
     <label class="full">Valor estimado (MXN)<input name="valor" id="f-valor" type="number" min="0" step="1000" inputmode="numeric" value="${esc(v.valor)}" placeholder="120000"></label>
     ${c?propBox(c):''}
+    ${c?cierreBox(c):''}
     <label class="full">Notas generales<textarea name="notas" id="f-notas" placeholder="Qué necesita, datos importantes del negocio…">${esc(v.notas)}</textarea></label>
     ${c?notasBox(c):''}`;
   const submit=async f=>{f.valor=f.valor?Number(f.valor):0;f.actualizado=Date.now();if(c)await save('clientes',c.id,f);else await add('clientes',f);toast(c?'Cliente actualizado':'Cliente registrado')};
   submit.validate=f=>f.empresa.trim()?null:'Escribe el nombre de la empresa.';
   modal(c?'Editar cliente':'Nuevo cliente',fields,{onSubmit:submit,onDelete:c?async()=>{await remove('clientes',c.id);toast('Cliente eliminado')}:null});
-  if(c){wireProp(c);wireNotas(c);
+  if(c){wireProp(c);wireNotas(c);wireCierre(c);
+    const fc=document.getElementById('f-cierre');if(fc)fc.onclick=()=>cierreForm(c);
     const av_=document.getElementById('f-avanza');
     if(av_)av_.onclick=async()=>{try{await save('clientes',c.id,{estado:sigE,actualizado:Date.now()});close();toast(`${c.empresa}: ${estado(sigE).l}`)}catch(e){writeError(e)}}}
 }
@@ -1720,7 +1769,8 @@ function propBox(c){
     :p.estado==='pendiente'?'<span class="access"><i></i>Claude la está preparando…</span>'
     :p.estado==='error'?'<span class="access"><i></i>No se pudo generar</span>'
     :`<span class="access ok"><i></i>Lista${p.generada?' · '+esc(new Date(p.generada).toLocaleDateString('es-MX',{day:'numeric',month:'short'})):''}</span>`;
-  const acts=(hay?`<button type="button" class="btn btn-sm" data-prop="ver">Ver propuesta</button>`:'')+
+  const tieneEnc=c.encuesta&&Object.keys(c.encuesta).length;
+  const acts=(hay||tieneEnc?`<button type="button" class="btn btn-sm" data-prop="ver">${hay?'Ver encuesta y propuesta':'Ver encuesta'}</button>`:'')+
     (A&&(!p||p.estado!=='pendiente')?`<button type="button" class="btn btn-sm ghost" data-prop="generar">${p&&p.estado?'Volver a generar':'Generar con Claude'}</button>`:'');
   return `<div class="cred prop-box" id="prop-box" data-cliente="${esc(c.id)}"><div class="cred-h"><span>Propuesta de Claude</span>${est}</div>
     ${p&&p.error?`<p class="prop-err">${esc(p.error)}</p>`:''}${p&&p.estado==='pendiente'?'<p class="prop-err">Suele tardar unos minutos; esta ficha se actualiza sola.</p>':''}
@@ -1759,7 +1809,7 @@ function mdBasico(t){
 }
 const GIRO_EMOJI={'Restaurante o cafetería':'🍽️','Tienda o comercio':'🛍️','Salud o clínica':'🩺','Belleza o spa':'💇','Gimnasio o deporte':'🏋️',
   'Servicios profesionales':'💼','Educación o cursos':'🎓','Inmobiliaria o construcción':'🏠','Logística o distribución':'🚚','Otro':'✨'};
-const PASOS_PROP=['Negocio','Guion','Presentación'];
+const PASOS_PROP=['Encuesta','Resumen','Presentación','Guion','Preguntas'];
 // Diapositivas de la presentación en orden (ids de web/propuesta/plantilla.js y DIAPOSITIVAS de propuesta-claude/prompt.ts).
 const DIAPOS=[['cover','Portada'],['agenda','Agenda'],['entendimos','Lo que entendimos'],['necesidad','La necesidad'],['oportunidad','La oportunidad'],
   ['solucion','La propuesta'],['funciones','Funciones'],['flujo','Cómo funciona'],['concepto','Así se vería'],['plan','Plan de trabajo'],
@@ -1768,51 +1818,67 @@ const DIAPOS=[['cover','Portada'],['agenda','Agenda'],['entendimos','Lo que ente
 const guionDe=d=>(Array.isArray(d&&d.script)?d.script:[]).filter(x=>x&&String(x.guion||'').trim())
   .map(x=>{const i=DIAPOS.findIndex(([id])=>id===x.slide);return {i,nombre:i>=0?DIAPOS[i][1]:String(x.slide||''),guion:String(x.guion).trim(),nota:String(x.nota||'').trim()}});
 const parrafos=t=>String(t||'').split(/\n+/).map(x=>x.trim()).filter(Boolean).map(x=>`<p>${esc(x)}</p>`).join('');
-// Recorrido de la propuesta: 1) el negocio (rubro, Google), 2) el guion para presentar, 3) la presentación.
+// Recorrido del prospecto: 1) encuesta (negocio, respuestas, Google), 2) resumen de la propuesta, 3) presentación,
+// 4) guion para leer en orden de la presentación, 5) preguntas probables. Abajo, el botón "Contrato firmado".
 function abrirPropuesta(c,paso,diapo){
-  const p=propDe(c.id)||{},d=p.datos||{},pr=d.pricing||{},g=d.google_profile||{},enc=c.encuesta||{};
+  const p=propDe(c.id)||{},d=p.datos||{},pr=d.pricing||{},g=d.google_profile||{},enc=c.encuesta||{},pp=d.proposal||{};
   const google=c.google||enc.google||'',giro=c.giro||enc.giro||'';
   const caja=(l,v)=>v?`<div><span>${l}</span><b>${esc(v)}</b></div>`:'';
   const wa=String(c.telefono||'').replace(/\D/g,'');
+  const sinProp=`<p class="prop-err">${p.estado==='pendiente'?'Claude está preparando la propuesta; suele tardar unos minutos y esta ventana se puede volver a abrir.':p.estado==='error'?esc(p.error||'No se pudo generar la propuesta.'):'Aún no hay propuesta para este cliente.'}</p>`;
+  const analisis=(abierto)=>p.texto?`<details class="prop-det"${abierto?' open':''}><summary>Análisis interno y precio</summary><div class="prop-txt" id="prop-txt">${mdBasico(p.texto)}</div></details>`:'';
+  const G=guionDe(d),Q=(Array.isArray(d.questions)?d.questions:[]).filter(x=>x&&x.question);
   let cuerpo='';
   if(paso===0){
     const datosG=g.found?`<div class="negocio-g"><div class="prop-sum">${caja('Calificación',g.rating?'★ '+g.rating:'')+caja('Reseñas',g.reviews)+caja('Categoría en Google',g.category)}</div>
         ${g.address?`<p><b>Dirección:</b> ${esc(g.address)}</p>`:''}${g.website?`<p><b>Sitio:</b> ${esc(g.website)}</p>`:''}${g.summary?`<p>${esc(g.summary)}</p>`:''}</div>`
       :(g.summary||g.website)?`<div class="negocio-g"><p class="prop-err">Claude no pudo leer la ficha de Google; esto lo encontró en otras fuentes públicas:</p>
         ${g.website?`<p><b>Sitio:</b> ${esc(g.website)}</p>`:''}${g.summary?`<p>${esc(g.summary)}</p>`:''}</div>`
-      :google?'<p class="prop-err" style="margin-top:12px">Claude no pudo consultar el perfil de Google; la propuesta se hizo solo con la encuesta.</p>':'';
+      :google&&p.datos?'<p class="prop-err" style="margin-top:12px">Claude no pudo consultar el perfil de Google; la propuesta se hizo solo con la encuesta.</p>':'';
+    const R=[['Negocio',enc.negocio||c.empresa],['Contacto',enc.nombre||c.contacto],['WhatsApp',c.telefono],['Correo',c.email],['Giro',giro],
+      ['Qué necesita',enc.sistemas||c.sistemas],['Para quién es la app',enc.usuarios],['Plataforma',enc.plataforma],['Para cuándo',enc.tiempo||c.tiempo],['Comentarios',enc.comentarios]]
+      .filter(x=>String(x[1]||'').trim());
+    const resp=Object.keys(enc).length?`<h4 class="sub-h">Respuestas de la encuesta</h4><dl class="enc-r">${R.map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>`
+      :`<p class="prop-err" style="margin-top:12px">Este cliente no llegó por la encuesta.${c.notas?' Notas: '+esc(c.notas):''}</p>`;
     cuerpo=`<div class="negocio-card"><div class="negocio-emoji" aria-hidden="true">${GIRO_EMOJI[giro]||'✨'}</div>
       <div><h4>${esc(c.empresa||'Sin nombre')}</h4><p>${esc(giro||'Giro sin definir')}${c.contacto?' · '+esc(c.contacto):''}</p></div>
       <div class="negocio-acts">${/^https?:\/\//i.test(google)?`<a class="btn btn-sm" href="${esc(google)}" target="_blank" rel="noopener">Ver en Google ↗</a>`:'<span class="access"><i></i>Sin link de Google</span>'}
-        ${wa?`<a class="btn btn-sm ghost" href="https://wa.me/${wa.length===10?'52'+wa:wa}" target="_blank" rel="noopener">WhatsApp</a>`:''}</div></div>${datosG}`;
+        ${wa?`<a class="btn btn-sm ghost" href="https://wa.me/${wa.length===10?'52'+wa:wa}" target="_blank" rel="noopener">WhatsApp</a>`:''}</div></div>${resp}${datosG}`;
   }else if(paso===1){
     // Tres precios; las propuestas anteriores traían "recomendado" y "mínimo de negociación".
     const objetivo=pr.target_price_mxn??pr.development_price_mxn,minimo=pr.minimum_acceptable_price_mxn??pr.minimum_negotiation_price_mxn;
     const sum=caja('Precio objetivo',objetivo?money(objetivo):'')+caja('Oferta',pr.offer_price_mxn?money(pr.offer_price_mxn):'')+caja('Mínimo aceptable',minimo?money(minimo):'')+
       caja('Mantenimiento',pr.monthly_maintenance_mxn?money(pr.monthly_maintenance_mxn)+'/mes':'')+caja('Nivel',pr.project_level);
-    const G=guionDe(d),Q=(Array.isArray(d.questions)?d.questions:[]).filter(x=>x&&x.question);
-    const analisis=p.texto?`<details class="prop-det"${G.length?'':' open'}><summary>Análisis interno y precio</summary><div class="prop-txt" id="prop-txt">${mdBasico(p.texto)}</div></details>`:'';
-    cuerpo=`${p.incompleta?'<p class="prop-err" style="margin-bottom:8px">La respuesta de Claude quedó cortada; conviene volver a generarla.</p>':''}
-      ${G.length?`<p class="ayuda" style="margin:0 0 12px">Léelo mientras compartes la presentación: cada parte va con su diapositiva. Las notas en gris son solo para ti.</p>
-        <div class="guion">${G.map(x=>`<article class="guion-d"><header><span class="guion-n">${x.i>=0?String(x.i+1).padStart(2,'0'):'·'}</span><b>${esc(x.nombre)}</b>
-          ${x.i>=0&&p.datos?`<button type="button" class="btn btn-sm ghost" data-diapo="${x.i}">Ver diapositiva</button>`:''}</header>
-          <div class="guion-t">${parrafos(x.guion)}</div>${x.nota?`<p class="guion-nota">${esc(x.nota)}</p>`:''}</article>`).join('')}</div>`
-      :'<p class="prop-err" style="margin-bottom:10px">Esta propuesta se generó antes del guion por diapositiva. Vuelve a generarla desde la ficha del cliente para tenerlo.</p>'}
-      ${sum?`<details class="prop-det"${G.length?'':' open'}><summary>Precios para negociar (solo para ti)</summary><div class="prop-sum">${sum}</div></details>`:''}
-      ${Q.length?`<details class="prop-det"><summary>Preguntas que te pueden hacer (${Q.length})</summary><div class="guion-q">${Q.map(x=>`<div><b>${esc(x.question)}</b><p>${esc(x.answer||'')}</p></div>`).join('')}</div></details>`:''}
-      ${analisis}
-      <div style="margin-top:12px"><button type="button" class="btn btn-sm" id="prop-copy">${G.length?'Copiar guion':'Copiar texto'}</button></div>`;
-  }else{
+    const txt=x=>typeof x==='string'?x:(x&&(x.name||x.nombre||x.feature||x.title))||'';
+    const lista=(t,a)=>Array.isArray(a)&&a.filter(txt).length?`<div><h4 class="sub-h">${t}</h4><ul class="res-l">${a.filter(txt).map(x=>`<li>${esc(txt(x))}</li>`).join('')}</ul></div>`:'';
+    const listas=lista('Primera versión',pp.essential_features)+lista('Recomendadas',pp.recommended_features)+lista('Para después',pp.future_features);
+    cuerpo=!p.datos&&!p.texto?sinProp:`${p.incompleta?'<p class="prop-err" style="margin-bottom:8px">La respuesta de Claude quedó cortada; conviene volver a generarla.</p>':''}
+      ${pp.summary||pp.solution?`<div class="res-txt">${parrafos(pp.summary||pp.solution)}</div>`:''}
+      ${sum?`<h4 class="sub-h">Precios (solo para ti)</h4><div class="prop-sum">${sum}</div>`:''}
+      ${listas?`<div class="res-grid">${listas}</div>`:''}
+      ${analisis(!(pp.summary||pp.solution))}`;
+  }else if(paso===2){
     const url=`propuesta.html?id=${encodeURIComponent(c.id)}`;
     cuerpo=p.datos?`<iframe class="prop-frame" src="${url}&embed=1${diapo>0?'&diapo='+(diapo+1):''}" title="Presentación de la propuesta" allow="fullscreen"></iframe>
-      <div style="margin-top:10px"><a class="btn btn-sm" href="${url}" target="_blank" rel="noopener">Abrir en pantalla completa ↗</a></div>`
-      :'<p class="prop-err">Aún no hay presentación para este cliente.</p>';
+      <div style="margin-top:10px"><a class="btn btn-sm" href="${url}" target="_blank" rel="noopener">Abrir en pantalla completa ↗</a></div>`:sinProp;
+  }else if(paso===3){
+    cuerpo=G.length?`<p class="ayuda" style="margin:0 0 12px">Léelo mientras compartes la presentación: cada parte va con su diapositiva. Las notas en gris son solo para ti.</p>
+        <div class="guion">${G.map(x=>`<article class="guion-d"><header><span class="guion-n">${x.i>=0?String(x.i+1).padStart(2,'0'):'·'}</span><b>${esc(x.nombre)}</b>
+          ${x.i>=0&&p.datos?`<button type="button" class="btn btn-sm ghost" data-diapo="${x.i}">Ver diapositiva</button>`:''}</header>
+          <div class="guion-t">${parrafos(x.guion)}</div>${x.nota?`<p class="guion-nota">${esc(x.nota)}</p>`:''}</article>`).join('')}</div>
+        <div style="margin-top:12px"><button type="button" class="btn btn-sm" id="prop-copy">Copiar guion</button></div>`
+      :p.datos?'<p class="prop-err">Esta propuesta se generó antes del guion por diapositiva. Vuelve a generarla desde la ficha del cliente para tenerlo.</p>'+analisis(true):sinProp;
+  }else{
+    cuerpo=Q.length?`<p class="ayuda" style="margin:0 0 12px">Lo que probablemente te pregunte ${esc(c.contacto||'el cliente')}, con una respuesta corta.</p>
+        <div class="guion-q">${Q.map((x,i)=>`<div><b>${i+1}. ${esc(x.question)}</b><p>${esc(x.answer||'')}</p></div>`).join('')}</div>`
+      :p.datos?'<p class="prop-err">Esta propuesta no trae preguntas por separado; vienen en el análisis.</p>'+analisis(true):sinProp;
   }
+  const cierreBtn=c.estado==='cerrado'?`<span class="access ok spacer"><i></i>${etapa(c).l}</span>`:c.estado==='perdido'?'':'<button type="button" class="btn spacer" id="paso-cierre">Contrato firmado</button>';
   root.innerHTML=`<div class="scrim"><div class="glass sheet wide" role="dialog" aria-modal="true" aria-label="Propuesta de ${esc(c.empresa||'')}">
-    <h3>Propuesta · ${esc(c.empresa||'')}</h3>
+    <h3>${esc(c.empresa||'Prospecto')}</h3>
     <div class="pasos">${PASOS_PROP.map((t,i)=>`<button type="button" class="chip-btn" data-paso="${i}" aria-pressed="${i===paso}"><b>${i+1}</b>${t}</button>`).join('')}</div>
     ${cuerpo}
-    <div class="paso-nav">${paso>0?'<button type="button" class="btn ghost spacer" data-ir="-1">← Anterior</button>':''}
+    <div class="paso-nav">${cierreBtn}${paso>0?'<button type="button" class="btn ghost" data-ir="-1">← Anterior</button>':''}
       <button type="button" class="btn ghost" id="paso-cerrar">Cerrar</button>
       ${paso<PASOS_PROP.length-1?'<button type="button" class="btn primary" data-ir="1">Siguiente →</button>':''}</div></div></div>`;
   root.querySelector('.scrim').addEventListener('click',e=>{if(e.target.classList.contains('scrim'))close()});
@@ -1821,13 +1887,121 @@ function abrirPropuesta(c,paso,diapo){
   root.querySelectorAll('[data-paso]').forEach(b=>b.onclick=()=>abrirPropuesta(c,+b.dataset.paso));
   root.querySelectorAll('[data-ir]').forEach(b=>b.onclick=()=>abrirPropuesta(c,paso+(+b.dataset.ir)));
   root.querySelectorAll('[data-diapo]').forEach(b=>b.onclick=()=>abrirPropuesta(c,2,+b.dataset.diapo));
+  const pc=document.getElementById('paso-cierre');if(pc)pc.onclick=()=>cierreForm(c);
   const cp=document.getElementById('prop-copy');
-  const G=guionDe(d),copia=G.length?G.map(x=>`${x.i>=0?x.i+1+'. ':''}${x.nombre.toUpperCase()}\n\n${x.guion}${x.nota?`\n\n(Nota: ${x.nota})`:''}`).join('\n\n'):(p.texto||'');
+  const copia=G.map(x=>`${x.i>=0?x.i+1+'. ':''}${x.nombre.toUpperCase()}\n\n${x.guion}${x.nota?`\n\n(Nota: ${x.nota})`:''}`).join('\n\n');
   if(cp)cp.onclick=()=>navigator.clipboard.writeText(copia).then(()=>toast('Copiado')).catch(()=>toast('Selecciona y copia el texto'));
 }
 
-function evForm(ev,fecha){
-  const v=ev||{fecha:fecha||today,hora:'10:00',duracion:30,tipo:'Llamada',empleadoId:ui.calEmp!=='todos'?ui.calEmp:''};
+/* ----- CIERRE: contrato firmado → creación de la app → venta completada (RPC cerrar_trato / completar_venta) ----- */
+// Los archivos van al bucket privado `documentos`, en la carpeta del cliente; se abren con un link temporal.
+const fechaLarga=s=>s?parse(s).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'}):'';
+async function subirDoc(c,file,tipo){
+  if(!file||!file.size)throw {code:'P0001',message:'Falta un archivo.'};
+  if(file.size>20*1024*1024)throw {code:'P0001',message:`${file.name} pesa más de 20 MB. Sube una foto o un PDF más ligero.`};
+  const ext=(String(file.name||'').split('.').pop()||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,5)||(file.type==='application/pdf'?'pdf':'jpg');
+  const path=`${c.id}/${tipo}-${Date.now()}.${ext}`;
+  const {error}=await sb.storage.from('documentos').upload(path,file,{contentType:file.type||undefined,upsert:false});
+  if(error)throw {code:'P0001',message:/mime|type|format/i.test(error.message||'')?'Ese tipo de archivo no se acepta: sube una foto (JPG o PNG) o un PDF.':`No se pudo subir ${file.name}. Revisa tu conexión e inténtalo de nuevo.`};
+  return path;
+}
+async function abrirDoc(path){
+  const w=window.open('','_blank');
+  const {data:d,error}=await sb.storage.from('documentos').createSignedUrl(path,600);
+  if(error||!d){if(w)w.close();toast('No se pudo abrir el documento.');return}
+  if(w)w.location=d.signedUrl;else location.href=d.signedUrl;
+}
+const docBtn=(path,l)=>path?`<button type="button" class="btn btn-sm" data-doc="${esc(path)}">${l} ↗</button>`:'';
+const campoArchivo=(name,label,ayuda)=>`<label class="full archivo">${label}<input type="file" name="${name}" accept="image/*,application/pdf"><span>${ayuda}</span></label>`;
+function cierreBox(c){
+  if(c.estado==='perdido')return '';
+  const A=!isEmp(),ci=c.cierre||{},co=c.completado||null,cerrado=c.estado==='cerrado';
+  let cuerpo;
+  if(!cerrado){
+    cuerpo=`<p class="prop-err">Cuando el cliente firme, sube el comprobante de pago y el contrato firmado para cerrar el trato.</p>
+      <div class="prop-acts"><button type="button" class="btn btn-sm primary" data-cierre="cerrar">Contrato firmado</button></div>`;
+  }else{
+    const linea=ci.fecha?`Trato cerrado el ${esc(fechaLarga(ci.fecha))}${ci.monto?' · pago de '+money(ci.monto):''}.`:'Trato cerrado antes de este proceso (sin documentos).';
+    if(co)cuerpo=`<p class="prop-err">${linea}<br>Venta completada el ${esc(fechaLarga(co.fecha))}${Number(co.monto)?' · pago final de '+money(co.monto):''}. Ya tiene su aplicación.</p>`;
+    else if(A)cuerpo=`<p class="prop-err">${linea}<br><b>Siguiente paso: creación de la aplicación.</b> Agenda las juntas con el cliente y, cuando liquide, finaliza la venta con el comprobante del pago restante.</p>`;
+    else cuerpo=`<p class="prop-err">${linea} Tu comisión por esta venta: <b>${money(bonos().porVenta)}</b>.</p>`;
+    const docs=docBtn(ci.comprobante,'Comprobante de pago')+docBtn(ci.contrato,'Contrato firmado')+docBtn(co&&co.comprobante,'Comprobante final');
+    const acts=docs+(!co&&A?'<button type="button" class="btn btn-sm" data-cierre="junta">Agendar junta</button><button type="button" class="btn btn-sm primary" data-cierre="finalizar">Finalizar venta</button>':'');
+    if(acts)cuerpo+=`<div class="prop-acts">${acts}</div>`;
+  }
+  const est=!cerrado?'<span class="access"><i></i>Abierto</span>':`<span class="access ok"><i></i>${etapa(c).l}</span>`;
+  return `<div class="cred prop-box" id="cierre-box"><div class="cred-h"><span>Cierre del trato</span>${est}</div>${cuerpo}</div>`;
+}
+function wireCierre(c){
+  const box=document.getElementById('cierre-box');if(!box)return;
+  box.querySelectorAll('[data-cierre]').forEach(b=>b.onclick=()=>{const k=b.dataset.cierre;
+    if(k==='cerrar')return cierreForm(c);
+    if(k==='finalizar')return finalizarForm(c);
+    if(k==='junta')return evForm(null,today,{clienteId:c.id,empleadoId:c.empleadoId||'',titulo:'Junta · '+(c.empresa||''),tipo:'Reunión'});
+  });
+}
+// Contrato firmado: comprobante de pago + contrato. Registra el pago en Finanzas, así cuenta como venta (bonos y ranking).
+function cierreForm(c){
+  const fields=`<p class="ayuda" style="grid-column:1/-1;margin:0 0 4px">Para cerrar el trato con <b>${esc(c.empresa||'el cliente')}</b> sube los dos documentos. Pueden ser fotos o PDF.</p>
+    ${campoArchivo('comprobante','Comprobante de pago','Foto o PDF de la transferencia o depósito del cliente.')}
+    ${campoArchivo('contrato','Contrato firmado','Foto o PDF del contrato con la firma del cliente.')}
+    <label>Monto del pago (MXN)<input name="monto" type="number" min="1" step="0.01" inputmode="decimal" placeholder="15000"></label>
+    <label>Fecha del pago<input name="fecha" type="date" value="${today}"></label>`;
+  const submit=async f=>{
+    const btn=document.querySelector('#mform [type=submit]');btn.disabled=true;btn.textContent='Subiendo documentos…';
+    try{
+      const comprobante=await subirDoc(c,f.comprobante,'comprobante'),contrato=await subirDoc(c,f.contrato,'contrato');
+      const {data:r,error}=await sb.rpc('cerrar_trato',{p_cliente:c.id,p_monto:Number(f.monto),p_fecha:f.fecha,p_comprobante:comprobante,p_contrato:contrato});
+      if(error)throw error;
+      await load('clientes');if(!isEmp())await load('finanzas');await cargarExtras();
+      return ()=>{refresh();celebrarCierre(cli(c.id)||c,r||{})};
+    }catch(e){btn.disabled=false;btn.textContent='Cerrar trato';throw e}
+  };
+  submit.validate=f=>!(f.comprobante&&f.comprobante.size)?'Sube el comprobante de pago.':!(f.contrato&&f.contrato.size)?'Sube el contrato firmado.'
+    :!(Number(f.monto)>0)?'Escribe el monto del pago.':!f.fecha?'Elige la fecha del pago.':null;
+  modal('Contrato firmado',fields,{onSubmit:submit,submitLabel:'Cerrar trato'});
+}
+function celebrarCierre(c,r){
+  const com=Number(r.comision)||bonos().porVenta;
+  const html=isEmp()?`<div class="festejo"><div class="fx" aria-hidden="true">🎉</div><h4>¡Felicidades!</h4><p>Acabas de cerrar un trato con <b>${esc(c.empresa||'')}</b>.</p><p>Recibirás tu comisión de <b>${money(com)}</b>.</p></div>`
+    :`<div class="festejo"><div class="fx" aria-hidden="true">✅</div><h4>Trato cerrado</h4><p><b>${esc(c.empresa||'')}</b> firmó. Siguiente paso: <b>creación de la aplicación</b>.</p><p>Agenda las juntas con ${esc(c.contacto||'el cliente')} y, cuando liquide, finaliza la venta con el comprobante del pago restante.</p></div>`;
+  modal(isEmp()?'Trato cerrado':'Siguiente paso',html,{onSubmit:async()=>{},submitLabel:'Listo'});
+}
+// Venta completada (solo admin): comprobante del pago restante. Queda en "Negocios con app".
+function finalizarForm(c){
+  const cobrado=data.finanzas.filter(m=>m.tipo==='ingreso'&&m.clienteId===c.id).reduce((s,m)=>s+(Number(m.monto)||0),0);
+  const resta=Math.max(0,(Number(c.valor)||0)-cobrado);
+  const fields=`<p class="ayuda" style="grid-column:1/-1;margin:0 0 4px">Para completar la venta de <b>${esc(c.empresa||'')}</b> sube el comprobante del pago restante.${Number(c.valor)?` Valor ${money(c.valor)} · cobrado ${money(cobrado)}.`:''}</p>
+    ${campoArchivo('comprobante','Comprobante del pago restante','Foto o PDF de la transferencia o depósito.')}
+    <label>Monto (MXN)<input name="monto" type="number" min="0" step="0.01" inputmode="decimal" value="${resta||''}" placeholder="0"></label>
+    <label>Fecha del pago<input name="fecha" type="date" value="${today}"></label>`;
+  const submit=async f=>{
+    const btn=document.querySelector('#mform [type=submit]');btn.disabled=true;btn.textContent='Subiendo comprobante…';
+    try{
+      const comprobante=await subirDoc(c,f.comprobante,'final');
+      const {error}=await sb.rpc('completar_venta',{p_cliente:c.id,p_monto:Number(f.monto)||0,p_fecha:f.fecha,p_comprobante:comprobante});
+      if(error)throw error;
+      await load('clientes');await load('finanzas');await cargarExtras();
+      return ()=>{refresh();modal('Venta completada',`<div class="festejo"><div class="fx" aria-hidden="true">🏁</div><h4>Venta completada</h4><p><b>${esc(c.empresa||'')}</b> ya tiene su aplicación y quedó en <b>Negocios con app</b> (Clientes).</p></div>`,{onSubmit:async()=>{},submitLabel:'Listo'})};
+    }catch(e){btn.disabled=false;btn.textContent='Completar venta';throw e}
+  };
+  submit.validate=f=>!(f.comprobante&&f.comprobante.size)?'Sube el comprobante del pago restante.':(f.monto!==''&&!(Number(f.monto)>=0))?'Revisa el monto.':!f.fecha?'Elige la fecha del pago.':null;
+  modal('Finalizar venta',fields,{onSubmit:submit,submitLabel:'Completar venta'});
+}
+// Aviso al admin cuando un vendedor cierra un trato.
+function avisoCierre(c){
+  let box=document.getElementById('avisos');
+  if(!box){box=document.createElement('div');box.id='avisos';document.body.appendChild(box)}
+  const e=emp(c.empleadoId),d=document.createElement('div');d.className='glass aviso';d.setAttribute('role','status');
+  d.innerHTML=`<div><b>🎉 Trato cerrado: ${esc(c.empresa||'')}</b><span>${e?esc(e.nombre)+' subió':'Se subió'} el contrato y el comprobante. Siguiente paso: creación de la app.</span></div>
+    <div class="aviso-acts"><button class="btn btn-sm primary" data-ver>Ver</button><button class="btn btn-sm ghost" data-x aria-label="Cerrar">×</button></div>`;
+  d.querySelector('[data-ver]').onclick=()=>{d.remove();clientForm(cli(c.id)||c)};
+  d.querySelector('[data-x]').onclick=()=>d.remove();
+  box.appendChild(d);
+}
+
+function evForm(ev,fecha,pre){
+  const v=ev||{fecha:fecha||today,hora:'10:00',duracion:30,tipo:'Llamada',empleadoId:ui.calEmp!=='todos'?ui.calEmp:'',...(pre||{})};
   const fields=`
     <label class="full">Título<input name="titulo" id="f-titulo" value="${esc(v.titulo)}" placeholder="Llamada de presentación"></label>
     <label>Fecha<input name="fecha" id="f-fecha" type="date" required value="${esc(v.fecha)}"></label>
@@ -1857,7 +2031,8 @@ function movForm(x,tipo,pre){
     <label>Método<select name="metodo" id="f-metodo">${METODOS.map(m=>opt(m,m,m===v.metodo)).join('')}</select></label>
     ${cliSelect(v.clienteId)}
     <label>Empleado<select name="empleadoId" id="f-mempleado">${opt('','Ninguno',!v.empleadoId)}${sortedEmps().map(e=>opt(e.id,e.nombre,e.id===v.empleadoId)).join('')}</select></label>
-    <label class="full">Notas<textarea name="notas" id="f-mnotas" placeholder="Factura, referencia de pago…">${esc(v.notas)}</textarea></label>`;
+    <label class="full">Notas<textarea name="notas" id="f-mnotas" placeholder="Factura, referencia de pago…">${esc(v.notas)}</textarea></label>
+    ${v.comprobante?`<div style="grid-column:1/-1">${docBtn(v.comprobante,'Ver comprobante')}</div>`:''}`;
   const submit=async f=>{f.monto=Number(f.monto);if(x)await save('finanzas',x.id,f);else await add('finanzas',f);toast(x?'Movimiento actualizado':(T==='ingreso'?'Ingreso registrado':'Egreso registrado'))};
   submit.validate=f=>!(Number(f.monto)>0)?'Escribe un monto mayor a cero.':(!f.fecha?'Elige una fecha.':null);
   modal(x?(T==='ingreso'?'Editar ingreso':'Editar egreso'):(T==='ingreso'?'Nuevo ingreso':'Nuevo egreso'),fields,{onSubmit:submit,onDelete:x?async()=>{await remove('finanzas',x.id);toast('Movimiento eliminado')}:null});
@@ -1918,6 +2093,8 @@ function empForm(e,abrirFoto){
     try{await rpc('admin_quitar_acceso',{p_empleado:e.id});toast('Acceso retirado');close()}catch(err){writeError(err)}};
   if(abrirFoto) inp.click();
 }
+
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-doc]');if(b){e.preventDefault();abrirDoc(b.dataset.doc)}});
 
 /* no repintar debajo de un formulario abierto */
 const _refresh=refresh;
