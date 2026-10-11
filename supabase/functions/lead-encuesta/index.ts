@@ -1,6 +1,6 @@
 // Recibe las respuestas de la encuesta pública (arkencuesta.netlify.app)
 // y las registra como cliente 'prospecto' asignado al vendedor del link (?v=...).
-// Desplegada con verify_jwt = false (es pública; valida origen, honeypot y datos).
+// Desplegada con verify_jwt = false (es pública; valida honeypot y datos).
 // Después de responder pide a propuesta-claude que Claude prepare la propuesta comercial y a
 // notificar que avise por push al vendedor (si algo falla, el prospecto queda registrado igual).
 // Desde oct 2026 la encuesta también manda tamaño, sucursales, usuarios al mes, diseño, integraciones, objetivos,
@@ -10,7 +10,6 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 
 declare const EdgeRuntime: { waitUntil(p: Promise<unknown>): void };
 
-const ORIGENES = ["https://arkencuesta.netlify.app"];
 const VENDEDORES: Record<string, string> = {
   andres: "andres-mayo",
   patricio: "patricio-schnabel",
@@ -20,10 +19,11 @@ const VENDEDORES: Record<string, string> = {
   bruno: "bruno-rodriguez",
 };
 
+// Acepta cualquier origen: la encuesta puede publicarse en otra cuenta o dominio de Netlify (p. ej. al cambiar de cuenta)
+// y el endpoint es público de todos modos; lo que lo protege es el honeypot y la validación de datos.
 function cors(origin: string | null) {
-  const ok = origin && (ORIGENES.includes(origin) || /^https:\/\/[a-z0-9]+--arkencuesta\.netlify\.app$/.test(origin));
   return {
-    "Access-Control-Allow-Origin": ok ? origin! : ORIGENES[0],
+    "Access-Control-Allow-Origin": origin || "*",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "content-type",
     "Vary": "Origin",
