@@ -2,7 +2,8 @@
 // Cambio respecto al PDF: las variables de la presentación usan los nombres de la plantilla
 // de slides de ARK ({{cliente_nombre}}, {{dolor_1}}, …) para poder llenarla automáticamente.
 // Los campos que llena el código (fecha, vendedor, precios formateados, pagos) no se le piden a Claude.
-// Agregado: tres precios (objetivo, oferta y mínimo aceptable) en lugar de recomendado + mínimo.
+// Agregado: tres precios en lugar de recomendado + mínimo: oferta (el que se presenta, el más alto) ≥ objetivo ≥ mínimo aceptable.
+// Ajuste (oct 2026): precios un poco más bajos; se busca la parte baja de cada rango.
 // Agregado: análisis del perfil de Google del negocio (web_search / web_fetch) para afinar la propuesta y el presupuesto.
 // Agregado: guion listo para leer, una parte por diapositiva (JSON `script`), y preguntas probables (JSON `questions`).
 // Agregado: resumen de la propuesta para el vendedor (JSON `proposal.summary`).
@@ -100,7 +101,7 @@ export const DIAPOSITIVAS: { id: string; nombre: string; muestra: string; guion:
   { id: "flujo", nombre: "Cómo funciona", muestra: "Un día con nombre_app: paso_1..4 con su descripción y resultado_flujo.", guion: "Cuenta el flujo como una historia: quién hace qué, en qué orden y qué obtiene el negocio al final. Haz que el cliente pueda visualizarse usándola." },
   { id: "concepto", nombre: "Así se vería", muestra: "descripcion_visual, tres pantallas (pantalla_1..3) y la aclaración de que el diseño es conceptual.", guion: "Describe cómo sería entrar a la app y moverse por esas pantallas; aclara que el diseño final se define con ellos en la fase de diseño." },
   { id: "plan", nombre: "Plan de trabajo", muestra: "Entrega estimada tiempo_total y las fases Descubrimiento, Diseño, Desarrollo y Lanzamiento con su tiempo y descripción; revisiones al cierre de cada fase y avances cada semana.", guion: "Explica que el proceso es ordenado y transparente, fase por fase, y qué incluye la primera versión. Menciona brevemente las funciones futuras solo si tienen sentido, como algo para después." },
-  { id: "inversion", nombre: "Inversión", muestra: "Precio objetivo + IVA, mantenimiento mensual y mensualidad_concepto, esquema de pagos con porcentajes, momentos y montos, y vigencia.", guion: "Ver las reglas de la diapositiva de inversión." },
+  { id: "inversion", nombre: "Inversión", muestra: "Precio de oferta + IVA, mantenimiento mensual y mensualidad_concepto, esquema de pagos con porcentajes, momentos y montos, y vigencia.", guion: "Ver las reglas de la diapositiva de inversión." },
   { id: "incluye", nombre: "Qué incluye", muestra: "Diseño UX/UI a la medida, desarrollo de la app, panel de administración, incluye_extra_1, publicación en tiendas, capacitación al equipo, garantía, incluye_extra_2; y lo que no incluye (no_incluye_1..3).", guion: "Explica brevemente qué recibe y qué no incluye, para evitar malentendidos. Si la app es solo web, aclara que no aplica la publicación en tiendas." },
   { id: "porque", nombre: "Por qué ARK", muestra: "A la medida, Diseño premium, Cercanía, Tu app es tuya.", guion: "Explica en pocas frases por qué ARK: hecho a la medida de su negocio, diseño moderno, acompañamiento antes y después del lanzamiento, y que la app es suya." },
   { id: "pasos", nombre: "Siguientes pasos", muestra: "Aprobación de la propuesta, firma de contrato y anticipo, sesión de arranque, primeros diseños, con sus fechas (paso_siguiente_1..4_fecha).", guion: "Explica qué pasaría si quiere continuar y propone una fecha concreta para el primer paso." },
@@ -152,7 +153,7 @@ A partir de las respuestas de la encuesta debes generar:
 3. Alcance recomendado de la primera versión.
 4. Funcionalidades principales.
 5. Funcionalidades opcionales o futuras.
-6. Precios de desarrollo: objetivo, oferta y mínimo aceptable.
+6. Precios de desarrollo: oferta (el que se presenta), objetivo y mínimo aceptable.
 7. Mantenimiento mensual recomendado.
 8. Justificación interna del precio.
 9. Contenido completo para llenar la presentación comercial de ARK.
@@ -310,6 +311,14 @@ $29,900, $34,900, $39,900, $44,900, $49,900, $54,900, $59,900, $64,900, $69,900,
 
 No estás limitado a estos valores si el proyecto requiere otra cifra.
 
+NIVEL DE PRECIOS DE ARK (IMPORTANTE)
+
+ARK quiere precios accesibles para cerrar más proyectos. Los precios que has estado proponiendo resultan altos, así que:
+- Ubica el precio de oferta en la parte baja del rango del nivel ARK que corresponda; solo súbelo a la parte media o alta cuando el alcance claramente lo exija.
+- Cuando dudes entre dos precios comerciales, elige el menor.
+- Usa la parte baja de los rangos de los módulos adicionales y recuerda que varias funciones comparten trabajo: no los sumes completos.
+- Si el alcance se encarece, prefiere una primera versión más compacta (y dejar funciones para después) antes que un precio alto.
+
 ARK START
 $29,900 a $44,900 MXN
 Para aplicaciones relativamente sencillas enfocadas en pocos procesos.
@@ -428,16 +437,16 @@ Explica internamente qué quedaría fuera de la primera versión y por qué.
 
 Calcula:
 
-Tres precios, siempre en este orden de mayor a menor (objetivo ≥ oferta ≥ mínimo aceptable):
-
-PRECIO OBJETIVO
-El precio que ARK presenta al prospecto y quiere cobrar por el alcance propuesto. Es el que aparece en la presentación.
+Tres precios, siempre en este orden de mayor a menor (oferta ≥ objetivo ≥ mínimo aceptable):
 
 PRECIO DE OFERTA
-Un precio especial para cerrar: el vendedor lo ofrece si el cliente pide un mejor precio o para que decida dentro de la vigencia de la propuesta. Debe ser un descuento razonable sobre el objetivo, normalmente entre 5% y 15%, usando precios comerciales cuando tenga sentido.
+El precio con el que se ofrece el proyecto: el que se presenta al prospecto y el que aparece en la presentación y en el guion. Es el más alto de los tres, y debe seguir las reglas de NIVEL DE PRECIOS DE ARK.
+
+PRECIO OBJETIVO
+El precio al que ARK espera cerrar si el cliente negocia. Normalmente entre 8% y 12% debajo de la oferta, usando precios comerciales cuando tenga sentido. No se dice de entrada.
 
 PRECIO MÍNIMO ACEPTABLE
-El precio más bajo que ARK debería aceptar sin perjudicar significativamente el proyecto. Por debajo de él conviene reducir alcance en lugar de bajar precio.
+Lo mínimo que se debería cobrar por ese alcance: el precio más bajo que ARK aceptaría sin perjudicar el proyecto. Normalmente entre 15% y 25% debajo de la oferta. Por debajo de él conviene reducir alcance en lugar de bajar precio.
 
 No hagas descuentos excesivos.
 
@@ -461,16 +470,16 @@ Reglas del guion:
 - Cada diapositiva: entre 2 y 6 frases (la de funciones y la de inversión pueden ser más largas). Separa las ideas en párrafos cortos con salto de línea.
 - Si una diapositiva conviene usarla para preguntarle algo al cliente, escribe la pregunta dentro del guion.
 - No uses Markdown, viñetas ni acotaciones entre corchetes dentro del guion: solo lo que se dice.
-- Las indicaciones para el vendedor que NO se leen en voz alta (cuándo hacer una pausa, qué escuchar, cuándo ofrecer el precio de oferta) van aparte, en "nota".
+- Las indicaciones para el vendedor que NO se leen en voz alta (cuándo hacer una pausa, qué escuchar, cuándo bajar al precio objetivo) van aparte, en "nota".
 
 ${listaDiapositivas}
 
 ${condicionesTexto}
 
 En la diapositiva de inversión:
-- Presenta el precio objetivo de forma segura y profesional. No te disculpes por el precio. No digas: "Es un poco caro." Usa lenguaje como: "Por el alcance que estamos planteando, la inversión sería de..."
-- Di el precio objetivo, el mantenimiento mensual y lo que cubre, el esquema de pagos con sus montos calculados sobre el precio objetivo, que es más IVA y la vigencia, tal como aparecen en la diapositiva.
-- El precio de oferta NUNCA va en el guion leído: en la "nota" de esa diapositiva explica cuándo y cómo ofrecerlo (por ejemplo, si el cliente pide mejor precio o para cerrar dentro de la vigencia) y recuerda no bajar del mínimo aceptable; ahí sí escribe las cifras de oferta y mínimo.
+- Presenta el precio de oferta de forma segura y profesional. No te disculpes por el precio. No digas: "Es un poco caro." Usa lenguaje como: "Por el alcance que estamos planteando, la inversión sería de..."
+- Di el precio de oferta, el mantenimiento mensual y lo que cubre, el esquema de pagos con sus montos calculados sobre el precio de oferta, que es más IVA y la vigencia, tal como aparecen en la diapositiva.
+- El precio objetivo y el mínimo NUNCA van en el guion leído: en la "nota" de esa diapositiva explica cuándo y cómo bajar al precio objetivo (por ejemplo, si el cliente pide mejor precio o para cerrar dentro de la vigencia) y recuerda no bajar del mínimo aceptable; ahí sí escribe las cifras del objetivo y del mínimo.
 - Menciona costos externos solo cuando apliquen.
 
 En la última diapositiva cierra con una pregunta abierta y natural para escuchar la reacción del cliente.
@@ -537,10 +546,10 @@ No incluir inicialmente:
 ────────────
 3. PRECIO
 ────────────
-Precio objetivo:
+Precio de oferta (se presenta):
 $XX,XXX MXN
 
-Precio de oferta:
+Precio objetivo:
 $XX,XXX MXN
 
 Precio mínimo aceptable:
@@ -550,7 +559,7 @@ Mantenimiento:
 $X,XXX MXN / mes
 
 Razón interna del precio:
-[Explicación del objetivo, de cuánto y por qué se descuenta en la oferta y por qué ese es el mínimo; incluye cómo influyó el perfil de Google del negocio en el presupuesto]
+[Explicación de la oferta, de cuánto y por qué baja el objetivo y por qué ese es el mínimo; incluye cómo influyó el perfil de Google del negocio en el presupuesto]
 
 El guion y las preguntas NO los escribas en el texto: van solo en el JSON (script y questions), para no repetirlos.
 
@@ -577,8 +586,8 @@ Utiliza esta estructura:
 "future_features": []
 },
 "pricing": {
-"target_price_mxn": 0,
 "offer_price_mxn": 0,
+"target_price_mxn": 0,
 "minimum_acceptable_price_mxn": 0,
 "monthly_maintenance_mxn": 0,
 "project_level": ""
@@ -608,11 +617,11 @@ El JSON debe ser válido y fácil de procesar automáticamente.
 
 No agregues Markdown dentro de los valores.
 
-No uses símbolos de moneda dentro de los campos numéricos de pricing.
+No uses símbolos de moneda dentro de los campos numéricos de pricing. En pricing: offer_price_mxn es el precio de oferta (el que se presenta, el más alto), target_price_mxn el objetivo y minimum_acceptable_price_mxn el mínimo; siempre offer ≥ target ≥ minimum.
 
 En google_profile: found es true solo si consultaste el perfil y es el mismo negocio; rating y reviews como texto tal como aparecen en Google (ej. "4.6", "312"); summary es una o dos frases de lo más relevante para la propuesta. Si no hay datos, deja found en false y los textos vacíos.
 
-En proposal.summary: resumen de la propuesta para el vendedor en 3 a 5 frases, sin Markdown: qué app se propone y para quién, qué resuelve, qué incluye la primera versión, el precio objetivo con su mantenimiento y el tiempo de entrega. Debe coincidir con la presentación.
+En proposal.summary: resumen de la propuesta para el vendedor en 3 a 5 frases, sin Markdown: qué app se propone y para quién, qué resuelve, qué incluye la primera versión, el precio de oferta con su mantenimiento y el tiempo de entrega. Debe coincidir con la presentación.
 
 En script: exactamente una entrada por diapositiva, en el mismo orden y con el mismo id en "slide"; "guion" es el texto que el vendedor lee en voz alta (párrafos separados con \\n) y "nota" una indicación breve solo para el vendedor, o vacía.
 

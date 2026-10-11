@@ -1161,11 +1161,11 @@ function vInicio(){
   const clienteDeCita=e=>cli(e.clienteId)||mine.find(c=>c.empresa&&String(e.titulo||'').toLowerCase().includes(c.empresa.toLowerCase()));
   const prep=myEv.filter(e=>e.fecha<=manana).map(e=>({e,c:clienteDeCita(e)})).find(x=>x.c&&propDe(x.c.id)&&propDe(x.c.id).datos);
   let prepHtml='';
-  if(prep){const p=propDe(prep.c.id),pr=(p.datos&&p.datos.pricing)||{},obj=pr.target_price_mxn??pr.development_price_mxn,min=pr.minimum_acceptable_price_mxn??pr.minimum_negotiation_price_mxn;
+  if(prep){const p=propDe(prep.c.id),P=preciosDe(p.datos&&p.datos.pricing);
     const cuando=prep.e.fecha===today?'Hoy':'Mañana';
     prepHtml=`<section class="glass panel prepara"><h2>Prepara tu llamada <span class="tag">${cuando}${prep.e.hora?' · '+esc(prep.e.hora):''}</span></h2>
       <div class="prepara-in"><div><b>${esc(prep.c.empresa)}</b><span>${esc(prep.e.titulo||prep.e.tipo||'Cita')}</span></div>
-        <div class="prop-sum">${obj?`<div><span>Objetivo</span><b>${money(obj)}</b></div>`:''}${pr.offer_price_mxn?`<div><span>Oferta</span><b>${money(pr.offer_price_mxn)}</b></div>`:''}${min?`<div><span>Mínimo</span><b>${money(min)}</b></div>`:''}</div>
+        <div class="prop-sum">${P.oferta?`<div><span>Oferta (se presenta)</span><b>${money(P.oferta)}</b></div>`:''}${P.objetivo?`<div><span>Objetivo</span><b>${money(P.objetivo)}</b></div>`:''}${P.minimo?`<div><span>Mínimo</span><b>${money(P.minimo)}</b></div>`:''}</div>
         <div class="pf-acts"><button class="btn btn-sm primary" data-prepara="${prep.c.id}" data-paso="3">Ver guion</button><button class="btn btn-sm" data-prepara="${prep.c.id}" data-paso="2">Presentación</button><button class="btn btn-sm" data-prepara="${prep.c.id}" data-paso="4">Preguntas</button><button class="btn btn-sm ghost" data-edit-client="${prep.c.id}">Notas</button></div></div></section>`}
   // recordatorios de notas que ya vencen
   const recs=data.notas.filter(n=>n.recordatorio&&!n.hecho&&n.recordatorio<=today&&mine.some(c=>c.id===n.clienteId)).sort((a,b)=>a.recordatorio.localeCompare(b.recordatorio));
@@ -1763,6 +1763,12 @@ function clientForm(c){
 
 /* ----- propuesta de Claude (tabla propuestas, Edge Function propuesta-claude) ----- */
 const propDe=id=>data.propuestas.find(x=>x.id===id)||null;
+// Tres precios: oferta (la que se presenta, la más alta) ≥ objetivo ≥ mínimo. Las propuestas anteriores traían el
+// objetivo como el más alto (o "recomendado"/"mínimo de negociación"), por eso oferta y objetivo se ordenan por monto.
+function preciosDe(pr){
+  pr=pr||{};const a=Number(pr.target_price_mxn??pr.development_price_mxn)||0,b=Number(pr.offer_price_mxn)||0;
+  return {oferta:Math.max(a,b),objetivo:a&&b?Math.min(a,b):0,minimo:Number(pr.minimum_acceptable_price_mxn??pr.minimum_negotiation_price_mxn)||0};
+}
 function propBox(c){
   const p=propDe(c.id),A=!isEmp(),hay=p&&p.texto;
   const est=!p||!p.estado?'<span class="access"><i></i>Sin propuesta</span>'
@@ -1846,9 +1852,8 @@ function abrirPropuesta(c,paso,diapo){
       <div class="negocio-acts">${/^https?:\/\//i.test(google)?`<a class="btn btn-sm" href="${esc(google)}" target="_blank" rel="noopener">Ver en Google ↗</a>`:'<span class="access"><i></i>Sin link de Google</span>'}
         ${wa?`<a class="btn btn-sm ghost" href="https://wa.me/${wa.length===10?'52'+wa:wa}" target="_blank" rel="noopener">WhatsApp</a>`:''}</div></div>${resp}${datosG}`;
   }else if(paso===1){
-    // Tres precios; las propuestas anteriores traían "recomendado" y "mínimo de negociación".
-    const objetivo=pr.target_price_mxn??pr.development_price_mxn,minimo=pr.minimum_acceptable_price_mxn??pr.minimum_negotiation_price_mxn;
-    const sum=caja('Precio objetivo',objetivo?money(objetivo):'')+caja('Oferta',pr.offer_price_mxn?money(pr.offer_price_mxn):'')+caja('Mínimo aceptable',minimo?money(minimo):'')+
+    const P=preciosDe(pr);
+    const sum=caja('Oferta (se presenta)',P.oferta?money(P.oferta):'')+caja('Precio objetivo',P.objetivo?money(P.objetivo):'')+caja('Mínimo aceptable',P.minimo?money(P.minimo):'')+
       caja('Mantenimiento',pr.monthly_maintenance_mxn?money(pr.monthly_maintenance_mxn)+'/mes':'')+caja('Nivel',pr.project_level);
     const txt=x=>typeof x==='string'?x:(x&&(x.name||x.nombre||x.feature||x.title))||'';
     const lista=(t,a)=>Array.isArray(a)&&a.filter(txt).length?`<div><h4 class="sub-h">${t}</h4><ul class="res-l">${a.filter(txt).map(x=>`<li>${esc(txt(x))}</li>`).join('')}</ul></div>`:'';
